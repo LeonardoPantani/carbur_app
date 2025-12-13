@@ -1,0 +1,98 @@
+{
+    "@@locale": "es",
+    "@@last_modified": "2025-12-13",
+    "@@comment": "Translations for the Spanish version of the app.",
+    "no_stations_found": "No se han encontrado estaciones.",
+    "@no_stations_found": {
+        "description": "Message shown when the search returns no fuel stations."
+    },
+    "fuel_petrol": "Gasolina",
+    "@fuel_petrol": {
+        "description": "Fuel label: petrol."
+    },
+    "fuel_diesel": "Diésel",
+    "@fuel_diesel": {
+        "description": "Fuel label: diesel."
+    },
+    "fuel_methane": "Metano",
+    "@fuel_methane": {
+        "description": "Fuel label: methane."
+    },
+    "fuel_lpg": "GLP",
+    "@fuel_lpg": {
+        "description": "Fuel label: liquefied petroleum gas (LPG)."
+    },
+    "fuel_lcng": "LCNG",
+    "@fuel_lcng": {
+        "description": "Fuel label: LCNG (liquefied to compressed natural gas)."
+    },
+    "fuel_lng": "GNL",
+    "@fuel_lng": {
+        "description": "Fuel label: liquefied natural gas (LNG)."
+    },
+    "settings_title": "Ajustes",
+    "@settings_title": {
+        "description": "Title of the settings page."
+    },
+    "settings_fuel_types": "Tipos de combustible",
+    "@settings_fuel_types": {
+        "description": "Label for the option to select preferred fuel types."
+    },
+    "settings_search_radius": "Radio de búsqueda",
+    "@settings_search_radius": {
+        "description": "Label for the option to adjust the search radius."
+    },
+    "settings_select_fuels": "¿Qué combustibles?",
+    "@settings_select_fuels": {
+        "description": "Title of the dialog for selecting fuel types."
+    },
+    "settings_footer_madeby": "Made with ❤️ by {name}",
+    "@settings_footer_madeby": {
+        "description": "Footer text showing the author's name.",
+        "placeholders": {
+            "name": {
+                "description": "The name of the author."
+            }
+        }
+    },
+    "close": "Cerrar",
+    "@close": {
+        "description": "Button label to close a dialog."
+    },
+    "ok": "Aceptar",
+    "@ok": {
+        "description": "Confirmation button label."
+    },
+    "cancel": "Cancelar",
+    "@cancel": {
+        "description": "Button label to cancel an operation."
+    },
+    "sort_cheaper": "Más barato",
+    "@sort_cheaper": {
+        "description": "Filter button to allows the user to choose the station with the cheapest price."
+    },
+    "sort_nearest": "Más cercana",
+    "@sort_nearest": {
+        "description": "Filter button to allows the user to choose the nearest station from them."
+    },
+    "sort_lastupdate": "Última actualización",
+    "@sort_lastupdate": {
+        "description": "Filter button to allow the user to choose the station with the most recent price update date."
+    },
+    "sort_best": "Mejor",
+    "@sort_best": {
+        "description": "Filter button to allow the user to choose the station with the best overall parameters."
+    },
+    "last_update": "{date} a las {time}",
+    "@last_update": {
+        "description": "Last update date and time for a fuel station.",
+        "placeholders": {
+            "date": {
+                "description": "Formatted date, e.g. August 14"
+            },
+            "time": {
+                "description": "Formatted time, e.g. 14:30"
+            }
+        }
+    }
+}
