@@ -6,8 +6,7 @@ import '../models/fuel_type.dart';
 import '../models/fuel_price.dart';
 
 class StationService {
-  static const String _url = "https://carburanti.mise.gov.it/ospzApi/search/zone";
-
+  // obtain fuel stations near me. API restricts to a max 10 km radius
   Future<List<Station>> fetchStations({
     required double lat,
     required double lng,
@@ -16,13 +15,13 @@ class StationService {
   }) async {
     final body = {
       "points": [
-        {"lat": lat, "lng": lng}
+        {"lat": lat, "lng": lng},
       ],
       "radius": radiusKm,
     };
 
     final response = await http.post(
-      Uri.parse(_url),
+      Uri.parse("https://carburanti.mise.gov.it/ospzApi/search/zone"),
       headers: {
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0",
@@ -45,9 +44,6 @@ class StationService {
     return results.map((e) => _stationFromJson(e)).toList();
   }
 
-  // ------------------------------------------------------------
-  // convertion from json to station model
-  // ------------------------------------------------------------
   Station _stationFromJson(Map<String, dynamic> json) {
     final fuels = <FuelType, FuelPrice>{};
 
@@ -74,9 +70,6 @@ class StationService {
     );
   }
 
-  // ------------------------------------------------------------
-  // convertion from fuel id to fuel type
-  // ------------------------------------------------------------
   FuelType? _fuelTypeFromMinisterId(int id) {
     switch (id) {
       case 1:
@@ -94,5 +87,33 @@ class StationService {
       default:
         return null;
     }
+  }
+
+  // obtain real driving distance
+  Future<double> fetchDrivingDistanceKm({
+    required double fromLat,
+    required double fromLng,
+    required double toLat,
+    required double toLng,
+  }) async {
+    final url =
+        "https://router.project-osrm.org/route/v1/driving/"
+        "$fromLng,$fromLat;$toLng,$toLat"
+        "?overview=false&generate_hints=false";
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode != 200) {
+      throw Exception("Errore OSRM: ${response.statusCode}");
+    }
+
+    final json = jsonDecode(response.body);
+
+    if (json["routes"] == null || json["routes"].isEmpty) {
+      throw Exception("Nessuna route trovata");
+    }
+
+    final distanceMeters = json["routes"][0]["distance"] as num;
+    return distanceMeters.toDouble() / 1000.0;
   }
 }

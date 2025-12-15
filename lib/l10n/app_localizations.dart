@@ -222,6 +222,12 @@ abstract class AppLocalizations {
   /// **'Best'**
   String get sort_best;
 
+  /// Header before list of stations that tells how many stations have been found following user's preferences.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 station found around you.} other{{count} stations found around you.}}'**
+  String stations_found(int count);
+
   /// Last update date and time for a fuel station.
   ///
   /// In en, this message translates to:

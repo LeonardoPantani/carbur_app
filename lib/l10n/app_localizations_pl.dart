@@ -68,6 +68,17 @@ class AppLocalizationsPl extends AppLocalizations {
   String get sort_best => 'Najlepsza';
 
   @override
+  String stations_found(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Znaleziono $count stacje paliw w pobliżu.',
+      one: 'Znaleziono 1 stację paliw w pobliżu.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String last_update(Object date, Object time) {
     return '$date o $time';
   }

@@ -34,6 +34,17 @@ class _HomePageState extends State<HomePage> {
             },
             itemBuilder: (context) => [
               PopupMenuItem(
+                value: _SortAction(StationSort.best),
+                enabled: currentSort != StationSort.best,
+                child: Row(
+                  children: [
+                    const Icon(Icons.recommend, size: 18),
+                    const SizedBox(width: 6),
+                    Text(AppLocalizations.of(context)!.sort_best),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
                 value: _SortAction(StationSort.price),
                 enabled: currentSort != StationSort.price,
                 child: Row(

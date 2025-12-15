@@ -8,8 +8,8 @@ class FuelSettingsProvider extends ChangeNotifier {
   final List<FuelType> availableFuels = FuelType.values;
 
   List<FuelType> selectedFuels = [FuelType.petrol];
-  int radiusKm = 5;
-  StationSort sort = StationSort.price;
+  int radiusKm = 3;
+  StationSort sort = StationSort.best;
 
   bool configurationChanged = false;
 
@@ -39,7 +39,7 @@ class FuelSettingsProvider extends ChangeNotifier {
       selectedFuels = [FuelType.petrol];
     }
 
-    radiusKm = prefs.getInt('radiusKm') ?? 10;
+    radiusKm = prefs.getInt('radiusKm') ?? radiusKm;
 
     final sortIndex = prefs.getInt('stationSort');
     if (sortIndex != null) {
@@ -68,12 +68,6 @@ class FuelSettingsProvider extends ChangeNotifier {
     await prefs.setInt('stationSort', sort.index);
   }
 
-  void setSort(StationSort newSort) {
-    sort = newSort;
-    _saveSort();
-    notifyListeners();
-  }
-
   void toggleFuel(FuelType fuel) {
     final isSelected = selectedFuels.contains(fuel);
 
@@ -87,15 +81,32 @@ class FuelSettingsProvider extends ChangeNotifier {
     _markChanged();
   }
 
-  void updateRadius(int km) {
+  void setSelectedFuels(List<FuelType> newFuels) {
+    final oldSet = selectedFuels.toSet();
+    final newSet = newFuels.toSet();
+
+    if (oldSet.length == newSet.length && oldSet.containsAll(newSet)) {
+      return;
+    }
+
+    selectedFuels = List.from(newFuels);
+    _saveSelectedFuels();
+    _markChanged();
+  }
+
+  void setRadius(int km) {
+    if (km == radiusKm) return;
+
     radiusKm = km;
     _saveRadius();
     _markChanged();
   }
 
-  void setSelectedFuels(List<FuelType> newFuels) {
-    selectedFuels = List.from(newFuels);
-    _saveSelectedFuels();
+  void setSort(StationSort newSort) {
+    if (newSort == sort) return;
+
+    sort = newSort;
+    _saveSort();
     _markChanged();
   }
 }

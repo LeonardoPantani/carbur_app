@@ -83,6 +83,15 @@
     "@sort_best": {
         "description": "Filter button to allow the user to choose the station with the best overall parameters."
     },
+    "stations_found": "{count, plural, one{1 station found around you.} other{{count} stations found around you.}}",
+    "@stations_found": {
+        "description": "Header before list of stations that tells how many stations have been found following user's preferences.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
     "last_update": "{date} at {time}",
     "@last_update": {
         "description": "Last update date and time for a fuel station.",

@@ -152,7 +152,7 @@ class SettingsPage extends StatelessWidget {
             TextButton(
               child: Text(l.ok),
               onPressed: () {
-                settings.updateRadius(tempValue);
+                settings.setRadius(tempValue);
                 Navigator.pop(context);
               },
             ),

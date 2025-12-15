@@ -9,16 +9,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_maps_flutter: ^2.14.0
+  google_maps_flutter:
   provider:
   shared_preferences:
   geolocator:
-  http: ^1.6.0
+  http:
   url_launcher:
   flutter_localizations:
     sdk: flutter
   intl:
   shimmer:
+  envied:
 
 dev_dependencies:
   flutter_test:

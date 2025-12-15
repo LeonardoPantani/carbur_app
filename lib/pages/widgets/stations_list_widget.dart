@@ -21,10 +21,18 @@ class StationList extends StatelessWidget {
     final provider = context.watch<StationProvider>();
     final settings = context.watch<FuelSettingsProvider>();
 
-    if (provider.isLoading) return const ShimmerStationList();
+    if (provider.isLoading) {
+      return RefreshIndicator(
+        onRefresh: () async {},
+        child: const ShimmerStationList(),
+      );
+    }
 
     if (provider.error != null) {
-      return Center(child: Text("Error: ${provider.error}"));
+      return RefreshIndicator(
+        onRefresh: () async {},
+        child: Center(child: Text("Error: ${provider.error}")),
+      );
     }
 
     if (provider.stations.isEmpty) {
@@ -56,9 +64,22 @@ class StationList extends StatelessWidget {
       },
       child: ListView.builder(
         key: ValueKey(Theme.of(context).brightness),
-        itemCount: provider.stations.length,
+        itemCount:
+            provider.stations.length +
+            1, // because first element is the header "x stations found around you."
         itemBuilder: (context, index) {
-          final station = provider.stations[index];
+          if (index == 0) {
+            final count = provider.stations.length;
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Text(
+                AppLocalizations.of(context)!.stations_found(count),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            );
+          }
+
+          final station = provider.stations[index - 1];
           final prices = station.visiblePrices(settings.selectedFuels);
           final spans = <InlineSpan>[];
           for (int i = 0; i < prices.length; i++) {
@@ -172,8 +193,26 @@ class ShimmerStationList extends StatelessWidget {
         : Colors.grey.shade100;
 
     return ListView.builder(
-      itemCount: 10,
+      itemCount: 11,
       itemBuilder: (context, index) {
+        if (index == 0) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Shimmer.fromColors(
+                baseColor: base,
+                highlightColor: highlight,
+                child: Container(
+                  height: 14,
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  decoration: BoxDecoration(color: highlight),
+                ),
+              ),
+            ),
+          );
+        }
+
         return Shimmer.fromColors(
           baseColor: base,
           highlightColor: highlight,
@@ -185,6 +224,7 @@ class ShimmerStationList extends StatelessWidget {
               color: highlight,
             ),
             subtitle: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
@@ -201,7 +241,6 @@ class ShimmerStationList extends StatelessWidget {
                 ),
               ],
             ),
-
             trailing: Container(height: 16, width: 40, color: highlight),
           ),
         );

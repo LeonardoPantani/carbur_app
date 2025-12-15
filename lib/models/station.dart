@@ -23,7 +23,7 @@ class Station {
   final DateTime lastUpdate;
   final double latitude;
   final double longitude;
-  final double distanceKm;
+  double distanceKm;
   final Map<FuelType, FuelPrice> prices;
 
   Station({
@@ -36,6 +36,12 @@ class Station {
     required this.distanceKm,
     required this.prices,
   }) : brand = _parseBrand(brandString);
+
+  set updateDistanceKm(double value) {
+    if (value > 0) {
+      distanceKm = value;
+    }
+  }
 }
 
 Brand _parseBrand(String raw) {
