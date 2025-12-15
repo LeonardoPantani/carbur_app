@@ -103,5 +103,17 @@
                 "description": "Formatted time, e.g. 14:30"
             }
         }
+    },
+    "section_map": "Mappa",
+    "@section_map": {
+        "description": "String visible in the bottom bar selection menu."
+    },
+    "section_stations_list": "Distributori",
+    "@section_stations_list": {
+        "description": "String visible in the bottom bar selection menu."
+    },
+    "start_navigation_question": "Avviare navigazione?",
+    "@start_navigation_question": {
+        "description": "Title of dialog that appears when clicking on a marker on the map."
     }
 }

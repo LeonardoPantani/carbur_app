@@ -35,7 +35,7 @@ class StationList extends StatelessWidget {
       );
     }
 
-    if (provider.stations.isEmpty) {
+    if (provider.listStations.isEmpty) {
       return RefreshIndicator(
         onRefresh: () async {
           final pos = context.read<PositionProvider>();
@@ -65,11 +65,11 @@ class StationList extends StatelessWidget {
       child: ListView.builder(
         key: ValueKey(Theme.of(context).brightness),
         itemCount:
-            provider.stations.length +
+            provider.listStations.length +
             1, // because first element is the header "x stations found around you."
         itemBuilder: (context, index) {
           if (index == 0) {
-            final count = provider.stations.length;
+            final count = provider.listStations.length;
             return Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Text(
@@ -79,7 +79,7 @@ class StationList extends StatelessWidget {
             );
           }
 
-          final station = provider.stations[index - 1];
+          final station = provider.listStations[index - 1];
           final prices = station.visiblePrices(settings.selectedFuels);
           final spans = <InlineSpan>[];
           for (int i = 0; i < prices.length; i++) {

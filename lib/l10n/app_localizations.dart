@@ -233,6 +233,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{date} at {time}'**
   String last_update(Object date, Object time);
+
+  /// String visible in the bottom bar selection menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get section_map;
+
+  /// String visible in the bottom bar selection menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Stations'**
+  String get section_stations_list;
+
+  /// Title of dialog that appears when clicking on a marker on the map.
+  ///
+  /// In en, this message translates to:
+  /// **'Start navigation?'**
+  String get start_navigation_question;
 }
 
 class _AppLocalizationsDelegate

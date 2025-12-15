@@ -82,4 +82,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String last_update(Object date, Object time) {
     return '$date alle $time';
   }
+
+  @override
+  String get section_map => 'Mappa';
+
+  @override
+  String get section_stations_list => 'Distributori';
+
+  @override
+  String get start_navigation_question => 'Avviare navigazione?';
 }

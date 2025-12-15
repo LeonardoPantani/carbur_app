@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import '../l10n/app_localizations.dart';
-import '../models/station_sort.dart';
 import '../pages/settings_page.dart';
-import '../providers/settings_provider.dart';
-import '../providers/station_provider.dart';
 import 'widgets/stations_list_widget.dart';
+import 'widgets/stations_map_widget.dart';
+import 'widgets/stations_sort_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,88 +14,62 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+
+  bool get _showSortMenu => _currentIndex == 1;
+
   @override
   Widget build(BuildContext context) {
-    final currentSort = context.watch<StationProvider>().currentSort;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           "CarburApp",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: [
-          PopupMenuButton<_SortAction>(
-            icon: const Icon(Icons.sort),
-            onSelected: (sort) {
-              context.read<FuelSettingsProvider>().setSort(sort.sort);
-              context.read<StationProvider>().setSorting(sort.sort);
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: _SortAction(StationSort.best),
-                enabled: currentSort != StationSort.best,
-                child: Row(
-                  children: [
-                    const Icon(Icons.recommend, size: 18),
-                    const SizedBox(width: 6),
-                    Text(AppLocalizations.of(context)!.sort_best),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: _SortAction(StationSort.price),
-                enabled: currentSort != StationSort.price,
-                child: Row(
-                  children: [
-                    const Icon(Icons.euro, size: 18),
-                    const SizedBox(width: 6),
-                    Text(AppLocalizations.of(context)!.sort_cheaper),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: _SortAction(StationSort.distance),
-                enabled: currentSort != StationSort.distance,
-                child: Row(
-                  children: [
-                    const Icon(Icons.place, size: 18),
-                    const SizedBox(width: 6),
-                    Text(AppLocalizations.of(context)!.sort_nearest),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: _SortAction(StationSort.updatedAt),
-                enabled: currentSort != StationSort.updatedAt,
-                child: Row(
-                  children: [
-                    const Icon(Icons.update, size: 18),
-                    const SizedBox(width: 6),
-                    Text(AppLocalizations.of(context)!.sort_lastupdate),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SettingsPage()),
-              );
-            },
-          ),
+        actions: _buildActions(context),
+      ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: const [
+          StationsMap(),
+          StationList(),
         ],
       ),
-
-      body: const StationList(),
+      bottomNavigationBar: _buildBottomBar(context),
     );
   }
-}
 
-class _SortAction {
-  final StationSort sort;
-  const _SortAction(this.sort);
+  List<Widget> _buildActions(BuildContext context) {
+    return [
+      if (_showSortMenu) const StationsSortWidget(), // stations sort only when list is selected
+      IconButton(
+        icon: const Icon(Icons.settings),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SettingsPage()),
+          );
+        },
+      ),
+    ];
+  }
+
+  Widget _buildBottomBar(BuildContext context) {
+    return BottomNavigationBar(
+      currentIndex: _currentIndex,
+      onTap: (index) {
+        setState(() => _currentIndex = index);
+      },
+      items: [
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.map),
+          label: AppLocalizations.of(context)!.section_map,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.local_gas_station),
+          label: AppLocalizations.of(context)!.section_stations_list,
+        ),
+      ],
+    );
+  }
 }

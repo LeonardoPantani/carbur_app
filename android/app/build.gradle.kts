@@ -4,6 +4,9 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val mapsApiKey: String = System.getenv("GOOGLE_MAPS_SDK_API_KEY") ?: "no_key"
+
+
 android {
     namespace = "it.pantani.carbur_app"
     compileSdk = flutter.compileSdkVersion
@@ -24,6 +27,8 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        manifestPlaceholders["mapsApiKey"] = mapsApiKey
     }
 
     buildTypes {

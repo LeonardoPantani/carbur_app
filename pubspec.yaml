@@ -20,14 +20,20 @@ dependencies:
   intl:
   shimmer:
   envied:
+  widget_to_marker:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons:
 
 flutter:
   uses-material-design: true
   generate: true
   assets:
     - assets/brands/
+
+flutter_launcher_icons:
+  android: true
+  ios: true

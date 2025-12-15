@@ -30,22 +30,21 @@ class StationProvider extends ChangeNotifier {
     final lat = _pos!.latitude!;
     final lng = _pos!.longitude!;
     final radiusKm = _settings!.radiusKm;
+    const fetchRadiusKm = 10;
 
     isLoading = true;
     notifyListeners();
 
     try {
       final stopwatch = Stopwatch()..start();
-      print(
-        "contattando il sito del ministero, lat = $lat, lng = $lng, radiusKm = $radiusKm",
-      );
+      print("contattando il sito del ministero, lat = $lat, lng = $lng");
       _allStations = await _service.fetchStations(
         lat: lat,
         lng: lng,
-        radiusKm: radiusKm,
+        radiusKm: fetchRadiusKm,
       );
       stopwatch.stop();
-        print(
+      print(
         "l'ottenimento dei dati dal ministero ha richiesto ${stopwatch.elapsedMilliseconds} ms",
       );
 
@@ -126,6 +125,29 @@ class StationProvider extends ChangeNotifier {
     });
   }
 
+  List<Station> get listStations {
+    final radiusKm = _settings!.radiusKm;
+    return _filterByFuel(
+      _allStations,
+    ).where((s) => s.distanceKm <= radiusKm).toList();
+  }
+
+  List<Station> get mapStations {
+    const mapRadiusKm = 10.0;
+    return _filterByFuel(
+      _allStations,
+    ).where((s) => s.distanceKm <= mapRadiusKm).toList();
+  }
+
+  List<Station> _filterByFuel(List<Station> input) {
+    final fuels = _settings!.selectedFuels;
+    if (fuels.isEmpty) return List.from(input);
+
+    return input.where((s) {
+      return s.prices.keys.any((k) => fuels.contains(k));
+    }).toList();
+  }
+
   /*
       First we calculate max() and min() of the following parameters from all stations found within range:
       - distance
@@ -175,7 +197,8 @@ class StationProvider extends ChangeNotifier {
 
       final pNorm = (price - pMin) / (pMax - pMin + 1e-9);
       final dNorm = (s.distanceKm - dMin) / (dMax - dMin + 1e-9);
-      final tNorm = (tMax - s.lastUpdate.millisecondsSinceEpoch) / (tMax - tMin + 1e-9);
+      final tNorm =
+          (tMax - s.lastUpdate.millisecondsSinceEpoch) / (tMax - tMin + 1e-9);
 
       return wPrice * pNorm + wDistance * dNorm + wTime * tNorm;
     }
