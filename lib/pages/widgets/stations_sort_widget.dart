@@ -16,7 +16,7 @@ class StationsSortWidget extends StatelessWidget {
     return PopupMenuButton<StationSort>(
       icon: const Icon(Icons.sort),
       onSelected: (sort) {
-        context.read<FuelSettingsProvider>().setSort(sort);
+        context.read<SettingsProvider>().setSort(sort);
         context.read<StationProvider>().setSorting(sort);
       },
       itemBuilder: (context) => [

@@ -15,11 +15,11 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => PositionProvider()),
-        ChangeNotifierProvider(create: (_) => FuelSettingsProvider()),
+        ChangeNotifierProvider(create: (_) => LocationProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProxyProvider2<
-          PositionProvider,
-          FuelSettingsProvider,
+          LocationProvider,
+          SettingsProvider,
           StationProvider
         >(
           create: (_) => StationProvider(),

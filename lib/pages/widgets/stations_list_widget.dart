@@ -19,7 +19,7 @@ class StationList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<StationProvider>();
-    final settings = context.watch<FuelSettingsProvider>();
+    final settings = context.watch<SettingsProvider>();
 
     if (provider.isLoading) {
       return RefreshIndicator(
@@ -38,7 +38,7 @@ class StationList extends StatelessWidget {
     if (provider.listStations.isEmpty) {
       return RefreshIndicator(
         onRefresh: () async {
-          final pos = context.read<PositionProvider>();
+          final pos = context.read<LocationProvider>();
           final stations = context.read<StationProvider>();
           await pos.refreshPosition();
           await stations.forceReload();
@@ -57,7 +57,7 @@ class StationList extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () async {
-        final pos = context.read<PositionProvider>();
+        final pos = context.read<LocationProvider>();
         final stations = context.read<StationProvider>();
         await pos.refreshPosition();
         await stations.forceReload();

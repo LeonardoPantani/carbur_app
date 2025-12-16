@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
-class PositionProvider extends ChangeNotifier {
+class LocationProvider extends ChangeNotifier {
   bool _initialized = false;
   bool isLoading = true;
 
   double? latitude;
   double? longitude;
 
-  PositionProvider() {
+  LocationProvider() {
     _init();
   }
 

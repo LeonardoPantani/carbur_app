@@ -48,7 +48,7 @@ class _StationsMapState extends State<StationsMap> {
       return;
     }
 
-    final pos = context.read<PositionProvider>();
+    final pos = context.read<LocationProvider>();
     if (pos.latitude == null || pos.longitude == null) {
       return;
     }
@@ -100,7 +100,7 @@ class _StationsMapState extends State<StationsMap> {
 
   void _onMarkerTap(Station s) {
   final l = AppLocalizations.of(context)!;
-  final settings = context.read<FuelSettingsProvider>();
+  final settings = context.read<SettingsProvider>();
 
   final prices = s.visiblePrices(settings.selectedFuels);
 
@@ -171,7 +171,7 @@ class _StationsMapState extends State<StationsMap> {
   Widget build(BuildContext context) {
     context.watch<StationProvider>();
 
-    final pos = context.watch<PositionProvider>();
+    final pos = context.watch<LocationProvider>();
 
     if (pos.latitude == null || pos.longitude == null) {
       return const Center(child: CircularProgressIndicator());

@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/fuel_type.dart';
 import '../models/station_sort.dart';
 
-class FuelSettingsProvider extends ChangeNotifier {
+class SettingsProvider extends ChangeNotifier {
   final List<FuelType> availableFuels = FuelType.values;
 
   List<FuelType> selectedFuels = [FuelType.petrol];
@@ -13,7 +13,7 @@ class FuelSettingsProvider extends ChangeNotifier {
 
   bool configurationChanged = false;
 
-  FuelSettingsProvider() {
+  SettingsProvider() {
     _loadSettings();
   }
 

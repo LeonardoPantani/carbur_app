@@ -10,7 +10,7 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<FuelSettingsProvider>();
+    final settings = context.watch<SettingsProvider>();
     final l = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -64,7 +64,7 @@ class SettingsPage extends StatelessWidget {
 
   void _openFuelSelectionDialog(
     BuildContext context,
-    FuelSettingsProvider settings,
+    SettingsProvider settings,
   ) {
     final l = AppLocalizations.of(context)!;
     List<FuelType> tempFuels = List.from(settings.selectedFuels);
@@ -118,7 +118,7 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  void _openRadiusDialog(BuildContext context, FuelSettingsProvider settings) {
+  void _openRadiusDialog(BuildContext context, SettingsProvider settings) {
     final l = AppLocalizations.of(context)!;
     int tempValue = settings.radiusKm;
 

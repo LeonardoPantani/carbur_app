@@ -9,8 +9,8 @@ import 'settings_provider.dart';
 class StationProvider extends ChangeNotifier {
   final StationService _service = StationService();
 
-  PositionProvider? _pos;
-  FuelSettingsProvider? _settings;
+  LocationProvider? _pos;
+  SettingsProvider? _settings;
 
   StationSort _sort = StationSort.best;
   StationSort get currentSort => _sort;
@@ -85,7 +85,7 @@ class StationProvider extends ChangeNotifier {
     return loadStations();
   }
 
-  void updateDependencies(PositionProvider pos, FuelSettingsProvider settings) {
+  void updateDependencies(LocationProvider pos, SettingsProvider settings) {
     _pos = pos;
     _settings = settings;
     _sort = settings.sort;
@@ -128,7 +128,7 @@ class StationProvider extends ChangeNotifier {
   List<Station> get listStations {
     final radiusKm = _settings!.radiusKm;
     return _filterByFuel(
-      _allStations,
+      stations,
     ).where((s) => s.distanceKm <= radiusKm).toList();
   }
 
