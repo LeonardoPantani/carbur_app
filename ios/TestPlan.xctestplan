@@ -1,0 +1,21 @@
+{
+  "configurations" : [
+    {
+      "id" : "EED144D4-A2BF-49EC-A289-7B091A81E4F7",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "locationScenario" : {
+      "identifier" : "..\/simulated_locations.gpx"
+    },
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+
+  ],
+  "version" : 1
+}

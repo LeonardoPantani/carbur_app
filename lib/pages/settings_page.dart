@@ -76,25 +76,29 @@ class SettingsPage extends StatelessWidget {
           builder: (context, setStateDialog) {
             return AlertDialog(
               title: Text(l.settings_select_fuels),
-              content: ListView(
-                shrinkWrap: true,
-                children: settings.availableFuels.map((fuel) {
-                  final selected = tempFuels.contains(fuel);
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 350,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: settings.availableFuels.map((fuel) {
+                    final selected = tempFuels.contains(fuel);
 
-                  return CheckboxListTile(
-                    title: Text(fuel.label(context)),
-                    value: selected,
-                    onChanged: (value) {
-                      setStateDialog(() {
-                        if (value == true) {
-                          tempFuels.add(fuel);
-                        } else {
-                          tempFuels.remove(fuel);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
+                    return CheckboxListTile(
+                      title: Text(fuel.label(context)),
+                      value: selected,
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          if (value == true) {
+                            tempFuels.add(fuel);
+                          } else {
+                            tempFuels.remove(fuel);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
               ),
               actions: [
                 TextButton(

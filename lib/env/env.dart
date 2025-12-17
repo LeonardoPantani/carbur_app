@@ -6,6 +6,12 @@ part 'env.g.dart';
 
 @Envied(path: '.env')
 abstract class Env {
-  @EnviedField(obfuscate: true, varName: "GOOGLE_MAPS_SDK_API_KEY")
-  static final String googleMapsSdkApiKey = _Env.googleMapsSdkApiKey;
+  @EnviedField(obfuscate: true, varName: "GOOGLE_MAPS_SDK_ANDROID_API_KEY")
+  static final String googleMapsSdkAndroidApiKey = _Env.googleMapsSdkAndroidApiKey;
+
+  @EnviedField(obfuscate: true, varName: "GOOGLE_MAPS_SDK_IOS_API_KEY")
+  static final String googleMapsSdkIosApiKey = _Env.googleMapsSdkIosApiKey;
+  
+  @EnviedField(obfuscate: true, varName: "GOOGLE_MAPS_JS_API_KEY")
+  static final String googleMapsJsApiKey = _Env.googleMapsJsApiKey;
 }

@@ -4,7 +4,7 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-val mapsApiKey: String = System.getenv("GOOGLE_MAPS_SDK_API_KEY") ?: "no_key"
+val mapsApiKey: String = System.getenv("GOOGLE_MAPS_SDK_ANDROID_API_KEY") ?: "no_key"
 
 
 android {

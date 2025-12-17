@@ -168,15 +168,21 @@ class StationProvider extends ChangeNotifier {
   */
 
   void _applyBestSorting(List<FuelType> fuels) {
+    if (stations.isEmpty) return;
+
     final prices = stations
         .map((s) => _lowestPrice(s, fuels))
         .where((p) => p.isFinite)
         .toList();
 
+    if (prices.isEmpty) return;
+
     final distances = stations.map((s) => s.distanceKm).toList();
     final times = stations
         .map((s) => s.lastUpdate.millisecondsSinceEpoch)
         .toList();
+
+    if (distances.isEmpty || times.isEmpty) return;
 
     final pMin = prices.reduce((a, b) => a < b ? a : b);
     final pMax = prices.reduce((a, b) => a > b ? a : b);

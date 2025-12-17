@@ -2,7 +2,6 @@ import 'package:carbur_app/models/fuel_type.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../extensions/brand_estensions.dart';
@@ -12,6 +11,7 @@ import '../../providers/position_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/station_provider.dart';
 import '../../extensions/number_extensions.dart';
+import '../../utils/navigation_utils.dart';
 
 class StationList extends StatelessWidget {
   const StationList({super.key});
@@ -163,13 +163,8 @@ class StationList extends StatelessWidget {
                 Text("km", style: Theme.of(context).textTheme.bodySmall),
               ],
             ),
-            onTap: () async {
-              final uri = Uri.parse(
-                "https://www.google.com/maps/dir/?api=1&origin=&destination=${station.latitude},${station.longitude}&travelmode=driving",
-              );
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              }
+            onTap: () {
+              openNavigation(station.latitude, station.longitude);
             },
           );
         },

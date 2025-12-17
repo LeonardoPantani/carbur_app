@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:widget_to_marker/widget_to_marker.dart';
 
 import '../../extensions/prices_estensions.dart';
@@ -15,6 +14,7 @@ import '../../models/station.dart';
 import '../../providers/position_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/station_provider.dart';
+import '../../utils/navigation_utils.dart';
 import 'price_marker_widget.dart';
 
 class StationsMap extends StatefulWidget {
@@ -99,73 +99,64 @@ class _StationsMapState extends State<StationsMap> {
   }
 
   void _onMarkerTap(Station s) {
-  final l = AppLocalizations.of(context)!;
-  final settings = context.read<SettingsProvider>();
+    final l = AppLocalizations.of(context)!;
+    final settings = context.read<SettingsProvider>();
 
-  final prices = s.visiblePrices(settings.selectedFuels);
+    final prices = s.visiblePrices(settings.selectedFuels);
 
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text(
-          s.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (final p in prices)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Text(
-                  "${p.key.label(context)}: "
-                  "${p.value.pricePerLiter.toStringAsFixed(3)} €",
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            s.name,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final p in prices)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Text(
+                    "${p.key.label(context)}: "
+                    "${p.value.pricePerLiter.toStringAsFixed(3)} €",
+                  ),
                 ),
+              const SizedBox(height: 8),
+              Text(
+                l.last_update(
+                  DateFormat.MMMMd(
+                    Localizations.localeOf(context).toString(),
+                  ).format(s.lastUpdate),
+                  DateFormat.Hm(
+                    Localizations.localeOf(context).toString(),
+                  ).format(s.lastUpdate),
+                ),
+                style: Theme.of(context).textTheme.bodySmall,
               ),
-            const SizedBox(height: 8),
-            Text(
-              l.last_update(
-                DateFormat.MMMMd(
-                  Localizations.localeOf(context).toString(),
-                ).format(s.lastUpdate),
-                DateFormat.Hm(
-                  Localizations.localeOf(context).toString(),
-                ).format(s.lastUpdate),
-              ),
-              style: Theme.of(context).textTheme.bodySmall,
+              const SizedBox(height: 16),
+              Text(l.start_navigation_question),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l.cancel),
             ),
-            const SizedBox(height: 16),
-            Text(l.start_navigation_question)
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                openNavigation(s.latitude, s.longitude);
+              },
+              child: Text(l.ok),
+            ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l.cancel),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final uri = Uri.parse(
-                "https://www.google.com/maps/dir/?api=1&destination=${s.latitude},${s.longitude}&travelmode=driving",
-              );
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(
-                  uri,
-                  mode: LaunchMode.externalApplication,
-                );
-              }
-            },
-            child: Text(l.ok),
-          ),
-        ],
-      );
-    },
-  );
-}
-
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
