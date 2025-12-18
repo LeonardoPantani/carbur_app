@@ -27,11 +27,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Location permission is required to let us load map and near fuel stations.</string>
+	<string>$(NSLocationAlwaysUsageDescription)</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Location permission is required to let us load map and near fuel stations.</string>
+	<string>$(NSLocationUsageDescription)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Location permission is required to let us load map and near fuel stations.</string>
+	<string>$(NSLocationWhenInUseUsageDescription)</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
