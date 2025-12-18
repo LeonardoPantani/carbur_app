@@ -91,4 +91,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get start_navigation_question => 'Start navigation?';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get error_description_unknown => 'Unknown error.';
+
+  @override
+  String get error_description_api_ministry_notworking =>
+      'Ministry of Enterprises website is not working.';
+
+  @override
+  String get error_description_api_routes_notworking =>
+      'Routes websites is not working.';
 }

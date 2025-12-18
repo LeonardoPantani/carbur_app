@@ -160,9 +160,53 @@ class _StationsMapState extends State<StationsMap> {
 
   @override
   Widget build(BuildContext context) {
-    context.watch<StationProvider>();
-
+    final stationsProvider = context.watch<StationProvider>();
     final pos = context.watch<LocationProvider>();
+    final l = AppLocalizations.of(context)!;
+
+    if (stationsProvider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (stationsProvider.error != null) {
+      return RefreshIndicator(
+        onRefresh: () async {
+          final pos = context.read<LocationProvider>();
+          final stations = context.read<StationProvider>();
+          await pos.refreshPosition();
+          await stations.forceReload();
+        },
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 96,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  switch (stationsProvider.error!) {
+                    StationError.ministry =>
+                      l.error_description_api_ministry_notworking,
+                    StationError.routes =>
+                      l.error_description_api_routes_notworking,
+                    StationError.network =>
+                      l.error_description_api_ministry_notworking,
+                    StationError.unknown => l.error_description_unknown,
+                  },
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     if (pos.latitude == null || pos.longitude == null) {
       return const Center(child: CircularProgressIndicator());

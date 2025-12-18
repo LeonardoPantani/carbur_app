@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import '../exceptions/custom_exceptions.dart';
 import '../models/fuel_type.dart';
 import '../models/station.dart';
 import '../models/station_sort.dart';
 import '../services/station_service.dart';
 import 'position_provider.dart';
 import 'settings_provider.dart';
+
+enum StationError { ministry, routes, network, unknown }
 
 class StationProvider extends ChangeNotifier {
   final StationService _service = StationService();
@@ -16,7 +19,7 @@ class StationProvider extends ChangeNotifier {
   StationSort get currentSort => _sort;
 
   bool isLoading = true;
-  String? error;
+  StationError? error;
 
   List<Station> _allStations = [];
   List<Station> stations = [];
@@ -57,11 +60,15 @@ class StationProvider extends ChangeNotifier {
         notifyListeners();
       });
     } catch (e) {
-      error = e.toString();
+      error = _mapExceptionToError(e);
+      _allStations = [];
+      stations = [];
+      isLoading = false;
+      notifyListeners();
+      return;
     }
 
     isLoading = false;
-
     _applyFuelFilter(_settings!.selectedFuels);
   }
 
@@ -297,5 +304,18 @@ class StationProvider extends ChangeNotifier {
 
     if (matches.isEmpty) return double.infinity;
     return matches.reduce((a, b) => a < b ? a : b);
+  }
+
+  StationError _mapExceptionToError(Object e) {
+    if (e is ApiException || e is ApiTimeoutException) {
+      return StationError.ministry;
+    }
+    if (e is NoRouteException) {
+      return StationError.routes;
+    }
+    if (e is NetworkException) {
+      return StationError.network;
+    }
+    return StationError.unknown;
   }
 }

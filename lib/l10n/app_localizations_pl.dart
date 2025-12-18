@@ -91,4 +91,18 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get start_navigation_question => 'Rozpocząć nawigację?';
+
+  @override
+  String get error => 'Błąd';
+
+  @override
+  String get error_description_unknown => 'Nieznany błąd.';
+
+  @override
+  String get error_description_api_ministry_notworking =>
+      'Strona Ministerstwa Przedsiębiorstw i Made in Italy jest niedostępna.';
+
+  @override
+  String get error_description_api_routes_notworking =>
+      'Usługa obliczania tras jest niedostępna.';
 }

@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
+import '../exceptions/custom_exceptions.dart';
 import '../models/station.dart';
 import '../models/fuel_type.dart';
 import '../models/fuel_price.dart';
@@ -20,28 +23,39 @@ class StationService {
       "radius": radiusKm,
     };
 
-    final response = await http.post(
-      Uri.parse("https://carburanti.mise.gov.it/ospzApi/search/zone"),
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0",
-      },
-      body: jsonEncode(body),
-    );
+    try {
+      final response = await http
+          .post(
+            Uri.parse("https://carburanti.mise.gov.it/ospzApi/search/zone"),
+            headers: {
+              "Content-Type": "application/json",
+              "User-Agent": "Mozilla/5.0",
+            },
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 10));
 
-    if (response.statusCode != 200) {
-      throw Exception("Errore API ministero: ${response.statusCode}");
+      if (response.statusCode != 200) {
+        print("Risposta API non valida (statusCode != 200)");
+        throw ApiException();
+      }
+
+      final Map<String, dynamic> json = jsonDecode(response.body);
+
+      if (json["success"] != true) {
+        print("Risposta API non valida (json[success] != true)");
+        throw ApiException();
+      }
+
+      final List results = json["results"];
+      return results.map((e) => _stationFromJson(e)).toList();
+    } on TimeoutException {
+      print("Il sito del ministero è andato in timeout.");
+      throw ApiTimeoutException();
+    } on SocketException {
+      print("Impossibile contattare il sito web.");
+      throw NetworkException();
     }
-
-    final Map<String, dynamic> json = jsonDecode(response.body);
-
-    if (json["success"] != true) {
-      throw Exception("Risposta API non valida");
-    }
-
-    final List results = json["results"];
-
-    return results.map((e) => _stationFromJson(e)).toList();
   }
 
   Station _stationFromJson(Map<String, dynamic> json) {
@@ -100,20 +114,28 @@ class StationService {
         "https://router.project-osrm.org/route/v1/driving/"
         "$fromLng,$fromLat;$toLng,$toLat"
         "?overview=false&generate_hints=false";
+    
+    try {
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 10));
 
-    final response = await http.get(Uri.parse(url));
+      if (response.statusCode != 200) {
+        throw ApiException();
+      }
 
-    if (response.statusCode != 200) {
-      throw Exception("Errore OSRM: ${response.statusCode}");
+      final json = jsonDecode(response.body);
+
+      if (json["routes"] == null || json["routes"].isEmpty) {
+        throw NoRouteException();
+      }
+
+      final distanceMeters = json["routes"][0]["distance"] as num;
+      return distanceMeters.toDouble() / 1000.0;
+    } on TimeoutException {
+      throw ApiTimeoutException();
+    } on SocketException {
+      throw NetworkException();
     }
-
-    final json = jsonDecode(response.body);
-
-    if (json["routes"] == null || json["routes"].isEmpty) {
-      throw Exception("Nessuna route trovata");
-    }
-
-    final distanceMeters = json["routes"][0]["distance"] as num;
-    return distanceMeters.toDouble() / 1000.0;
   }
 }

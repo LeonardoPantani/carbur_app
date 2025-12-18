@@ -91,4 +91,18 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get start_navigation_question => 'Démarrer la navigation ?';
+
+  @override
+  String get error => 'Erreur';
+
+  @override
+  String get error_description_unknown => 'Erreur inconnue.';
+
+  @override
+  String get error_description_api_ministry_notworking =>
+      'Le site du Ministère des Entreprises et du Made in Italy est indisponible.';
+
+  @override
+  String get error_description_api_routes_notworking =>
+      'Le service de calcul des itinéraires est indisponible.';
 }

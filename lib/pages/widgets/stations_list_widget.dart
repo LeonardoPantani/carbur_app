@@ -21,6 +21,8 @@ class StationList extends StatelessWidget {
     final provider = context.watch<StationProvider>();
     final settings = context.watch<SettingsProvider>();
 
+    AppLocalizations l = AppLocalizations.of(context)!;
+
     if (provider.isLoading) {
       return RefreshIndicator(
         onRefresh: () async {},
@@ -30,8 +32,40 @@ class StationList extends StatelessWidget {
 
     if (provider.error != null) {
       return RefreshIndicator(
-        onRefresh: () async {},
-        child: Center(child: Text("Error: ${provider.error}")),
+        onRefresh: () async {
+          final pos = context.read<LocationProvider>();
+          final stations = context.read<StationProvider>();
+          await pos.refreshPosition();
+          await stations.forceReload();
+        },
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 96,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  switch (provider.error!) {
+                    StationError.ministry =>
+                      l.error_description_api_ministry_notworking,
+                    StationError.routes =>
+                      l.error_description_api_routes_notworking,
+                    StationError.network => l.error_description_api_ministry_notworking,
+                    StationError.unknown => l.error_description_unknown,
+                  },
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     }
 

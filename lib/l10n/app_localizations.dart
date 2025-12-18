@@ -251,6 +251,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start navigation?'**
   String get start_navigation_question;
+
+  /// Error screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// This appears as a description when an unknown error must be shown to the user.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error.'**
+  String get error_description_unknown;
+
+  /// This appears as a description when the API of the Ministry of Enterprises and Made in Italy is not working.
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry of Enterprises website is not working.'**
+  String get error_description_api_ministry_notworking;
+
+  /// This appears as a description when the API that calculates the driving routes between user's location and fuel station is not working.
+  ///
+  /// In en, this message translates to:
+  /// **'Routes websites is not working.'**
+  String get error_description_api_routes_notworking;
 }
 
 class _AppLocalizationsDelegate

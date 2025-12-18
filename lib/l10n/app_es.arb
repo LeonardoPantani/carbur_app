@@ -115,5 +115,21 @@
     "start_navigation_question": "¿Iniciar navegación?",
     "@start_navigation_question": {
         "description": "Title of dialog that appears when clicking on a marker on the map."
+    },
+    "error": "Error",
+    "@error": {
+        "description": "Error screen title."
+    },
+    "error_description_unknown": "Error desconocido.",
+    "@error_description_unknown": {
+        "description": "This appears as a description when an unknown error must be shown to the user."
+    },
+    "error_description_api_ministry_notworking": "El sitio web del Ministerio de Empresas y Made in Italy no está disponible.",
+    "@error_description_api_ministry_notworking": {
+        "description": "This appears as a description when the API of the Ministry of Enterprises and Made in Italy is not working."
+    },
+    "error_description_api_routes_notworking": "El servicio de cálculo de rutas no está disponible.",
+    "@error_description_api_routes_notworking": {
+        "description": "This appears as a description when the API that calculates the driving routes between user's location and fuel station is not working."
     }
 }
