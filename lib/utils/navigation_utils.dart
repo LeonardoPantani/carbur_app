@@ -3,9 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 Future<void> openNavigation(double lat, double lng) async {
   final googleMaps = Uri.parse('google.navigation:q=$lat,$lng&mode=d');
 
-  final appleMaps = Uri.parse(
-    'http://maps.apple.com/?daddr=$lat,$lng&dirflg=d',
-  );
+  final appleMaps = Uri.parse('maps://?daddr=$lat,$lng&dirflg=d');
 
   final waze = Uri.parse('waze://?ll=$lat,$lng&navigate=yes');
 
@@ -14,17 +12,17 @@ Future<void> openNavigation(double lat, double lng) async {
   );
 
   if (await canLaunchUrl(googleMaps)) {
-    await launchUrl(googleMaps);
+    await launchUrl(googleMaps, mode: LaunchMode.externalApplication);
     return;
   }
 
   if (await canLaunchUrl(waze)) {
-    await launchUrl(waze);
+    await launchUrl(waze, mode: LaunchMode.externalApplication);
     return;
   }
 
   if (await canLaunchUrl(appleMaps)) {
-    await launchUrl(appleMaps);
+    await launchUrl(appleMaps, mode: LaunchMode.externalApplication);
     return;
   }
 
