@@ -24,16 +24,19 @@ class StationService {
     };
 
     try {
-      final response = await http
-          .post(
-            Uri.parse("https://carburanti.mise.gov.it/ospzApi/search/zone"),
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": "Mozilla/5.0",
-            },
-            body: jsonEncode(body),
-          )
-          .timeout(const Duration(seconds: 10));
+      final response = await Future.any([
+        http.post(
+          Uri.parse("https://carburanti.mise.gov.it/ospzApi/search/zone"),
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0",
+          },
+          body: jsonEncode(body),
+        ),
+        Future.delayed(const Duration(seconds: 10), () {
+          throw TimeoutException("Hard timeout");
+        }),
+      ]);
 
       if (response.statusCode != 200) {
         print("Risposta API non valida (statusCode != 200)");
@@ -114,12 +117,14 @@ class StationService {
         "https://router.project-osrm.org/route/v1/driving/"
         "$fromLng,$fromLat;$toLng,$toLat"
         "?overview=false&generate_hints=false";
-    
-    try {
-      final response = await http
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 10));
 
+    try {
+      final response = await Future.any([
+        http.get(Uri.parse(url)),
+        Future.delayed(const Duration(seconds: 30), () {
+          throw TimeoutException("Hard timeout");
+        }),
+      ]);
       if (response.statusCode != 200) {
         throw ApiException();
       }
