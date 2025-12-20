@@ -4,8 +4,22 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-val mapsApiKey: String = System.getenv("GOOGLE_MAPS_SDK_ANDROID_API_KEY") ?: "no_key"
-
+// loading .env file for api key string
+import java.util.Properties
+import org.gradle.api.GradleException
+val dotenv = Properties()
+val envFile = rootProject.file("../.env")
+if (!envFile.exists()) {
+    throw GradleException(
+        "Missing .env file. Expected at: ${envFile.absolutePath}"
+    )
+}
+envFile.inputStream().use { dotenv.load(it) }
+val mapsApiKey = dotenv.getProperty("GOOGLE_MAPS_SDK_ANDROID_API_KEY")
+    ?: throw GradleException(
+        "Missing GOOGLE_MAPS_SDK_ANDROID_API_KEY in .env"
+    )
+// end of loading from .env file
 
 android {
     namespace = "it.pantani.carbur_app"

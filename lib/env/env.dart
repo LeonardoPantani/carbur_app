@@ -4,7 +4,7 @@ part 'env.g.dart';
 
 // compilare con: dart run build_runner build
 
-@Envied(path: '.env')
+@Envied(path: '.env', useConstantCase: true)
 abstract class Env {
   @EnviedField(obfuscate: true, varName: "GOOGLE_MAPS_SDK_ANDROID_API_KEY")
   static final String googleMapsSdkAndroidApiKey = _Env.googleMapsSdkAndroidApiKey;

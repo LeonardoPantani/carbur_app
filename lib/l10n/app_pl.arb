@@ -10,7 +10,7 @@
     "@fuel_petrol": {
         "description": "Fuel label: petrol."
     },
-    "fuel_diesel": "Olej napędowy",
+    "fuel_diesel": "Diesel",
     "@fuel_diesel": {
         "description": "Fuel label: diesel."
     },

@@ -170,7 +170,7 @@ class StationProvider extends ChangeNotifier {
 
       Finally we calculate the cost function:
         score = w_d * d'_s + w_p * p'_s + w_t * t'_s
-      with the following bond (vincolo):
+      with the following constraint (vincolo):
         w_d + w_p + w_t = 1
   */
 
