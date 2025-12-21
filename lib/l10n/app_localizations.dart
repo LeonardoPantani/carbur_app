@@ -275,6 +275,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Routes websites is not working.'**
   String get error_description_api_routes_notworking;
+
+  /// Title of the section listing the available facilities at the fuel station.
+  ///
+  /// In en, this message translates to:
+  /// **'Facilities'**
+  String get facilities_title;
+
+  /// Message shown when no facility information is available for the fuel station.
+  ///
+  /// In en, this message translates to:
+  /// **'This fuel station does not provide information about its facilities.'**
+  String get facilities_not_available;
+
+  /// Service available at the fuel station: food and beverage facilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Food & beverages'**
+  String get facility_food_and_beverage;
+
+  /// Service available at the fuel station: car repair workshop.
+  ///
+  /// In en, this message translates to:
+  /// **'Car workshop'**
+  String get facility_car_workshop;
+
+  /// Service available at the fuel station: parking for campers and trucks.
+  ///
+  /// In en, this message translates to:
+  /// **'Camper / truck parking'**
+  String get facility_camper_truck_parking;
+
+  /// Service available at the fuel station: camper waste disposal area.
+  ///
+  /// In en, this message translates to:
+  /// **'Camper waste disposal'**
+  String get facility_camper_exhaust;
+
+  /// Service available at the fuel station: dedicated area for children.
+  ///
+  /// In en, this message translates to:
+  /// **'Kids area'**
+  String get facility_kids_area;
+
+  /// Service available at the fuel station: ATM (cash machine).
+  ///
+  /// In en, this message translates to:
+  /// **'ATM'**
+  String get facility_bancomat;
+
+  /// Service available at the fuel station: facilities for people with disabilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessible services'**
+  String get facility_handicapped_services;
+
+  /// Service available at the fuel station: wireless internet access.
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi'**
+  String get facility_wifi;
+
+  /// Service available at the fuel station: tire dealer or tire repair service.
+  ///
+  /// In en, this message translates to:
+  /// **'Tire service'**
+  String get facility_tire_dealer;
+
+  /// Service available at the fuel station: car wash facility.
+  ///
+  /// In en, this message translates to:
+  /// **'Car wash'**
+  String get facility_car_wash;
+
+  /// Service available at the fuel station: electric vehicle charging station.
+  ///
+  /// In en, this message translates to:
+  /// **'Electric charging'**
+  String get facility_electric_charging;
+
+  /// Fallback label for an unknown or unsupported fuel station service.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown service'**
+  String get facility_unknown;
+
+  /// Label for phone number.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// Label for email address.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// Label for website URL.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get website;
+
+  /// Title of the opening hours section.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening hours'**
+  String get opening_hours_title;
+
+  /// Note explaining that opening hours apply only to attended service.
+  ///
+  /// In en, this message translates to:
+  /// **'These hours refer to the attended service. Self-service is always available.'**
+  String get opening_hours_note;
+
+  /// Message shown when opening hours are not available.
+  ///
+  /// In en, this message translates to:
+  /// **'This fuel station does not provide information about its opening hours.'**
+  String get opening_hours_not_available;
+
+  /// Header of the weekday column in the opening hours table.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekday'**
+  String get weekday;
+
+  /// Header of the morning opening hours column.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get morning;
+
+  /// Header of the afternoon opening hours column.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get afternoon;
+
+  /// Label indicating 24-hour opening.
+  ///
+  /// In en, this message translates to:
+  /// **'Open 24h'**
+  String get open_24h;
+
+  /// Back button label.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// Button label to start navigation to the station.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate'**
+  String get start_navigation;
+
+  /// Weekday: Monday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get weekday_monday;
+
+  /// Weekday: Tuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get weekday_tuesday;
+
+  /// Weekday: Wednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get weekday_wednesday;
+
+  /// Weekday: Thursday.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get weekday_thursday;
+
+  /// Weekday: Friday.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get weekday_friday;
+
+  /// Weekday: Saturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get weekday_saturday;
+
+  /// Weekday: Sunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get weekday_sunday;
+
+  /// Dialog text showing the unique identifier of the fuel station.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel station identifier: {id}'**
+  String station_identifier(int id);
+
+  /// Title of the fuel details page.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel station details'**
+  String get station_details_title;
 }
 
 class _AppLocalizationsDelegate

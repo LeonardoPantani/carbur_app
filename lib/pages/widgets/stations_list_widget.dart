@@ -9,9 +9,10 @@ import '../../extensions/prices_estensions.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/position_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../../providers/station_details_provider.dart';
 import '../../providers/station_provider.dart';
 import '../../extensions/number_extensions.dart';
-import '../../utils/navigation_utils.dart';
+import '../station_details_page.dart';
 
 class StationList extends StatelessWidget {
   const StationList({super.key});
@@ -56,7 +57,8 @@ class StationList extends StatelessWidget {
                       l.error_description_api_ministry_notworking,
                     StationError.routes =>
                       l.error_description_api_routes_notworking,
-                    StationError.network => l.error_description_api_ministry_notworking,
+                    StationError.network =>
+                      l.error_description_api_ministry_notworking,
                     StationError.unknown => l.error_description_unknown,
                   },
                   textAlign: TextAlign.center,
@@ -198,7 +200,16 @@ class StationList extends StatelessWidget {
               ],
             ),
             onTap: () {
-              openNavigation(station.latitude, station.longitude);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChangeNotifierProvider(
+                    create: (_) =>
+                        StationDetailsProvider(station)..loadDetails(),
+                    child: const StationDetailsPage(),
+                  ),
+                ),
+              );
             },
           );
         },

@@ -131,5 +131,150 @@
     "error_description_api_routes_notworking": "Routes websites is not working.",
     "@error_description_api_routes_notworking": {
         "description": "This appears as a description when the API that calculates the driving routes between user's location and fuel station is not working."
+    },
+    "facilities_title": "Facilities",
+    "@facilities_title": {
+        "description": "Title of the section listing the available facilities at the fuel station."
+    },
+    "facilities_not_available": "This fuel station does not provide information about its facilities.",
+    "@facilities_not_available": {
+        "description": "Message shown when no facility information is available for the fuel station."
+    },
+    "facility_food_and_beverage": "Food & beverages",
+    "@facility_food_and_beverage": {
+        "description": "Service available at the fuel station: food and beverage facilities."
+    },
+    "facility_car_workshop": "Car workshop",
+    "@facility_car_workshop": {
+        "description": "Service available at the fuel station: car repair workshop."
+    },
+    "facility_camper_truck_parking": "Camper / truck parking",
+    "@facility_camper_truck_parking": {
+        "description": "Service available at the fuel station: parking for campers and trucks."
+    },
+    "facility_camper_exhaust": "Camper waste disposal",
+    "@facility_camper_exhaust": {
+        "description": "Service available at the fuel station: camper waste disposal area."
+    },
+    "facility_kids_area": "Kids area",
+    "@facility_kids_area": {
+        "description": "Service available at the fuel station: dedicated area for children."
+    },
+    "facility_bancomat": "ATM",
+    "@facility_bancomat": {
+        "description": "Service available at the fuel station: ATM (cash machine)."
+    },
+    "facility_handicapped_services": "Accessible services",
+    "@facility_handicapped_services": {
+        "description": "Service available at the fuel station: facilities for people with disabilities."
+    },
+    "facility_wifi": "Wi-Fi",
+    "@facility_wifi": {
+        "description": "Service available at the fuel station: wireless internet access."
+    },
+    "facility_tire_dealer": "Tire service",
+    "@facility_tire_dealer": {
+        "description": "Service available at the fuel station: tire dealer or tire repair service."
+    },
+    "facility_car_wash": "Car wash",
+    "@facility_car_wash": {
+        "description": "Service available at the fuel station: car wash facility."
+    },
+    "facility_electric_charging": "Electric charging",
+    "@facility_electric_charging": {
+        "description": "Service available at the fuel station: electric vehicle charging station."
+    },
+    "facility_unknown": "Unknown service",
+    "@facility_unknown": {
+        "description": "Fallback label for an unknown or unsupported fuel station service."
+    },
+    "phone": "Phone",
+    "@phone": {
+        "description": "Label for phone number."
+    },
+    "email": "Email",
+    "@email": {
+        "description": "Label for email address."
+    },
+    "website": "Website",
+    "@website": {
+        "description": "Label for website URL."
+    },
+    "opening_hours_title": "Opening hours",
+    "@opening_hours_title": {
+        "description": "Title of the opening hours section."
+    },
+    "opening_hours_note": "These hours refer to the attended service. Self-service is always available.",
+    "@opening_hours_note": {
+        "description": "Note explaining that opening hours apply only to attended service."
+    },
+    "opening_hours_not_available": "This fuel station does not provide information about its opening hours.",
+    "@opening_hours_not_available": {
+        "description": "Message shown when opening hours are not available."
+    },
+    "weekday": "Weekday",
+    "@weekday": {
+        "description": "Header of the weekday column in the opening hours table."
+    },
+    "morning": "Morning",
+    "@morning": {
+        "description": "Header of the morning opening hours column."
+    },
+    "afternoon": "Afternoon",
+    "@afternoon": {
+        "description": "Header of the afternoon opening hours column."
+    },
+    "open_24h": "Open 24h",
+    "@open_24h": {
+        "description": "Label indicating 24-hour opening."
+    },
+    "back": "Back",
+    "@back": {
+        "description": "Back button label."
+    },
+    "start_navigation": "Navigate",
+    "@start_navigation": {
+        "description": "Button label to start navigation to the station."
+    },
+    "weekday_monday": "Monday",
+    "@weekday_monday": {
+        "description": "Weekday: Monday."
+    },
+    "weekday_tuesday": "Tuesday",
+    "@weekday_tuesday": {
+        "description": "Weekday: Tuesday."
+    },
+    "weekday_wednesday": "Wednesday",
+    "@weekday_wednesday": {
+        "description": "Weekday: Wednesday."
+    },
+    "weekday_thursday": "Thursday",
+    "@weekday_thursday": {
+        "description": "Weekday: Thursday."
+    },
+    "weekday_friday": "Friday",
+    "@weekday_friday": {
+        "description": "Weekday: Friday."
+    },
+    "weekday_saturday": "Saturday",
+    "@weekday_saturday": {
+        "description": "Weekday: Saturday."
+    },
+    "weekday_sunday": "Sunday",
+    "@weekday_sunday": {
+        "description": "Weekday: Sunday."
+    },
+    "station_identifier": "Fuel station identifier: {id}",
+    "@station_identifier": {
+        "description": "Dialog text showing the unique identifier of the fuel station.",
+        "placeholders": {
+            "id": {
+                "type": "int"
+            }
+        }
+    },
+    "station_details_title": "Fuel station details",
+    "@station_details_title": {
+        "description": "Title of the fuel details page."
     }
 }

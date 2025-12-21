@@ -105,4 +105,114 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get error_description_api_routes_notworking =>
       'Il servizio di calcolo dei percorsi non è disponibile.';
+
+  @override
+  String get facilities_title => 'Servizi';
+
+  @override
+  String get facilities_not_available =>
+      'Questo distributore non fornisce info sui servizi che offre.';
+
+  @override
+  String get facility_food_and_beverage => 'Cibo e bevande';
+
+  @override
+  String get facility_car_workshop => 'Officina';
+
+  @override
+  String get facility_camper_truck_parking => 'Parcheggio per camper e camion';
+
+  @override
+  String get facility_camper_exhaust => 'Scarico per camper';
+
+  @override
+  String get facility_kids_area => 'Area bambini';
+
+  @override
+  String get facility_bancomat => 'Bancomat';
+
+  @override
+  String get facility_handicapped_services => 'Servizi per disabili';
+
+  @override
+  String get facility_wifi => 'Wi-Fi';
+
+  @override
+  String get facility_tire_dealer => 'Gommista';
+
+  @override
+  String get facility_car_wash => 'Autolavaggio';
+
+  @override
+  String get facility_electric_charging => 'Colonnine elettriche di ricarica';
+
+  @override
+  String get facility_unknown => 'Servizio sconosciuto';
+
+  @override
+  String get phone => 'Telefono';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get website => 'Sito web';
+
+  @override
+  String get opening_hours_title => 'Orari di apertura';
+
+  @override
+  String get opening_hours_note =>
+      'Questi orari di apertura si riferiscono al servito. È sempre possibile fare rifornimento self-service.';
+
+  @override
+  String get opening_hours_not_available =>
+      'Questo distributore non fornisce i propri orari di apertura.';
+
+  @override
+  String get weekday => 'Giorno';
+
+  @override
+  String get morning => 'Mattina';
+
+  @override
+  String get afternoon => 'Pomeriggio';
+
+  @override
+  String get open_24h => 'Aperto H24';
+
+  @override
+  String get back => 'Indietro';
+
+  @override
+  String get start_navigation => 'Navigazione';
+
+  @override
+  String get weekday_monday => 'Lunedì';
+
+  @override
+  String get weekday_tuesday => 'Martedì';
+
+  @override
+  String get weekday_wednesday => 'Mercoledì';
+
+  @override
+  String get weekday_thursday => 'Giovedì';
+
+  @override
+  String get weekday_friday => 'Venerdì';
+
+  @override
+  String get weekday_saturday => 'Sabato';
+
+  @override
+  String get weekday_sunday => 'Domenica';
+
+  @override
+  String station_identifier(int id) {
+    return 'ID distributore: $id';
+  }
+
+  @override
+  String get station_details_title => 'Dettagli distributore';
 }

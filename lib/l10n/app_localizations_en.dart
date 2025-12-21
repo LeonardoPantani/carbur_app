@@ -105,4 +105,114 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get error_description_api_routes_notworking =>
       'Routes websites is not working.';
+
+  @override
+  String get facilities_title => 'Facilities';
+
+  @override
+  String get facilities_not_available =>
+      'This fuel station does not provide information about its facilities.';
+
+  @override
+  String get facility_food_and_beverage => 'Food & beverages';
+
+  @override
+  String get facility_car_workshop => 'Car workshop';
+
+  @override
+  String get facility_camper_truck_parking => 'Camper / truck parking';
+
+  @override
+  String get facility_camper_exhaust => 'Camper waste disposal';
+
+  @override
+  String get facility_kids_area => 'Kids area';
+
+  @override
+  String get facility_bancomat => 'ATM';
+
+  @override
+  String get facility_handicapped_services => 'Accessible services';
+
+  @override
+  String get facility_wifi => 'Wi-Fi';
+
+  @override
+  String get facility_tire_dealer => 'Tire service';
+
+  @override
+  String get facility_car_wash => 'Car wash';
+
+  @override
+  String get facility_electric_charging => 'Electric charging';
+
+  @override
+  String get facility_unknown => 'Unknown service';
+
+  @override
+  String get phone => 'Phone';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get website => 'Website';
+
+  @override
+  String get opening_hours_title => 'Opening hours';
+
+  @override
+  String get opening_hours_note =>
+      'These hours refer to the attended service. Self-service is always available.';
+
+  @override
+  String get opening_hours_not_available =>
+      'This fuel station does not provide information about its opening hours.';
+
+  @override
+  String get weekday => 'Weekday';
+
+  @override
+  String get morning => 'Morning';
+
+  @override
+  String get afternoon => 'Afternoon';
+
+  @override
+  String get open_24h => 'Open 24h';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get start_navigation => 'Navigate';
+
+  @override
+  String get weekday_monday => 'Monday';
+
+  @override
+  String get weekday_tuesday => 'Tuesday';
+
+  @override
+  String get weekday_wednesday => 'Wednesday';
+
+  @override
+  String get weekday_thursday => 'Thursday';
+
+  @override
+  String get weekday_friday => 'Friday';
+
+  @override
+  String get weekday_saturday => 'Saturday';
+
+  @override
+  String get weekday_sunday => 'Sunday';
+
+  @override
+  String station_identifier(int id) {
+    return 'Fuel station identifier: $id';
+  }
+
+  @override
+  String get station_details_title => 'Fuel station details';
 }

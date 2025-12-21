@@ -105,4 +105,114 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get error_description_api_routes_notworking =>
       'Der Routenberechnungsdienst ist nicht verfügbar.';
+
+  @override
+  String get facilities_title => 'Serviceleistungen';
+
+  @override
+  String get facilities_not_available =>
+      'Diese Tankstelle stellt keine Informationen zu ihren Serviceleistungen bereit.';
+
+  @override
+  String get facility_food_and_beverage => 'Essen & Getränke';
+
+  @override
+  String get facility_car_workshop => 'Autowerkstatt';
+
+  @override
+  String get facility_camper_truck_parking => 'Wohnmobil- / Lkw-Parkplatz';
+
+  @override
+  String get facility_camper_exhaust => 'Wohnmobil-Entsorgung';
+
+  @override
+  String get facility_kids_area => 'Kinderbereich';
+
+  @override
+  String get facility_bancomat => 'Geldautomat';
+
+  @override
+  String get facility_handicapped_services => 'Barrierefreie Services';
+
+  @override
+  String get facility_wifi => 'WLAN';
+
+  @override
+  String get facility_tire_dealer => 'Reifenservice';
+
+  @override
+  String get facility_car_wash => 'Autowaschanlage';
+
+  @override
+  String get facility_electric_charging => 'Ladestation für Elektrofahrzeuge';
+
+  @override
+  String get facility_unknown => 'Unbekannter Service';
+
+  @override
+  String get phone => 'Telefon';
+
+  @override
+  String get email => 'E-Mail';
+
+  @override
+  String get website => 'Webseite';
+
+  @override
+  String get opening_hours_title => 'Öffnungszeiten';
+
+  @override
+  String get opening_hours_note =>
+      'Diese Zeiten gelten für den bedienten Service. Selbstbedienung ist immer verfügbar.';
+
+  @override
+  String get opening_hours_not_available =>
+      'Diese Tankstelle stellt keine Informationen zu den Öffnungszeiten bereit.';
+
+  @override
+  String get weekday => 'Tag';
+
+  @override
+  String get morning => 'Vormittag';
+
+  @override
+  String get afternoon => 'Nachmittag';
+
+  @override
+  String get open_24h => '24 Stunden geöffnet';
+
+  @override
+  String get back => 'Zurück';
+
+  @override
+  String get start_navigation => 'Navigation starten';
+
+  @override
+  String get weekday_monday => 'Montag';
+
+  @override
+  String get weekday_tuesday => 'Dienstag';
+
+  @override
+  String get weekday_wednesday => 'Mittwoch';
+
+  @override
+  String get weekday_thursday => 'Donnerstag';
+
+  @override
+  String get weekday_friday => 'Freitag';
+
+  @override
+  String get weekday_saturday => 'Samstag';
+
+  @override
+  String get weekday_sunday => 'Sonntag';
+
+  @override
+  String station_identifier(int id) {
+    return 'Tankstellenkennung: $id';
+  }
+
+  @override
+  String get station_details_title => 'Tankstellendetails';
 }

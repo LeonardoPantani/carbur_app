@@ -14,7 +14,7 @@ import '../../models/station.dart';
 import '../../providers/position_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/station_provider.dart';
-import '../../utils/navigation_utils.dart';
+import '../../utils/hyperlink_utils.dart';
 import 'price_marker_widget.dart';
 
 class StationsMap extends StatefulWidget {

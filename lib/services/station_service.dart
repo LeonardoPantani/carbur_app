@@ -7,6 +7,7 @@ import '../exceptions/custom_exceptions.dart';
 import '../models/station.dart';
 import '../models/fuel_type.dart';
 import '../models/fuel_price.dart';
+import '../models/station_details.dart';
 
 class StationService {
   // obtain fuel stations near me. API restricts to a max 10 km radius
@@ -141,6 +142,36 @@ class StationService {
       throw ApiTimeoutException();
     } on SocketException {
       throw NetworkException();
+    }
+  }
+
+  // obtain details of a station
+  Future<StationDetails> fetchDetails(Station station) async {
+    final uri = Uri.parse(
+      'https://carburanti.mise.gov.it/ospzApi/registry/servicearea/${station.id}',
+    );
+
+    try {
+      final response = await http
+          .get(
+            uri,
+            headers: const {
+              'User-Agent': 'Mozilla/5.0',
+              'Accept': 'application/json',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        throw Exception('API details statusCode != 200');
+      }
+
+      final Map<String, dynamic> json =
+          jsonDecode(response.body) as Map<String, dynamic>;
+
+      return StationDetails.fromJson(station: station, json: json);
+    } on TimeoutException {
+      throw Exception('Timeout API details');
     }
   }
 }

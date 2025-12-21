@@ -1,5 +1,28 @@
 import 'package:url_launcher/url_launcher.dart';
 
+Future<void> openPhone(String phone) async {
+  final uri = Uri.parse('tel:$phone');
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
+
+Future<void> openEmail(String email) async {
+  final uri = Uri.parse('mailto:$email');
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
+
+Future<void> openWebsite(String website) async {
+  final uri = Uri.parse(
+    website.startsWith('http') ? website : 'https://$website',
+  );
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
+
 Future<void> openNavigation(double lat, double lng) async {
   final googleMaps = Uri.parse('google.navigation:q=$lat,$lng&mode=d');
 

@@ -105,4 +105,116 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get error_description_api_routes_notworking =>
       'Usługa obliczania tras jest niedostępna.';
+
+  @override
+  String get facilities_title => 'Usługi';
+
+  @override
+  String get facilities_not_available =>
+      'Ta stacja paliw nie udostępnia informacji o dostępnych usługach.';
+
+  @override
+  String get facility_food_and_beverage => 'Jedzenie i napoje';
+
+  @override
+  String get facility_car_workshop => 'Warsztat samochodowy';
+
+  @override
+  String get facility_camper_truck_parking =>
+      'Parking dla kamperów / ciężarówek';
+
+  @override
+  String get facility_camper_exhaust => 'Zrzut nieczystości z kampera';
+
+  @override
+  String get facility_kids_area => 'Strefa dla dzieci';
+
+  @override
+  String get facility_bancomat => 'Bankomat';
+
+  @override
+  String get facility_handicapped_services =>
+      'Udogodnienia dla osób z niepełnosprawnościami';
+
+  @override
+  String get facility_wifi => 'Wi-Fi';
+
+  @override
+  String get facility_tire_dealer => 'Serwis opon';
+
+  @override
+  String get facility_car_wash => 'Myjnia samochodowa';
+
+  @override
+  String get facility_electric_charging => 'Ładowanie elektryczne';
+
+  @override
+  String get facility_unknown => 'Nieznana usługa';
+
+  @override
+  String get phone => 'Telefon';
+
+  @override
+  String get email => 'E-mail';
+
+  @override
+  String get website => 'Strona internetowa';
+
+  @override
+  String get opening_hours_title => 'Godziny otwarcia';
+
+  @override
+  String get opening_hours_note =>
+      'Te godziny dotyczą obsługi z personelem. Samoobsługa jest zawsze dostępna.';
+
+  @override
+  String get opening_hours_not_available =>
+      'Ta stacja paliw nie udostępnia informacji o godzinach otwarcia.';
+
+  @override
+  String get weekday => 'Dzień';
+
+  @override
+  String get morning => 'Rano';
+
+  @override
+  String get afternoon => 'Popołudnie';
+
+  @override
+  String get open_24h => 'Otwarte 24 h';
+
+  @override
+  String get back => 'Wstecz';
+
+  @override
+  String get start_navigation => 'Rozpocznij nawigację';
+
+  @override
+  String get weekday_monday => 'Poniedziałek';
+
+  @override
+  String get weekday_tuesday => 'Wtorek';
+
+  @override
+  String get weekday_wednesday => 'Środa';
+
+  @override
+  String get weekday_thursday => 'Czwartek';
+
+  @override
+  String get weekday_friday => 'Piątek';
+
+  @override
+  String get weekday_saturday => 'Sobota';
+
+  @override
+  String get weekday_sunday => 'Niedziela';
+
+  @override
+  String station_identifier(int id) {
+    return 'Identyfikator stacji paliw: $id';
+  }
+
+  @override
+  String get station_details_title => 'Szczegóły stacji paliw';
 }
