@@ -215,4 +215,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get station_details_title => 'Tankstellendetails';
+
+  @override
+  String get fuel_prices_title => 'Kraftstoffpreise';
+
+  @override
+  String get fuel_prices_not_available => 'Preise nicht verfügbar.';
+
+  @override
+  String get settings_marker_fuel => 'Bevorzugter Kraftstofftyp';
+
+  @override
+  String get settings_marker_fuel_auto => 'Automatisch';
+
+  @override
+  String get settings_marker_fuel_auto_disabledwhy =>
+      'Diese Einstellung ist deaktiviert, wenn nur eine Kraftstoffart ausgewählt ist.';
 }

@@ -10,6 +10,7 @@ class SettingsProvider extends ChangeNotifier {
   List<FuelType> selectedFuels = [FuelType.petrol];
   int radiusKm = 3;
   StationSort sort = StationSort.best;
+  FuelType? preferredMarkerFuel;
 
   bool configurationChanged = false;
 
@@ -37,6 +38,12 @@ class SettingsProvider extends ChangeNotifier {
       }).toList();
     } else {
       selectedFuels = [FuelType.petrol];
+    }
+
+    final preferredCode = prefs.getInt('preferredMarkerFuel');
+    if (preferredCode != null) {
+      final found = selectedFuels.where((f) => f.ministerCode == preferredCode);
+      preferredMarkerFuel = found.isNotEmpty ? found.first : null;
     }
 
     radiusKm = prefs.getInt('radiusKm') ?? radiusKm;
@@ -68,6 +75,19 @@ class SettingsProvider extends ChangeNotifier {
     await prefs.setInt('stationSort', sort.index);
   }
 
+  Future<void> _savePreferredMarkerFuel() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (preferredMarkerFuel == null) {
+      await prefs.remove('preferredMarkerFuel');
+    } else {
+      await prefs.setInt(
+        'preferredMarkerFuel',
+        preferredMarkerFuel!.ministerCode,
+      );
+    }
+  }
+
   void toggleFuel(FuelType fuel) {
     final isSelected = selectedFuels.contains(fuel);
 
@@ -75,6 +95,13 @@ class SettingsProvider extends ChangeNotifier {
       selectedFuels.remove(fuel);
     } else {
       selectedFuels.add(fuel);
+    }
+
+    if (preferredMarkerFuel != null &&
+        !selectedFuels.contains(preferredMarkerFuel)) {
+      preferredMarkerFuel =
+          selectedFuels.isNotEmpty ? selectedFuels.first : null;
+      _savePreferredMarkerFuel();
     }
 
     _saveSelectedFuels();
@@ -90,6 +117,13 @@ class SettingsProvider extends ChangeNotifier {
     }
 
     selectedFuels = List.from(newFuels);
+    if (preferredMarkerFuel != null &&
+        !selectedFuels.contains(preferredMarkerFuel)) {
+      preferredMarkerFuel = selectedFuels.isNotEmpty
+          ? selectedFuels.first
+          : null;
+      _savePreferredMarkerFuel();
+    }
     _saveSelectedFuels();
     _markChanged();
   }
@@ -107,6 +141,16 @@ class SettingsProvider extends ChangeNotifier {
 
     sort = newSort;
     _saveSort();
+    _markChanged();
+  }
+
+  void setPreferredMarkerFuel(FuelType? fuel) {
+    if (fuel != null && !selectedFuels.contains(fuel)) return;
+
+    if (preferredMarkerFuel == fuel) return;
+
+    preferredMarkerFuel = fuel;
+    _savePreferredMarkerFuel();
     _markChanged();
   }
 }

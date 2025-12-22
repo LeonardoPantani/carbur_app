@@ -1,4 +1,5 @@
 import 'package:carbur_app/models/fuel_type.dart';
+import 'package:carbur_app/models/station.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -14,14 +15,13 @@ import '../../providers/station_provider.dart';
 import '../../extensions/number_extensions.dart';
 import '../station_details_page.dart';
 
-class StationList extends StatelessWidget {
-  const StationList({super.key});
+class StationsList extends StatelessWidget {
+  const StationsList({super.key});
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<StationProvider>();
     final settings = context.watch<SettingsProvider>();
-
     AppLocalizations l = AppLocalizations.of(context)!;
 
     if (provider.isLoading) {
@@ -33,12 +33,7 @@ class StationList extends StatelessWidget {
 
     if (provider.error != null) {
       return RefreshIndicator(
-        onRefresh: () async {
-          final pos = context.read<LocationProvider>();
-          final stations = context.read<StationProvider>();
-          await pos.refreshPosition();
-          await stations.forceReload();
-        },
+        onRefresh: () => _onRefresh(context),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -73,12 +68,7 @@ class StationList extends StatelessWidget {
 
     if (provider.listStations.isEmpty) {
       return RefreshIndicator(
-        onRefresh: () async {
-          final pos = context.read<LocationProvider>();
-          final stations = context.read<StationProvider>();
-          await pos.refreshPosition();
-          await stations.forceReload();
-        },
+        onRefresh: () => _onRefresh(context),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
@@ -92,145 +82,151 @@ class StationList extends StatelessWidget {
     }
 
     return RefreshIndicator(
-      onRefresh: () async {
-        final pos = context.read<LocationProvider>();
-        final stations = context.read<StationProvider>();
-        await pos.refreshPosition();
-        await stations.forceReload();
-      },
-      child: ListView.builder(
-        key: ValueKey(Theme.of(context).brightness),
-        itemCount:
-            provider.listStations.length +
-            1, // because first element is the header "x stations found around you."
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            final count = provider.listStations.length;
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Text(
-                AppLocalizations.of(context)!.stations_found(count),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            );
-          }
-
-          final station = provider.listStations[index - 1];
-          final prices = station.visiblePrices(settings.selectedFuels);
-          final spans = <InlineSpan>[];
-          for (int i = 0; i < prices.length; i++) {
-            spans.add(TextSpan(text: "${prices[i].key.label(context)}: "));
-            spans.add(
-              WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    "${prices[i].value.pricePerLiter.formatPrice(context)} €",
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            );
-
-            if (i < prices.length - 1) {
-              spans.add(const TextSpan(text: " • "));
-            }
-          }
-
-          // single element
-          return ListTile(
-            leading: Image.asset(
-              station.brand.asset,
-              width: 50,
-              height: 50,
-              fit: BoxFit.contain,
+      onRefresh: () => _onRefresh(context),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Text(
+              l.stations_found(provider.listStations.length),
+              style: Theme.of(context).textTheme.bodySmall,
             ),
-            title: Text(
-              station.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    children: spans,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  AppLocalizations.of(context)!.last_update(
-                    DateFormat.MMMMd(
-                      Localizations.localeOf(context).toString(),
-                    ).format(station.lastUpdate),
-                    DateFormat.Hm(
-                      Localizations.localeOf(context).toString(),
-                    ).format(station.lastUpdate),
-                  ),
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              key: ValueKey(Theme.of(context).brightness),
+              itemCount: provider.listStations.length,
+              itemBuilder: (context, index) {
+                final station = provider.listStations[index];
 
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  station.distanceKm.formatDistance(context),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text("km", style: Theme.of(context).textTheme.bodySmall),
-              ],
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ChangeNotifierProvider(
-                    create: (_) =>
-                        StationDetailsProvider(station)..loadDetails(),
-                    child: const StationDetailsPage(),
+                return ListTile(
+                  leading: Image.asset(
+                    station.brand.asset,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.contain,
                   ),
-                ),
-              );
-            },
-          );
-        },
+                  title: Text(
+                    station.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          children: _buildPriceSpans(
+                            context,
+                            station,
+                            settings,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        AppLocalizations.of(context)!.last_update(
+                          DateFormat.MMMMd(
+                            Localizations.localeOf(context).toString(),
+                          ).format(station.lastUpdate),
+                          DateFormat.Hm(
+                            Localizations.localeOf(context).toString(),
+                          ).format(station.lastUpdate),
+                        ),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        station.distanceKm.formatDistance(context),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text("km", style: Theme.of(context).textTheme.bodySmall),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChangeNotifierProvider(
+                          create: (_) =>
+                              StationDetailsProvider(station)..loadDetails(),
+                          child: const StationDetailsPage(),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  List<InlineSpan> _buildPriceSpans(
+    BuildContext context,
+    Station station,
+    SettingsProvider settings,
+  ) {
+    final prices = station.visiblePrices(settings.selectedFuels);
+    final spans = <InlineSpan>[];
+
+    for (int i = 0; i < prices.length; i++) {
+      spans.add(TextSpan(text: "${prices[i].key.label(context)}: "));
+      spans.add(
+        WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              "${prices[i].value.pricePerLiter.formatPrice(context)} €",
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      if (i < prices.length - 1) {
+        spans.add(const TextSpan(text: " • "));
+      }
+    }
+    return spans;
+  }
+
+  Future<void> _onRefresh(BuildContext context) async {
+    final pos = context.read<LocationProvider>();
+    final stations = context.read<StationProvider>();
+    await pos.refreshPosition();
+    await stations.forceReload();
+  }
 }
 
-// fake list shown while loading
 class ShimmerStationList extends StatelessWidget {
   const ShimmerStationList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final base = Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey.shade800
-        : Colors.grey.shade300;
-
-    final highlight = Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey.shade700
-        : Colors.grey.shade100;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final base = isDark ? Colors.grey.shade800 : Colors.grey.shade300;
+    final highlight = isDark ? Colors.grey.shade700 : Colors.grey.shade100;
 
     return ListView.builder(
       itemCount: 11,

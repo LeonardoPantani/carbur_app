@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
         index: _currentIndex,
         children: const [
           StationsMap(),
-          StationList(),
+          StationsList(),
         ],
       ),
       bottomNavigationBar: _buildBottomBar(context),

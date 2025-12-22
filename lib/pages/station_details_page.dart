@@ -1,9 +1,13 @@
+import 'package:carbur_app/extensions/number_extensions.dart';
+import 'package:carbur_app/extensions/prices_estensions.dart';
+import 'package:carbur_app/models/fuel_type.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../extensions/brand_estensions.dart';
 import '../extensions/station_facilities_extension.dart';
 import '../l10n/app_localizations.dart';
+import '../providers/settings_provider.dart';
 import '../providers/station_details_provider.dart';
 import '../utils/hyperlink_utils.dart';
 
@@ -53,13 +57,16 @@ class StationDetailsPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // row that comprehends: title, address | brand logo image
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
+                          // title, address
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // title (clickable)
                               InkWell(
                                 onTap: () {
                                   showDialog(
@@ -85,7 +92,7 @@ class StationDetailsPage extends StatelessWidget {
                                   ).textTheme.headlineSmall,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              // address
                               Text(
                                 details.address,
                                 style: Theme.of(context).textTheme.bodyMedium,
@@ -94,6 +101,7 @@ class StationDetailsPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
+                        // logo
                         Image.asset(
                           station.brand.asset,
                           width: 75,
@@ -103,59 +111,62 @@ class StationDetailsPage extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
-                    if (details.phone?.isNotEmpty == true)
-                      InkWell(
-                        onTap: () => openPhone(details.phone!),
-                        child: Text(
-                          '${l.phone}: ${details.phone}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ),
+                    // fuel prices header
+                    Text(
+                      l.fuel_prices_title,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 4),
+                    // list of fuel prices (showing only selected in settings)
+                    Consumer<SettingsProvider>(
+                      builder: (context, settings, _) {
+                        final prices = station.visiblePrices(
+                          settings.selectedFuels,
+                        );
 
-                    if (details.email?.isNotEmpty == true)
-                      InkWell(
-                        onTap: () => openEmail(details.email!),
-                        child: Text(
-                          '${l.email}: ${details.email}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ),
+                        if (prices.isEmpty) {
+                          return Text(
+                            l.fuel_prices_not_available,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          );
+                        }
 
-                    if (details.website?.isNotEmpty == true)
-                      InkWell(
-                        onTap: () => openWebsite(details.website!),
-                        child: Text(
-                          '${l.website}: ${details.website}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ),
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: prices.map((p) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 2),
+                              child: Text(
+                                '${p.key.label(context)}: ${p.value.pricePerLiter.formatPrice(context)} €',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
 
-                    const SizedBox(height: 24),
-
+                    // opening hours headers
                     Text(
                       l.opening_hours_title,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 4),
-                    if (details.openingHours.isNotEmpty)
+                    // showing error if empty
+                    if (details.openingHours.isEmpty)
+                      Text(l.opening_hours_not_available)
+                    else
+                      // showing disclaimer and table with opening hours
                       Text(
                         l.opening_hours_note,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           fontStyle: FontStyle.italic,
                         ),
                       ),
-                    const SizedBox(height: 12),
-                    if (details.openingHours.isEmpty)
-                      Text(l.opening_hours_not_available)
-                    else
+                    if (details.openingHours.isNotEmpty)
                       Table(
                         columnWidths: const {
                           0: FlexColumnWidth(2),
@@ -201,17 +212,19 @@ class StationDetailsPage extends StatelessWidget {
                           }),
                         ],
                       ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 12),
 
+                    // facilities header
                     Text(
                       l.facilities_title,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 8),
-
+                    const SizedBox(height: 4),
+                    // showing error if empty
                     if (details.services.isEmpty)
                       Text(l.facilities_not_available)
                     else
+                      // showing list of facilities
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: details.services.map((f) {
@@ -221,13 +234,47 @@ class StationDetailsPage extends StatelessWidget {
                           );
                         }).toList(),
                       ),
+                    const SizedBox(height: 12),
+
+                    // showing other infos: phone, email, website
+                    if (details.phone?.isNotEmpty == true)
+                      InkWell(
+                        onTap: () => openPhone(details.phone!),
+                        child: Text(
+                          '${l.phone}: ${details.phone}',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+
+                    if (details.email?.isNotEmpty == true)
+                      InkWell(
+                        onTap: () => openEmail(details.email!),
+                        child: Text(
+                          '${l.email}: ${details.email}',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+
+                    if (details.website?.isNotEmpty == true)
+                      InkWell(
+                        onTap: () => openWebsite(details.website!),
+                        child: Text(
+                          '${l.website}: ${details.website}',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 12),
-
+            // showing at the bottom the back and navigate buttons
             Row(
               children: [
                 Expanded(

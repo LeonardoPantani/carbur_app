@@ -217,4 +217,20 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get station_details_title => 'Szczegóły stacji paliw';
+
+  @override
+  String get fuel_prices_title => 'Ceny paliw';
+
+  @override
+  String get fuel_prices_not_available => 'Ceny niedostępne.';
+
+  @override
+  String get settings_marker_fuel => 'Preferowany rodzaj paliwa';
+
+  @override
+  String get settings_marker_fuel_auto => 'Automatycznie';
+
+  @override
+  String get settings_marker_fuel_auto_disabledwhy =>
+      'To ustawienie jest niedostępne, gdy wybrany jest tylko jeden rodzaj paliwa.';
 }

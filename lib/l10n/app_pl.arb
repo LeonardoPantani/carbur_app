@@ -276,5 +276,25 @@
     "station_details_title": "Szczegóły stacji paliw",
     "@station_details_title": {
         "description": "Title of the fuel details page."
+    },
+    "fuel_prices_title": "Ceny paliw",
+    "@fuel_prices_title": {
+        "description": "Title of the fuels list header in fuel station details page."
+    },
+    "fuel_prices_not_available": "Ceny niedostępne.",
+    "@fuel_prices_not_available": {
+        "description": "Text showing if fuel prices are not found (strange)."
+    },
+    "settings_marker_fuel": "Preferowany rodzaj paliwa",
+    "@settings_marker_fuel": {
+        "description": "Title of setting that selects which price should the markers on the map show if the user has selected multiple fuels."
+    },
+    "settings_marker_fuel_auto": "Automatycznie",
+    "@settings_marker_fuel_auto": {
+        "description": "Automatic choice of the price to show in the marker the map."
+    },
+    "settings_marker_fuel_auto_disabledwhy": "To ustawienie jest niedostępne, gdy wybrany jest tylko jeden rodzaj paliwa.",
+    "@settings_marker_fuel_auto_disabledwhy": {
+        "description": "Explaination on why the preferred fuel type setting is not available."
     }
 }

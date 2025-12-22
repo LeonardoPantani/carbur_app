@@ -276,5 +276,25 @@
     "station_details_title": "Dettagli distributore",
     "@station_details_title": {
         "description": "Title of the fuel details page."
+    },
+    "fuel_prices_title": "Prezzi carburante",
+    "@fuel_prices_title": {
+        "description": "Title of the fuels list header in fuel station details page."
+    },
+    "fuel_prices_not_available": "I prezzi dei carburanti non sono disponibili.",
+    "@fuel_prices_not_available": {
+        "description": "Text showing if fuel prices are not found (strange)."
+    },
+    "settings_marker_fuel": "Carburante preferito",
+    "@settings_marker_fuel": {
+        "description": "Title of setting that selects which price should the markers on the map show if the user has selected multiple fuels."
+    },
+    "settings_marker_fuel_auto": "Automatico",
+    "@settings_marker_fuel_auto": {
+        "description": "Automatic choice of the price to show in the marker the map."
+    },
+    "settings_marker_fuel_auto_disabledwhy": "Questa impostazione è disabilitata se selezioni un solo tipo di carburante.",
+    "@settings_marker_fuel_auto_disabledwhy": {
+        "description": "Explaination on why the preferred fuel type setting is not available."
     }
 }

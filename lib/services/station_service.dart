@@ -8,6 +8,7 @@ import '../models/station.dart';
 import '../models/fuel_type.dart';
 import '../models/fuel_price.dart';
 import '../models/station_details.dart';
+import '../utils/logger.dart';
 
 class StationService {
   // obtain fuel stations near me. API restricts to a max 10 km radius
@@ -40,24 +41,24 @@ class StationService {
       ]);
 
       if (response.statusCode != 200) {
-        print("Risposta API non valida (statusCode != 200)");
+        logger.i("Risposta API non valida (statusCode != 200)");
         throw ApiException();
       }
 
       final Map<String, dynamic> json = jsonDecode(response.body);
 
       if (json["success"] != true) {
-        print("Risposta API non valida (json[success] != true)");
+        logger.i("Risposta API non valida (json[success] != true)");
         throw ApiException();
       }
 
       final List results = json["results"];
       return results.map((e) => _stationFromJson(e)).toList();
     } on TimeoutException {
-      print("Il sito del ministero è andato in timeout.");
+      logger.i("Il sito del ministero è andato in timeout.");
       throw ApiTimeoutException();
     } on SocketException {
-      print("Impossibile contattare il sito web.");
+      logger.i("Impossibile contattare il sito web.");
       throw NetworkException();
     }
   }

@@ -4,6 +4,7 @@ import '../models/fuel_type.dart';
 import '../models/station.dart';
 import '../models/station_sort.dart';
 import '../services/station_service.dart';
+import '../utils/logger.dart';
 import 'position_provider.dart';
 import 'settings_provider.dart';
 
@@ -40,14 +41,14 @@ class StationProvider extends ChangeNotifier {
 
     try {
       final stopwatch = Stopwatch()..start();
-      print("contattando il sito del ministero, lat = $lat, lng = $lng");
+      logger.i("contattando il sito del ministero, lat = $lat, lng = $lng");
       _allStations = await _service.fetchStations(
         lat: lat,
         lng: lng,
         radiusKm: fetchRadiusKm,
       );
       stopwatch.stop();
-      print(
+      logger.i(
         "l'ottenimento dei dati dal ministero ha richiesto ${stopwatch.elapsedMilliseconds} ms",
       );
 
@@ -88,7 +89,7 @@ class StationProvider extends ChangeNotifier {
   }
 
   Future<void> forceReload() async {
-    print("forzando ricarica");
+    logger.i("forzando ricarica");
     return loadStations();
   }
 
@@ -101,7 +102,7 @@ class StationProvider extends ChangeNotifier {
   }
 
   void setSorting(StationSort sort) {
-    print("cambiando ordinamento a ${sort.toString()}");
+    logger.i("cambiando ordinamento a ${sort.toString()}");
     _sort = sort;
     _applySorting(_settings!.selectedFuels);
     notifyListeners();
@@ -220,7 +221,7 @@ class StationProvider extends ChangeNotifier {
   }
 
   void _handleAutoUpdates() {
-    print("handleAutoUpdates chiamata");
+    logger.i("handleAutoUpdates chiamata");
     if (_pos == null || _settings == null) return;
 
     if (_pos!.isLoading || _pos!.latitude == null) {
@@ -228,7 +229,7 @@ class StationProvider extends ChangeNotifier {
     }
 
     if (_lastRadiusKm == null) {
-      print(
+      logger.i(
         "il raggio di ricerca ultimo era nullo (primo caricamento o refresh forzato)",
       );
       loadStations();
@@ -236,13 +237,13 @@ class StationProvider extends ChangeNotifier {
     }
 
     if (_settings!.radiusKm != _lastRadiusKm) {
-      print("il raggio nuovo è diverso da quello precedente");
+      logger.i("il raggio nuovo è diverso da quello precedente");
       loadStations();
       return;
     }
 
     if (_settings!.selectedFuels != _lastFuels) {
-      print("il filtro dei distributori è cambiato");
+      logger.i("il filtro dei distributori è cambiato");
       _applyFuelFilter(_settings!.selectedFuels);
       return;
     }
@@ -254,6 +255,7 @@ class StationProvider extends ChangeNotifier {
     double fromLng,
   ) async {
     final stopwatch = Stopwatch()..start();
+    logger.i("ottenendo distanze reali in auto...");
     final candidates = List<Station>.from(_allStations)
       ..sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
 
@@ -261,7 +263,6 @@ class StationProvider extends ChangeNotifier {
 
     final futures = topCandidates.map((station) async {
       try {
-        print("ottenendo la distanza reale per ${station.name}");
         final realDistance = await _service.fetchDrivingDistanceKm(
           fromLat: fromLat,
           fromLng: fromLng,
@@ -284,15 +285,8 @@ class StationProvider extends ChangeNotifier {
     final radiusKm = _settings!.radiusKm;
     stations = _allStations.where((s) => s.distanceKm <= radiusKm).toList();
 
-    print(
-      "Totale stazioni nel range ($radiusKm km): ${stations.length}, cioé:",
-    );
-    for (final entry in stations) {
-      print("- ${entry.name} lontano ${entry.distanceKm} km");
-    }
-
     stopwatch.stop();
-    print(
+    logger.i(
       "aggiornamento distanze reali completato in ${stopwatch.elapsedMilliseconds} ms",
     );
   }

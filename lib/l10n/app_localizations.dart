@@ -485,6 +485,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fuel station details'**
   String get station_details_title;
+
+  /// Title of the fuels list header in fuel station details page.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel prices'**
+  String get fuel_prices_title;
+
+  /// Text showing if fuel prices are not found (strange).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel prices not available.'**
+  String get fuel_prices_not_available;
+
+  /// Title of setting that selects which price should the markers on the map show if the user has selected multiple fuels.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred fuel type'**
+  String get settings_marker_fuel;
+
+  /// Automatic choice of the price to show in the marker the map.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get settings_marker_fuel_auto;
+
+  /// Explaination on why the preferred fuel type setting is not available.
+  ///
+  /// In en, this message translates to:
+  /// **'This setting is disabled when you select only a type of fuel.'**
+  String get settings_marker_fuel_auto_disabledwhy;
 }
 
 class _AppLocalizationsDelegate

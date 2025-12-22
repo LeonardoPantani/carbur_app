@@ -215,4 +215,20 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get station_details_title => 'Détails de la station-service';
+
+  @override
+  String get fuel_prices_title => 'Prix des carburants';
+
+  @override
+  String get fuel_prices_not_available => 'Prix non disponibles.';
+
+  @override
+  String get settings_marker_fuel => 'Type de carburant préféré';
+
+  @override
+  String get settings_marker_fuel_auto => 'Automatique';
+
+  @override
+  String get settings_marker_fuel_auto_disabledwhy =>
+      'Ce paramètre est désactivé lorsque vous sélectionnez un seul type de carburant.';
 }

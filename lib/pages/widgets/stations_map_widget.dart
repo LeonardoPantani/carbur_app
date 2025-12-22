@@ -4,17 +4,15 @@ import 'package:carbur_app/extensions/brand_estensions.dart';
 import 'package:carbur_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:widget_to_marker/widget_to_marker.dart';
 
-import '../../extensions/prices_estensions.dart';
-import '../../models/fuel_type.dart';
 import '../../models/station.dart';
 import '../../providers/position_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../../providers/station_details_provider.dart';
 import '../../providers/station_provider.dart';
-import '../../utils/hyperlink_utils.dart';
+import '../../utils/logger.dart';
+import '../station_details_page.dart';
 import 'price_marker_widget.dart';
 
 class StationsMap extends StatefulWidget {
@@ -28,6 +26,7 @@ class _StationsMapState extends State<StationsMap> {
   final MapType _mapType = MapType.normal;
   Brightness? _lastBrightness;
   int? _lastStationsHash;
+  final Map<String, BitmapDescriptor> _markerCache = {};
 
   Set<Marker> _markers = {};
 
@@ -38,123 +37,131 @@ class _StationsMapState extends State<StationsMap> {
   }
 
   Future<void> _rebuildMarkers() async {
+    // 1. Recupero dati dai provider
     final stationsProvider = context.read<StationProvider>();
-    final brightness = Theme.of(context).brightness;
     final stations = stationsProvider.mapStations;
+    final settings = context.read<SettingsProvider>();
 
-    final hash = Object.hashAll(stations.map((s) => s.id));
+    if (stations.isEmpty) {
+      if (_markers.isNotEmpty && mounted) {
+        setState(() => _markers = {});
+      }
+      return;
+    }
+
+    final brightness = Theme.of(context).brightness;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    final markerFuel =
+        settings.preferredMarkerFuel ??
+        (settings.selectedFuels.isNotEmpty
+            ? settings.selectedFuels.first
+            : null);
+
+    // 2. Controllo se è necessario rigenerare (Hash dei dati)
+    // Usiamo l'ID e il prezzo per capire se qualcosa è cambiato effettivamente
+    final hash = Object.hashAll(
+      stations.map((s) {
+        final price = markerFuel == null
+            ? null
+            : s.prices[markerFuel]?.pricePerLiter;
+
+        return '${s.id}-$price';
+      }),
+    );
 
     if (_lastBrightness == brightness && _lastStationsHash == hash) {
       return;
     }
 
-    final pos = context.read<LocationProvider>();
-    if (pos.latitude == null || pos.longitude == null) {
-      return;
-    }
+    logger.i("ricostruzione markers...");
+    final stopwatch = Stopwatch()..start();
 
     _lastBrightness = brightness;
     _lastStationsHash = hash;
 
-    final bg = brightness == Brightness.dark
-        ? Colors.grey.shade900
-        : Colors.white;
-    final fg = brightness == Brightness.dark ? Colors.white : Colors.black;
+    // 3. Fase di caricamento/generazione icone in parallelo
+    final List<Future<void>> iconTasks = [];
 
-    final markers = <Marker>{};
+    for (final s in stations) {
+      final fuelPrice = markerFuel == null ? null : s.prices[markerFuel];
 
-    for (final s in stationsProvider.mapStations) {
-      final price =
-          "${s.prices.values.first.pricePerLiter.toStringAsFixed(3)} €";
+      if (fuelPrice == null) {
+        continue; // niente marker se quel fuel non è disponibile
+      }
 
-      final icon =
-          await PriceMarker(
+      final price = "${fuelPrice.pricePerLiter.toStringAsFixed(3)} €";
+      final assetPath = s.brand.asset; // Usando la tua extension BrandIcon
+
+      // La cache key deve essere specifica per Prezzo + Brand + Tema
+      final cacheKey = '$price-$assetPath-$brightness';
+
+      if (!_markerCache.containsKey(cacheKey)) {
+        iconTasks.add(
+          priceToMarker(
             price: price,
-            background: bg,
-            textColor: fg,
-            logo: Image.asset(s.brand.asset, fit: BoxFit.contain),
-          ).toBitmapDescriptor(
-            logicalSize: const Size(78, 30),
-            imageSize: const Size(234, 90),
-          );
-
-      markers.add(
-        Marker(
-          markerId: MarkerId(s.id.toString()),
-          position: LatLng(s.latitude, s.longitude),
-          icon: icon,
-          anchor: const Offset(0.5, 1),
-          onTap: () {
-            _onMarkerTap(s);
-          },
-        ),
-      );
+            brightness: brightness,
+            pixelRatio: pixelRatio,
+            assetPath: assetPath,
+          ).then((bit) {
+            _markerCache[cacheKey] = bit;
+          }),
+        );
+      }
     }
 
+    // Attendiamo che tutte le generazioni asincrone finiscano
+    if (iconTasks.isNotEmpty) {
+      await Future.wait(iconTasks);
+    }
+
+    // 4. Creazione effettiva dei Marker di Google Maps
+    final markers = stations
+        .map((s) {
+          final fuelPrice = markerFuel == null ? null : s.prices[markerFuel];
+
+          if (fuelPrice == null) {
+            return null;
+          }
+
+          final price = "${fuelPrice.pricePerLiter.toStringAsFixed(3)} €";
+
+          final assetPath = s.brand.asset;
+          final cacheKey = '$price-$assetPath-$brightness';
+
+          return Marker(
+            markerId: MarkerId(s.id.toString()),
+            position: LatLng(s.latitude, s.longitude),
+            icon: _markerCache[cacheKey]!, // Ora siamo sicuri che sia in cache
+            anchor: const Offset(0.5, 1), // Punta il centro basso del marker
+            onTap: () => _openDetails(s),
+          );
+        })
+        .whereType<Marker>()
+        .toSet();
+
+    // 5. Aggiornamento dello stato
     if (mounted) {
       setState(() {
         _markers = markers;
       });
     }
+
+    stopwatch.stop();
+    logger.i(
+      "la ricostruzione dei marker ha richiesto ${stopwatch.elapsedMilliseconds} ms",
+    );
   }
 
-  void _onMarkerTap(Station s) {
-    final l = AppLocalizations.of(context)!;
-    final settings = context.read<SettingsProvider>();
-
-    final prices = s.visiblePrices(settings.selectedFuels);
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            s.name,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final p in prices)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  child: Text(
-                    "${p.key.label(context)}: "
-                    "${p.value.pricePerLiter.toStringAsFixed(3)} €",
-                  ),
-                ),
-              const SizedBox(height: 8),
-              Text(
-                l.last_update(
-                  DateFormat.MMMMd(
-                    Localizations.localeOf(context).toString(),
-                  ).format(s.lastUpdate),
-                  DateFormat.Hm(
-                    Localizations.localeOf(context).toString(),
-                  ).format(s.lastUpdate),
-                ),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const SizedBox(height: 16),
-              Text(l.start_navigation_question),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l.cancel),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                openNavigation(s.latitude, s.longitude);
-              },
-              child: Text(l.ok),
-            ),
-          ],
-        );
-      },
+  void _openDetails(Station s) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => StationDetailsProvider(s)..loadDetails(),
+          child: const StationDetailsPage(),
+        ),
+      ),
     );
   }
 

@@ -517,6 +517,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
+  logger:
+    dependency: "direct main"
+    description:
+      name: logger
+      sha256: a7967e31b703831a893bbc3c3dd11db08126fe5f369b5c648a36f821979f5be3
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.6.2"
   logging:
     dependency: transitive
     description:
@@ -978,14 +986,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
-  widget_to_marker:
-    dependency: "direct main"
-    description:
-      name: widget_to_marker
-      sha256: badc36f23c76f3ca9d43d7780058096be774adf0f661bdb6eb6f6b893f648ab9
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.6"
   win32:
     dependency: transitive
     description:

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../utils/logger.dart';
+
 class LocationProvider extends ChangeNotifier {
   bool _initialized = false;
   bool isLoading = true;
@@ -15,7 +17,7 @@ class LocationProvider extends ChangeNotifier {
   Future<void> _init() async {
     if (_initialized) return;
     _initialized = true;
-    print("Caricamento posizione...");
+    logger.i("Caricamento posizione...");
     await _requestLocationPermission();
     await _getCurrentPosition();
   }
@@ -41,10 +43,10 @@ class LocationProvider extends ChangeNotifier {
       latitude = pos.latitude;
       longitude = pos.longitude;
 
-      debugPrint("Coordinate ottenute: $latitude, $longitude");
+      logger.i("Coordinate ottenute: $latitude, $longitude");
       notifyListeners();
     } catch (e) {
-      debugPrint("Errore ottenendo posizione: $e");
+      logger.i("Errore ottenendo posizione: $e");
     }
     isLoading = false;
   }

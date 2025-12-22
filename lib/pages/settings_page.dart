@@ -27,6 +27,7 @@ class SettingsPage extends StatelessWidget {
                         .map((f) => f.label(context))
                         .join(", "),
                   ),
+                  leading: const Icon(Icons.local_gas_station),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => _openFuelSelectionDialog(context, settings),
                 ),
@@ -34,8 +35,21 @@ class SettingsPage extends StatelessWidget {
                 ListTile(
                   title: Text(l.settings_search_radius),
                   subtitle: Text("${settings.radiusKm} km"),
+                  leading: const Icon(Icons.my_location),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => _openRadiusDialog(context, settings),
+                ),
+
+                ListTile(
+                  title: Text(l.settings_marker_fuel),
+                  subtitle: Text(
+                    settings.preferredMarkerFuel?.label(context) ??
+                        l.settings_marker_fuel_auto,
+                  ),
+                  leading: const Icon(Icons.price_check),
+                  trailing: const Icon(Icons.chevron_right),
+                  enabled: settings.selectedFuels.length > 1,
+                  onTap: settings.selectedFuels.length > 1 ? () => _openMarkerFuelDialog(context, settings) : null,
                 ),
               ],
             ),
@@ -159,6 +173,53 @@ class SettingsPage extends StatelessWidget {
                 settings.setRadius(tempValue);
                 Navigator.pop(context);
               },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _openMarkerFuelDialog(BuildContext context, SettingsProvider settings) {
+    final l = AppLocalizations.of(context)!;
+
+    FuelType? tempValue = settings.preferredMarkerFuel;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(l.settings_marker_fuel),
+          content: DropdownButtonFormField<FuelType?>(
+            initialValue: tempValue,
+            decoration: const InputDecoration(isDense: true),
+            items: [
+              DropdownMenuItem<FuelType?>(
+                value: null,
+                child: Text(l.settings_marker_fuel_auto),
+              ),
+              ...settings.selectedFuels.map(
+                (fuel) => DropdownMenuItem<FuelType?>(
+                  value: fuel,
+                  child: Text(fuel.label(context)),
+                ),
+              ),
+            ],
+            onChanged: (value) {
+              tempValue = value;
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l.cancel),
+            ),
+            TextButton(
+              onPressed: () {
+                settings.setPreferredMarkerFuel(tempValue);
+                Navigator.pop(context);
+              },
+              child: Text(l.ok),
             ),
           ],
         );
