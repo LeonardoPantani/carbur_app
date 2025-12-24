@@ -1,3 +1,4 @@
+import 'package:carbur_app/pages/plan_route_page.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> {
         children: const [
           StationsMap(),
           StationsList(),
+          PlanRoutePage(),
         ],
       ),
       bottomNavigationBar: _buildBottomBar(context),
@@ -69,6 +71,10 @@ class _HomePageState extends State<HomePage> {
         BottomNavigationBarItem(
           icon: const Icon(Icons.local_gas_station),
           label: AppLocalizations.of(context)!.section_stations_list,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.directions),
+          label: "Plan trip",
         ),
       ],
     );

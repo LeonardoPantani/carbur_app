@@ -37,7 +37,6 @@ class _StationsMapState extends State<StationsMap> {
   }
 
   Future<void> _rebuildMarkers() async {
-    // 1. Recupero dati dai provider
     final stationsProvider = context.read<StationProvider>();
     final stations = stationsProvider.mapStations;
     final settings = context.read<SettingsProvider>();
@@ -58,8 +57,6 @@ class _StationsMapState extends State<StationsMap> {
             ? settings.selectedFuels.first
             : null);
 
-    // 2. Controllo se è necessario rigenerare (Hash dei dati)
-    // Usiamo l'ID e il prezzo per capire se qualcosa è cambiato effettivamente
     final hash = Object.hashAll(
       stations.map((s) {
         final price = markerFuel == null
@@ -80,20 +77,18 @@ class _StationsMapState extends State<StationsMap> {
     _lastBrightness = brightness;
     _lastStationsHash = hash;
 
-    // 3. Fase di caricamento/generazione icone in parallelo
     final List<Future<void>> iconTasks = [];
 
     for (final s in stations) {
       final fuelPrice = markerFuel == null ? null : s.prices[markerFuel];
 
       if (fuelPrice == null) {
-        continue; // niente marker se quel fuel non è disponibile
+        continue;
       }
 
       final price = "${fuelPrice.pricePerLiter.toStringAsFixed(3)} €";
-      final assetPath = s.brand.asset; // Usando la tua extension BrandIcon
+      final assetPath = s.brand.asset;
 
-      // La cache key deve essere specifica per Prezzo + Brand + Tema
       final cacheKey = '$price-$assetPath-$brightness';
 
       if (!_markerCache.containsKey(cacheKey)) {
@@ -110,12 +105,10 @@ class _StationsMapState extends State<StationsMap> {
       }
     }
 
-    // Attendiamo che tutte le generazioni asincrone finiscano
     if (iconTasks.isNotEmpty) {
       await Future.wait(iconTasks);
     }
 
-    // 4. Creazione effettiva dei Marker di Google Maps
     final markers = stations
         .map((s) {
           final fuelPrice = markerFuel == null ? null : s.prices[markerFuel];
@@ -132,15 +125,14 @@ class _StationsMapState extends State<StationsMap> {
           return Marker(
             markerId: MarkerId(s.id.toString()),
             position: LatLng(s.latitude, s.longitude),
-            icon: _markerCache[cacheKey]!, // Ora siamo sicuri che sia in cache
-            anchor: const Offset(0.5, 1), // Punta il centro basso del marker
+            icon: _markerCache[cacheKey]!,
+            anchor: const Offset(0.5, 1),
             onTap: () => _openDetails(s),
           );
         })
         .whereType<Marker>()
         .toSet();
 
-    // 5. Aggiornamento dello stato
     if (mounted) {
       setState(() {
         _markers = markers;
