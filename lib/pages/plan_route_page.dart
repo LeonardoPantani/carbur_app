@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/position_provider.dart';
 import '../providers/route_planner_provider.dart';
 import 'search_place_page.dart';
 
@@ -14,12 +15,31 @@ class PlanRoutePage extends StatefulWidget {
 
 class _PlanRoutePageState extends State<PlanRoutePage> {
   GoogleMapController? _mapController;
+  final MapType _mapType = MapType.normal;
 
   static const LatLng _userLocation = LatLng(43.7167, 10.4017);
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final pos = context.watch<LocationProvider>();
+
+    if (_mapController != null && pos.latitude != null) {
+      final latLng = LatLng(pos.latitude!, pos.longitude!);
+
+      _mapController!.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = context.watch<RoutePlannerProvider>();
+
+    final brightness = Theme.of(context).brightness;
+    final mapStyle = brightness == Brightness.dark
+        ? _darkMapStyle
+        : _lightMapStyle;
 
     return SingleChildScrollView(
       child: Column(
@@ -28,12 +48,19 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
             height: MediaQuery.of(context).size.height * 0.40,
             width: double.infinity,
             child: GoogleMap(
+              key: ValueKey(brightness),
+              style: mapStyle,
               initialCameraPosition: const CameraPosition(
                 target: _userLocation,
                 zoom: 14,
               ),
+              mapType: _mapType,
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
+              compassEnabled: true,
+              tiltGesturesEnabled: false,
+              zoomControlsEnabled: false,
+              mapToolbarEnabled: false,
               onMapCreated: (controller) {
                 _mapController = controller;
               },
@@ -111,14 +138,10 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
             readOnly: true,
             decoration: InputDecoration(
               labelText: label,
-              filled: useCurrentLocation,
-              fillColor: useCurrentLocation ? Colors.grey.shade100 : null,
               border: const OutlineInputBorder(),
+              enabled: !useCurrentLocation,
               prefixIcon: Icon(
                 useCurrentLocation ? Icons.my_location : Icons.place,
-                color: useCurrentLocation
-                    ? Theme.of(context).primaryColor
-                    : null,
               ),
             ),
             onTap: useCurrentLocation
@@ -141,9 +164,6 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
           onPressed: onToggleCurrentLocation,
           icon: Icon(
             useCurrentLocation ? Icons.my_location : Icons.location_disabled,
-            color: useCurrentLocation
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).disabledColor,
           ),
         ),
       ],
@@ -172,3 +192,43 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
     );
   }
 }
+
+const String _darkMapStyle = '''
+[
+  {
+    "elementType": "geometry",
+    "stylers": [{"color": "#1d1d1d"}]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#8a8a8a"}]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [{"color": "#1d1d1d"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [{"color": "#2c2c2c"}]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [{"color": "#0e1626"}]
+  },
+  {
+    "featureType": "poi",
+    "stylers": [{"visibility": "off"}]
+  }
+]
+''';
+
+const String _lightMapStyle = '''
+[
+  {
+    "featureType": "poi",
+    "stylers": [{"visibility": "off"}]
+  }
+]
+''';
