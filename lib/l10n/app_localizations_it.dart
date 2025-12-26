@@ -80,7 +80,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String last_update(Object date, Object time) {
-    return '$date alle $time';
+    return 'Aggiornato il $date alle $time';
   }
 
   @override

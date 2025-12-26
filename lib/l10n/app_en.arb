@@ -92,7 +92,7 @@
             }
         }
     },
-    "last_update": "{date} at {time}",
+    "last_update": "Updated on {date} at {time}",
     "@last_update": {
         "description": "Last update date and time for a fuel station.",
         "placeholders": {

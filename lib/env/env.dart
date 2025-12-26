@@ -17,4 +17,7 @@ abstract class Env {
 
   @EnviedField(obfuscate: true, varName: "GOOGLE_PLACES_API_KEY")
   static final String googlePlacesApiKey = _Env.googlePlacesApiKey;
+
+  @EnviedField(obfuscate: true, varName: "GOOGLE_ROUTES_API_KEY")
+  static final String googleRoutesApiKey = _Env.googleRoutesApiKey;
 }

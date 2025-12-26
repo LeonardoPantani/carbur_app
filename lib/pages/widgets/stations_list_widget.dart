@@ -101,11 +101,17 @@ class StationsList extends StatelessWidget {
                 final station = provider.listStations[index];
 
                 return ListTile(
-                  leading: Image.asset(
-                    station.brand.asset,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.contain,
+                  contentPadding: const EdgeInsets.fromLTRB(4, 4, 16, 4),
+                  horizontalTitleGap: 3,
+                  leading: SizedBox(
+                    width: 75,
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Image.asset(
+                        station.brand.asset,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
                   title: Text(
                     station.name,
@@ -128,7 +134,7 @@ class StationsList extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
                         AppLocalizations.of(context)!.last_update(
                           DateFormat.MMMMd(
@@ -188,14 +194,14 @@ class StationsList extends StatelessWidget {
         WidgetSpan(
           alignment: PlaceholderAlignment.middle,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.primary,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               "${prices[i].value.pricePerLiter.formatPrice(context)} €",
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
               ),
@@ -253,7 +259,7 @@ class ShimmerStationList extends StatelessWidget {
           baseColor: base,
           highlightColor: highlight,
           child: ListTile(
-            leading: Container(width: 50, height: 50, color: highlight),
+            leading: Container(width: 75, height: 75, color: highlight),
             title: Container(
               height: 16,
               width: double.infinity,

@@ -92,7 +92,7 @@ class SettingsPage extends StatelessWidget {
               title: Text(l.settings_select_fuels),
               content: SizedBox(
                 width: double.maxFinite,
-                height: 350,
+                height: 250,
                 child: ListView(
                   shrinkWrap: true,
                   children: settings.availableFuels.map((fuel) {

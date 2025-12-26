@@ -20,4 +20,8 @@ class ApiKeyGetter {
   static String get autoCompleteMaps {
     return Env.googlePlacesApiKey;
   }
+
+  static String get routes {
+    return Env.googleRoutesApiKey;
+  }
 }

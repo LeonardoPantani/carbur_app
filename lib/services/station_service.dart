@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
+import '../env/api_key_getter.dart';
 import '../exceptions/custom_exceptions.dart';
 import '../models/station.dart';
 import '../models/fuel_type.dart';
@@ -99,10 +100,6 @@ class StationService {
         return FuelType.methane;
       case 4:
         return FuelType.lpg;
-      case 323:
-        return FuelType.lcng;
-      case 324:
-        return FuelType.lng;
       default:
         return null;
     }
@@ -174,5 +171,89 @@ class StationService {
     } on TimeoutException {
       throw Exception('Timeout API details');
     }
+  }
+
+  // calculating route
+  Future<Map<String, dynamic>?> computeRoute({
+    double? lat,
+    double? lng,
+    bool useCurrentLocationAsStart = true,
+    bool useCurrentLocationAsDestination = false,
+    String? startPlaceId,
+    String? destinationPlaceId,
+    required bool avoidTolls,
+    required String languageCode
+  }) async {
+    assert(
+      !(useCurrentLocationAsStart && useCurrentLocationAsDestination),
+    ); // cannot route to myself
+    assert(
+      startPlaceId != destinationPlaceId,
+    ); // cannot go from one place to same place
+
+    logger.i("Preparazione api routes");
+
+    final uri = Uri.parse(
+      'https://routes.googleapis.com/directions/v2:computeRoutes',
+    );
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': ApiKeyGetter.routes,
+      'X-Goog-FieldMask':
+          'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline',
+    };
+
+    Map<String, dynamic> origin;
+    Map<String, dynamic> destination;
+
+    if (useCurrentLocationAsStart) {
+      assert(lat != null && lng != null);
+      origin = {
+        "location": {
+          "latLng": {"latitude": lat, "longitude": lng},
+        },
+      };
+    } else {
+      origin = {"placeId": startPlaceId};
+    }
+
+    if (useCurrentLocationAsDestination) {
+      destination = {
+        "location": {
+          "latLng": {"latitude": lat, "longitude": lng},
+        },
+      };
+    } else {
+      destination = {"placeId": destinationPlaceId};
+    }
+
+    final body = {
+      "origin": origin,
+      "destination": destination,
+      "travelMode": "DRIVE",
+      "routingPreference": "TRAFFIC_AWARE",
+      "routeModifiers": {
+        "avoidTolls": avoidTolls,
+        "avoidHighways": false,
+        "avoidFerries": false,
+      },
+      "computeAlternativeRoutes": false,
+      "languageCode": languageCode,
+      "units": "METRIC",
+    };
+
+    final response = await http.post(
+      uri,
+      headers: headers,
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode != 200) {
+      logger.e("Errore Routes API: ${response.body}");
+      return null;
+    }
+
+    return jsonDecode(response.body);
   }
 }

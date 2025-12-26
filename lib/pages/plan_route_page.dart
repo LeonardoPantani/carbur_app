@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/position_provider.dart';
 import '../providers/route_planner_provider.dart';
+import '../utils/utils.dart';
 import 'search_place_page.dart';
 
 class PlanRoutePage extends StatefulWidget {
@@ -16,6 +16,7 @@ class PlanRoutePage extends StatefulWidget {
 class _PlanRoutePageState extends State<PlanRoutePage> {
   GoogleMapController? _mapController;
   final MapType _mapType = MapType.normal;
+  bool _routeFitted = false;
 
   static const LatLng _userLocation = LatLng(43.7167, 10.4017);
 
@@ -23,18 +24,23 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final pos = context.watch<LocationProvider>();
+    final provider = context.watch<RoutePlannerProvider>();
 
-    if (_mapController != null && pos.latitude != null) {
-      final latLng = LatLng(pos.latitude!, pos.longitude!);
+    if (_mapController != null &&
+        provider.routePolylinePoints.isNotEmpty &&
+        !_routeFitted) {
+      final bounds = computeBounds(provider.routePolylinePoints);
 
-      _mapController!.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
+      _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 48));
+
+      _routeFitted = true;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<RoutePlannerProvider>();
+    final String languageCode = Localizations.localeOf(context).languageCode;
 
     final brightness = Theme.of(context).brightness;
     final mapStyle = brightness == Brightness.dark
@@ -64,6 +70,16 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
               onMapCreated: (controller) {
                 _mapController = controller;
               },
+              polylines: provider.routePolylinePoints.isEmpty
+                  ? {}
+                  : {
+                      Polyline(
+                        polylineId: const PolylineId('route'),
+                        points: provider.routePolylinePoints,
+                        width: 4,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    },
             ),
           ),
 
@@ -79,13 +95,18 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
                   onToggleCurrentLocation: provider.toggleStartCurrentLocation,
                 ),
 
-                if (provider.startSuggestions.isNotEmpty)
-                  _buildSuggestions(
-                    provider.startSuggestions,
-                    provider.selectStartPlace,
-                  ),
-
-                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      iconSize: 20,
+                      tooltip: 'Swap start and destination',
+                      icon: const Icon(Icons.swap_vert),
+                      onPressed: provider.swapStartAndDestination,
+                    ),
+                  ],
+                ),
 
                 _buildLocationField(
                   label: 'Destination',
@@ -95,17 +116,25 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
                       provider.toggleDestinationCurrentLocation,
                 ),
 
-                if (provider.destinationSuggestions.isNotEmpty)
-                  _buildSuggestions(
-                    provider.destinationSuggestions,
-                    provider.selectDestinationPlace,
-                  ),
+                const SizedBox(height: 6),
 
-                const SizedBox(height: 24),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Avoid tolls'),
+                  value: provider.avoidTolls,
+                  onChanged: provider.setAvoidTolls,
+                ),
+
+                const SizedBox(height: 6),
 
                 ElevatedButton.icon(
                   onPressed: provider.canSearch
-                      ? provider.searchFuelStations
+                      ? () {
+                          setState(() {
+                            _routeFitted = false;
+                          });
+                          provider.searchFuelStations(context, languageCode);
+                        }
                       : null,
                   icon: const Icon(Icons.local_gas_station),
                   label: const Text(
@@ -167,28 +196,6 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildSuggestions(
-    List<PlaceSuggestion> suggestions,
-    ValueChanged<PlaceSuggestion> onTap,
-  ) {
-    return Container(
-      margin: const EdgeInsets.only(top: 4),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: suggestions.length,
-        itemBuilder: (context, index) {
-          final s = suggestions[index];
-          return ListTile(title: Text(s.description), onTap: () => onTap(s));
-        },
-      ),
     );
   }
 }

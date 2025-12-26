@@ -6,8 +6,6 @@ enum FuelType {
   diesel,
   methane,
   lpg,
-  lcng,
-  lng,
 }
 
 extension FuelTypeInfo on FuelType {
@@ -17,8 +15,6 @@ extension FuelTypeInfo on FuelType {
       case FuelType.diesel:   return 2;
       case FuelType.methane:  return 3;
       case FuelType.lpg:      return 4;
-      case FuelType.lcng:     return 323;
-      case FuelType.lng:      return 324;
     }
   }
 
@@ -34,10 +30,6 @@ extension FuelTypeInfo on FuelType {
         return l.fuel_methane;
       case FuelType.lpg:
         return l.fuel_lpg;
-      case FuelType.lcng:
-        return l.fuel_lcng;
-      case FuelType.lng:
-        return l.fuel_lng;
     }
   }
 }

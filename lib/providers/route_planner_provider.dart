@@ -3,20 +3,26 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import '../env/api_key_getter.dart';
+import '../services/station_service.dart';
 import '../utils/logger.dart';
+import '../utils/utils.dart';
+import 'position_provider.dart';
 
 class PlaceSuggestion {
   final String description;
   final String placeId;
+  final List<String> types;
 
-  PlaceSuggestion(this.description, this.placeId);
+  PlaceSuggestion(this.description, this.placeId, this.types);
 }
 
 class RoutePlannerProvider extends ChangeNotifier {
-  static final String _apiKey = ApiKeyGetter.autoCompleteMaps;
+  static final String _apiKeyAutocomplete = ApiKeyGetter.autoCompleteMaps;
 
   final TextEditingController startController = TextEditingController();
   final TextEditingController destinationController = TextEditingController();
@@ -38,8 +44,38 @@ class RoutePlannerProvider extends ChangeNotifier {
 
   String? _sessionToken;
 
-  bool get canSearch =>
-      !(useCurrentLocationAsStart && useCurrentLocationAsDestination);
+  bool avoidTolls = false;
+
+  void setAvoidTolls(bool value) {
+    if (avoidTolls == value) return;
+    avoidTolls = value;
+    hasSearched = false;
+    notifyListeners();
+  }
+
+  List<LatLng> routePolylinePoints = [];
+
+  bool hasSearched = false;
+
+  bool get canSearch {
+    if (hasSearched) return false;
+
+    final bothCurrent =
+        useCurrentLocationAsStart && useCurrentLocationAsDestination;
+
+    final startInvalid = !useCurrentLocationAsStart && startPlaceId == null;
+
+    final destinationInvalid =
+        !useCurrentLocationAsDestination && destinationPlaceId == null;
+
+    final samePlace =
+        !useCurrentLocationAsStart &&
+        !useCurrentLocationAsDestination &&
+        startPlaceId != null &&
+        startPlaceId == destinationPlaceId;
+
+    return !(bothCurrent || startInvalid || destinationInvalid || samePlace);
+  }
 
   RoutePlannerProvider() {
     if (useCurrentLocationAsStart) {
@@ -104,6 +140,7 @@ class RoutePlannerProvider extends ChangeNotifier {
   }
 
   Future<void> selectStartPlace(PlaceSuggestion suggestion) async {
+    hasSearched = false;
     startController.text = suggestion.description;
     startPlaceId = suggestion.placeId;
     startSuggestions.clear();
@@ -150,6 +187,7 @@ class RoutePlannerProvider extends ChangeNotifier {
   }
 
   Future<void> selectDestinationPlace(PlaceSuggestion suggestion) async {
+    hasSearched = false;
     destinationController.text = suggestion.description;
     destinationSuggestions.clear();
     destinationPlaceId = suggestion.placeId;
@@ -164,20 +202,19 @@ class RoutePlannerProvider extends ChangeNotifier {
     String languageCode, {
     double? lat,
     double? lng,
+    String? excludePlaceId,
   }) async {
     _sessionToken ??= _generateSessionToken();
 
     final Map<String, String> parameters = {
       'input': input,
-      'key': _apiKey,
+      'key': _apiKeyAutocomplete,
       'language': languageCode,
-      'types': 'address',
       'sessiontoken': _sessionToken!,
     };
 
     if (lat != null && lng != null) {
-      parameters['location'] = "$lat,$lng";
-      parameters['radius'] = "10000";
+      parameters['locationbias'] = "circle:50000@$lat,$lng";
     }
 
     logger.i(
@@ -196,7 +233,14 @@ class RoutePlannerProvider extends ChangeNotifier {
 
       if (data['status'] == 'OK') {
         return (data['predictions'] as List)
-            .map((p) => PlaceSuggestion(p['description'], p['place_id']))
+            .map(
+              (p) => PlaceSuggestion(
+                p['description'],
+                p['place_id'],
+                List<String>.from(p['types'] ?? const []),
+              ),
+            )
+            .where((p) => p.placeId != excludePlaceId)
             .toList();
       }
       return [];
@@ -208,8 +252,67 @@ class RoutePlannerProvider extends ChangeNotifier {
 
   /* ---------------- ACTION ---------------- */
 
-  void searchFuelStations() {
-    // TODO
+  void searchFuelStations(BuildContext context, String languageCode) async {
+    final location = context.read<LocationProvider>();
+
+    final double? lat = location.latitude;
+    final double? lng = location.longitude;
+
+    final result = await StationService().computeRoute(
+      avoidTolls: avoidTolls,
+      languageCode: languageCode,
+      useCurrentLocationAsStart: useCurrentLocationAsStart,
+      useCurrentLocationAsDestination: useCurrentLocationAsDestination,
+      startPlaceId: startPlaceId,
+      destinationPlaceId: destinationPlaceId,
+      lat: lat,
+      lng: lng,
+    );
+
+    final routes = result?['routes'];
+    if (routes == null || routes.isEmpty) return;
+
+    final encodedPolyline = routes[0]['polyline']['encodedPolyline'] as String;
+
+    final points = decodePolylineToPoints(encodedPolyline);
+
+    routePolylinePoints = points
+        .map((p) => LatLng(p['lat']!, p['lng']!))
+        .toList();
+
+    if (result != null &&
+        result['routes'] != null &&
+        (result['routes'] as List).isNotEmpty) {
+      hasSearched = true;
+      notifyListeners();
+    }
+  }
+
+  void swapStartAndDestination() {
+    final tmpUseCurrentStart = useCurrentLocationAsStart;
+    final tmpUseCurrentDestination = useCurrentLocationAsDestination;
+
+    final tmpStartText = startController.text;
+    final tmpDestinationText = destinationController.text;
+
+    final tmpStartPlaceId = startPlaceId;
+    final tmpDestinationPlaceId = destinationPlaceId;
+
+    useCurrentLocationAsStart = tmpUseCurrentDestination;
+    useCurrentLocationAsDestination = tmpUseCurrentStart;
+
+    startController.text = tmpDestinationText;
+    destinationController.text = tmpStartText;
+
+    startPlaceId = tmpDestinationPlaceId;
+    destinationPlaceId = tmpStartPlaceId;
+
+    startSuggestions.clear();
+    destinationSuggestions.clear();
+
+    hasSearched = false;
+
+    notifyListeners();
   }
 
   @override
