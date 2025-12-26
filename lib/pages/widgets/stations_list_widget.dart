@@ -1,19 +1,11 @@
-import 'package:carbur_app/models/fuel_type.dart';
-import 'package:carbur_app/models/station.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../extensions/brand_estensions.dart';
-import '../../extensions/prices_estensions.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/position_provider.dart';
-import '../../providers/settings_provider.dart';
-import '../../providers/station_details_provider.dart';
 import '../../providers/station_provider.dart';
-import '../../extensions/number_extensions.dart';
-import '../station_details_page.dart';
+import 'station_list_tile.dart';
 
 class StationsList extends StatelessWidget {
   const StationsList({super.key});
@@ -21,7 +13,6 @@ class StationsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<StationProvider>();
-    final settings = context.watch<SettingsProvider>();
     AppLocalizations l = AppLocalizations.of(context)!;
 
     if (provider.isLoading) {
@@ -99,122 +90,13 @@ class StationsList extends StatelessWidget {
               itemCount: provider.listStations.length,
               itemBuilder: (context, index) {
                 final station = provider.listStations[index];
-
-                return ListTile(
-                  contentPadding: const EdgeInsets.fromLTRB(4, 4, 16, 4),
-                  horizontalTitleGap: 3,
-                  leading: SizedBox(
-                    width: 75,
-                    child: AspectRatio(
-                      aspectRatio: 1,
-                      child: Image.asset(
-                        station.brand.asset,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    station.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          children: _buildPriceSpans(
-                            context,
-                            station,
-                            settings,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        AppLocalizations.of(context)!.last_update(
-                          DateFormat.MMMMd(
-                            Localizations.localeOf(context).toString(),
-                          ).format(station.lastUpdate),
-                          DateFormat.Hm(
-                            Localizations.localeOf(context).toString(),
-                          ).format(station.lastUpdate),
-                        ),
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        station.distanceKm.formatDistance(context),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text("km", style: Theme.of(context).textTheme.bodySmall),
-                    ],
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ChangeNotifierProvider(
-                          create: (_) =>
-                              StationDetailsProvider(station)..loadDetails(),
-                          child: const StationDetailsPage(),
-                        ),
-                      ),
-                    );
-                  },
-                );
+                return StationTile(station: station);
               },
             ),
           ),
         ],
       ),
     );
-  }
-
-  List<InlineSpan> _buildPriceSpans(
-    BuildContext context,
-    Station station,
-    SettingsProvider settings,
-  ) {
-    final prices = station.visiblePrices(settings.selectedFuels);
-    final spans = <InlineSpan>[];
-
-    for (int i = 0; i < prices.length; i++) {
-      spans.add(TextSpan(text: "${prices[i].key.label(context)}: "));
-      spans.add(
-        WidgetSpan(
-          alignment: PlaceholderAlignment.middle,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              "${prices[i].value.pricePerLiter.formatPrice(context)} €",
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-      );
-
-      if (i < prices.length - 1) {
-        spans.add(const TextSpan(text: " • "));
-      }
-    }
-    return spans;
   }
 
   Future<void> _onRefresh(BuildContext context) async {

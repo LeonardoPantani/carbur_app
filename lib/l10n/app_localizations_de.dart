@@ -90,6 +90,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get section_stations_list => 'Tankstellen';
 
   @override
+  String get section_route_planner => 'Routenplaner';
+
+  @override
   String get start_navigation_question => 'Navigation starten?';
 
   @override
@@ -231,4 +234,51 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_marker_fuel_auto_disabledwhy =>
       'Diese Einstellung ist deaktiviert, wenn nur eine Kraftstoffart ausgewählt ist.';
+
+  @override
+  String get other_infos_title => 'Weitere Informationen';
+
+  @override
+  String get other_infos_notavailable =>
+      'Diese Tankstelle bietet keine weiteren Informationen.';
+
+  @override
+  String get autocomplete_compliance_google_text =>
+      'Autovervollständigungs-Technologie von Google';
+
+  @override
+  String get routeplanner_editroute_button => 'Route bearbeiten';
+
+  @override
+  String get routeplanner_start_label => 'Startpunkt';
+
+  @override
+  String get routeplanner_destination_label => 'Ziel';
+
+  @override
+  String get routeplanner_setting_avoidtolls => 'Mautstellen vermeiden';
+
+  @override
+  String get routeplanner_reset_button => 'Zurücksetzen';
+
+  @override
+  String get routeplanner_search_button => 'Suchen';
+
+  @override
+  String get routeplanner_emptylist_placeholder_text =>
+      'Tankstellen entlang der Route werden hier angezeigt.';
+
+  @override
+  String get routeplanner_toll_switch_desc_text =>
+      'Mautstraßen von der Routenberechnung ausschließen.';
+
+  @override
+  String get routeplanner_enter_start_placeholder => 'Startpunkt eingeben';
+
+  @override
+  String get routeplanner_enter_destination_placeholder => 'Ziel eingeben';
+
+  @override
+  String get routeplanner_usingcurrentlocation_text =>
+      'Aktueller Standort wird verwendet';
 }

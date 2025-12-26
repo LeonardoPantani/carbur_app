@@ -1,8 +1,10 @@
 import 'package:carbur_app/pages/plan_route_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
 import '../pages/settings_page.dart';
+import '../providers/map_provider.dart';
 import 'widgets/stations_list_widget.dart';
 import 'widgets/stations_map_widget.dart';
 import 'widgets/stations_sort_widget.dart';
@@ -32,10 +34,13 @@ class _HomePageState extends State<HomePage> {
       ),
       body: IndexedStack(
         index: _currentIndex,
-        children: const [
+        children: [
           StationsMap(),
           StationsList(),
-          PlanRoutePage(),
+          ChangeNotifierProvider(
+            create: (_) => MapProvider(), // this MapProvider is separated from the first one.
+            child: const PlanRoutePage(), // this beacause PlanRoutePage must have another map with no markers
+          ),
         ],
       ),
       bottomNavigationBar: _buildBottomBar(context),
@@ -74,7 +79,7 @@ class _HomePageState extends State<HomePage> {
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.directions),
-          label: "Plan trip",
+          label: AppLocalizations.of(context)!.section_route_planner,
         ),
       ],
     );

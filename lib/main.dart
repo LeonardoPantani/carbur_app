@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'providers/map_provider.dart';
 import 'providers/position_provider.dart';
-import 'providers/route_planner_provider.dart';
+import 'providers/plan_route_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/station_provider.dart';
 
@@ -18,8 +19,9 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => LocationProvider()),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider(create: (_) => MapProvider()),
         ChangeNotifierProvider(
-          create: (_) => RoutePlannerProvider(),
+          create: (_) => PlanRouteProvider(),
         ),
         ChangeNotifierProxyProvider2<
           LocationProvider,

@@ -90,6 +90,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get section_stations_list => 'Stacje paliw';
 
   @override
+  String get section_route_planner => 'Zaplanuj podróż';
+
+  @override
   String get start_navigation_question => 'Rozpocząć nawigację?';
 
   @override
@@ -233,4 +236,51 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get settings_marker_fuel_auto_disabledwhy =>
       'To ustawienie jest niedostępne, gdy wybrany jest tylko jeden rodzaj paliwa.';
+
+  @override
+  String get other_infos_title => 'Inne informacje';
+
+  @override
+  String get other_infos_notavailable =>
+      'Ta stacja paliw nie podaje innych informacji.';
+
+  @override
+  String get autocomplete_compliance_google_text =>
+      'Technologia autouzupełniania dostarczana przez Google';
+
+  @override
+  String get routeplanner_editroute_button => 'Edytuj trasę';
+
+  @override
+  String get routeplanner_start_label => 'Punkt startowy';
+
+  @override
+  String get routeplanner_destination_label => 'Cel podróży';
+
+  @override
+  String get routeplanner_setting_avoidtolls => 'Unikaj opłat';
+
+  @override
+  String get routeplanner_reset_button => 'Resetuj';
+
+  @override
+  String get routeplanner_search_button => 'Szukaj';
+
+  @override
+  String get routeplanner_emptylist_placeholder_text =>
+      'Tutaj zostaną wyświetlone stacje benzynowe na trasie.';
+
+  @override
+  String get routeplanner_toll_switch_desc_text =>
+      'Wyklucz drogi płatne z obliczania trasy.';
+
+  @override
+  String get routeplanner_enter_start_placeholder => 'Wpisz punkt startowy';
+
+  @override
+  String get routeplanner_enter_destination_placeholder => 'Wpisz cel podróży';
+
+  @override
+  String get routeplanner_usingcurrentlocation_text =>
+      'Korzystanie z aktualnej lokalizacji';
 }

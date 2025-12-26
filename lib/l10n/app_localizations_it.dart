@@ -90,6 +90,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get section_stations_list => 'Distributori';
 
   @override
+  String get section_route_planner => 'Pianifica viaggio';
+
+  @override
   String get start_navigation_question => 'Avviare navigazione?';
 
   @override
@@ -185,7 +188,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get back => 'Indietro';
 
   @override
-  String get start_navigation => 'Navigazione';
+  String get start_navigation => 'Avvia navigaz.';
 
   @override
   String get weekday_monday => 'Lunedì';
@@ -232,4 +235,51 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_marker_fuel_auto_disabledwhy =>
       'Questa impostazione è disabilitata se selezioni un solo tipo di carburante.';
+
+  @override
+  String get other_infos_title => 'Altre informazioni';
+
+  @override
+  String get other_infos_notavailable =>
+      'Questa stazione di servizio non fornisce altre informazioni.';
+
+  @override
+  String get autocomplete_compliance_google_text =>
+      'Completamento automatico fornito da Google';
+
+  @override
+  String get routeplanner_editroute_button => 'Modifica percorso';
+
+  @override
+  String get routeplanner_start_label => 'Partenza';
+
+  @override
+  String get routeplanner_destination_label => 'Destinazione';
+
+  @override
+  String get routeplanner_setting_avoidtolls => 'Evita pedaggi';
+
+  @override
+  String get routeplanner_reset_button => 'Ripristina';
+
+  @override
+  String get routeplanner_search_button => 'Cerca';
+
+  @override
+  String get routeplanner_emptylist_placeholder_text =>
+      'Le stazioni di servizio lungo il percorso verranno mostrate qui.';
+
+  @override
+  String get routeplanner_toll_switch_desc_text =>
+      'Escludi le strade a pedaggio dal calcolo del percorso.';
+
+  @override
+  String get routeplanner_enter_start_placeholder => 'Inserisci partenza';
+
+  @override
+  String get routeplanner_enter_destination_placeholder =>
+      'Inserisci destinazione';
+
+  @override
+  String get routeplanner_usingcurrentlocation_text => 'Usando posizione';
 }

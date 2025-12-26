@@ -112,6 +112,10 @@
     "@section_stations_list": {
         "description": "String visible in the bottom bar selection menu."
     },
+    "section_route_planner": "Planifica tu ruta",
+    "@section_route_planner": {
+        "description": "String visible in the bottom bar selection menu."
+    },
     "start_navigation_question": "¿Iniciar navegación?",
     "@start_navigation_question": {
         "description": "Title of dialog that appears when clicking on a marker on the map."
@@ -296,5 +300,61 @@
     "settings_marker_fuel_auto_disabledwhy": "Esta configuración se desactiva cuando seleccionas solo un tipo de combustible.",
     "@settings_marker_fuel_auto_disabledwhy": {
         "description": "Explaination on why the preferred fuel type setting is not available."
+    },
+    "other_infos_title": "Otra información",
+    "@other_infos_title": {
+        "description": "Other information header title (regarding a fuel station, like email, website or phone number)."
+    },
+    "other_infos_notavailable": "Esta gasolinera no proporciona otra información.",
+    "@other_infos_notavailable": {
+        "description": "Message shown when no other information is available for the fuel station."
+    },
+    "autocomplete_compliance_google_text": "Tecnología de autocompletado proporcionada por Google",
+    "@autocomplete_compliance_google_text": {
+        "description": "Text that appears at the bottom of the search address page."
+    },
+    "routeplanner_editroute_button": "Editar ruta",
+    "@routeplanner_editroute_button": {
+        "description": "Text of button that appears after closing the menu of selection of destination."
+    },
+    "routeplanner_start_label": "Punto de partida",
+    "@routeplanner_start_label": {
+        "description": "Label indicating the text area containing the start point address."
+    },
+    "routeplanner_destination_label": "Destino",
+    "@routeplanner_destination_label": {
+        "description": "Label indicating the text area containing the destination address."
+    },
+    "routeplanner_setting_avoidtolls": "Evitar peajes",
+    "@routeplanner_setting_avoidtolls": {
+        "description": "Switch that enables or disables tolls routes."
+    },
+    "routeplanner_reset_button": "Restablecer",
+    "@routeplanner_reset_button": {
+        "description": "Reset button."
+    },
+    "routeplanner_search_button": "Buscar",
+    "@routeplanner_search_button": {
+        "description": "Search route button."
+    },
+    "routeplanner_emptylist_placeholder_text": "Las gasolineras a lo largo de la ruta se mostrarán aquí.",
+    "@routeplanner_emptylist_placeholder_text": {
+        "description": "Placeholder for when the fuel stations list has not been populated yet."
+    },
+    "routeplanner_toll_switch_desc_text": "Excluir carreteras de peaje del cálculo de la ruta.",
+    "@routeplanner_toll_switch_desc_text": {
+        "description": "Descriptive text for avoid tolls button."
+    },
+    "routeplanner_enter_start_placeholder": "Introducir punto de partida",
+    "@routeplanner_enter_start_placeholder": {
+        "description": "Placeholder text in text area while entering text."
+    },
+    "routeplanner_enter_destination_placeholder": "Introducir destino",
+    "@routeplanner_enter_destination_placeholder": {
+        "description": "Placeholder text in text area while entering text."
+    },
+    "routeplanner_usingcurrentlocation_text": "Usando ubicación actual",
+    "@routeplanner_usingcurrentlocation_text": {
+        "description": "Inside text area of both start and destination points while current location is used."
     }
 }

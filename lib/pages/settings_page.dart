@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../models/fuel_type.dart';
 import '../providers/settings_provider.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/hyperlink_utils.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -58,9 +58,8 @@ class SettingsPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 32),
             child: InkWell(
-              onTap: () async {
-                final uri = Uri.parse("https://github.com/LeonardoPantani");
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              onTap: () {
+                openWebsite("https://github.com/LeonardoPantani");
               },
               child: Text(
                 l.settings_footer_madeby("Leonardo Pantani"),

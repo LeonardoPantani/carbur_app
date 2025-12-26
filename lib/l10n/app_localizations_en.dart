@@ -90,6 +90,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get section_stations_list => 'Stations';
 
   @override
+  String get section_route_planner => 'Route planner';
+
+  @override
   String get start_navigation_question => 'Start navigation?';
 
   @override
@@ -231,4 +234,50 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_marker_fuel_auto_disabledwhy =>
       'This setting is disabled when you select only a type of fuel.';
+
+  @override
+  String get other_infos_title => 'Other information';
+
+  @override
+  String get other_infos_notavailable =>
+      'This fuel station does not provide other info.';
+
+  @override
+  String get autocomplete_compliance_google_text =>
+      'Autocomplete technology provided by Google';
+
+  @override
+  String get routeplanner_editroute_button => 'Edit route';
+
+  @override
+  String get routeplanner_start_label => 'Start point';
+
+  @override
+  String get routeplanner_destination_label => 'Destination';
+
+  @override
+  String get routeplanner_setting_avoidtolls => 'Avoid tolls';
+
+  @override
+  String get routeplanner_reset_button => 'Reset';
+
+  @override
+  String get routeplanner_search_button => 'Search';
+
+  @override
+  String get routeplanner_emptylist_placeholder_text =>
+      'Petrol stations along the route will be shown here.';
+
+  @override
+  String get routeplanner_toll_switch_desc_text =>
+      'Exclude toll roads from route calculation.';
+
+  @override
+  String get routeplanner_enter_start_placeholder => 'Enter start point';
+
+  @override
+  String get routeplanner_enter_destination_placeholder => 'Enter destination';
+
+  @override
+  String get routeplanner_usingcurrentlocation_text => 'Using current location';
 }

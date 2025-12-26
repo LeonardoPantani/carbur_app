@@ -246,6 +246,12 @@ abstract class AppLocalizations {
   /// **'Stations'**
   String get section_stations_list;
 
+  /// String visible in the bottom bar selection menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Route planner'**
+  String get section_route_planner;
+
   /// Title of dialog that appears when clicking on a marker on the map.
   ///
   /// In en, this message translates to:
@@ -515,6 +521,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This setting is disabled when you select only a type of fuel.'**
   String get settings_marker_fuel_auto_disabledwhy;
+
+  /// Other information header title (regarding a fuel station, like email, website or phone number).
+  ///
+  /// In en, this message translates to:
+  /// **'Other information'**
+  String get other_infos_title;
+
+  /// Message shown when no other information is available for the fuel station.
+  ///
+  /// In en, this message translates to:
+  /// **'This fuel station does not provide other info.'**
+  String get other_infos_notavailable;
+
+  /// Text that appears at the bottom of the search address page.
+  ///
+  /// In en, this message translates to:
+  /// **'Autocomplete technology provided by Google'**
+  String get autocomplete_compliance_google_text;
+
+  /// Text of button that appears after closing the menu of selection of destination.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit route'**
+  String get routeplanner_editroute_button;
+
+  /// Label indicating the text area containing the start point address.
+  ///
+  /// In en, this message translates to:
+  /// **'Start point'**
+  String get routeplanner_start_label;
+
+  /// Label indicating the text area containing the destination address.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination'**
+  String get routeplanner_destination_label;
+
+  /// Switch that enables or disables tolls routes.
+  ///
+  /// In en, this message translates to:
+  /// **'Avoid tolls'**
+  String get routeplanner_setting_avoidtolls;
+
+  /// Reset button.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get routeplanner_reset_button;
+
+  /// Search route button.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get routeplanner_search_button;
+
+  /// Placeholder for when the fuel stations list has not been populated yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Petrol stations along the route will be shown here.'**
+  String get routeplanner_emptylist_placeholder_text;
+
+  /// Descriptive text for avoid tolls button.
+  ///
+  /// In en, this message translates to:
+  /// **'Exclude toll roads from route calculation.'**
+  String get routeplanner_toll_switch_desc_text;
+
+  /// Placeholder text in text area while entering text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter start point'**
+  String get routeplanner_enter_start_placeholder;
+
+  /// Placeholder text in text area while entering text.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter destination'**
+  String get routeplanner_enter_destination_placeholder;
+
+  /// Inside text area of both start and destination points while current location is used.
+  ///
+  /// In en, this message translates to:
+  /// **'Using current location'**
+  String get routeplanner_usingcurrentlocation_text;
 }
 
 class _AppLocalizationsDelegate

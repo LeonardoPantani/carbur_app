@@ -2,16 +2,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:carbur_app/models/fuel_type.dart' show FuelType;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../env/api_key_getter.dart';
+import '../models/station.dart';
 import '../services/station_service.dart';
 import '../utils/logger.dart';
 import '../utils/utils.dart';
 import 'position_provider.dart';
+import 'settings_provider.dart';
 
 class PlaceSuggestion {
   final String description;
@@ -21,7 +24,7 @@ class PlaceSuggestion {
   PlaceSuggestion(this.description, this.placeId, this.types);
 }
 
-class RoutePlannerProvider extends ChangeNotifier {
+class PlanRouteProvider extends ChangeNotifier {
   static final String _apiKeyAutocomplete = ApiKeyGetter.autoCompleteMaps;
 
   final TextEditingController startController = TextEditingController();
@@ -77,9 +80,11 @@ class RoutePlannerProvider extends ChangeNotifier {
     return !(bothCurrent || startInvalid || destinationInvalid || samePlace);
   }
 
-  RoutePlannerProvider() {
+  List<Station> stationsOnRoute = [];
+
+  PlanRouteProvider() {
     if (useCurrentLocationAsStart) {
-      startController.text = 'Using current location';
+      startController.text = '';
     }
     if (useCurrentLocationAsDestination) {
       destinationController.text = '';
@@ -108,7 +113,7 @@ class RoutePlannerProvider extends ChangeNotifier {
 
     if (useCurrentLocationAsStart) {
       _previousStartText = startController.text;
-      startController.text = 'Using current location';
+      startController.text = '';
       startSuggestions.clear();
     } else {
       startController.text = _previousStartText;
@@ -155,7 +160,7 @@ class RoutePlannerProvider extends ChangeNotifier {
 
     if (useCurrentLocationAsDestination) {
       _previousDestinationText = destinationController.text;
-      destinationController.text = 'Using current location';
+      destinationController.text = '';
       destinationSuggestions.clear();
     } else {
       destinationController.text = _previousDestinationText;
@@ -252,8 +257,12 @@ class RoutePlannerProvider extends ChangeNotifier {
 
   /* ---------------- ACTION ---------------- */
 
-  void searchFuelStations(BuildContext context, String languageCode) async {
+  Future<void> searchFuelStations(
+    BuildContext context,
+    String languageCode,
+  ) async {
     final location = context.read<LocationProvider>();
+    final settings = context.read<SettingsProvider>();
 
     final double? lat = location.latitude;
     final double? lng = location.longitude;
@@ -273,19 +282,42 @@ class RoutePlannerProvider extends ChangeNotifier {
     if (routes == null || routes.isEmpty) return;
 
     final encodedPolyline = routes[0]['polyline']['encodedPolyline'] as String;
+    final pointsJson = decodePolylineToPoints(encodedPolyline);
 
-    final points = decodePolylineToPoints(encodedPolyline);
-
-    routePolylinePoints = points
+    final List<Map<String, double>> ministerPoints = pointsJson
+        .map((p) => {"lat": p['lat']!, "lng": p['lng']!})
+        .toList();
+    routePolylinePoints = ministerPoints
         .map((p) => LatLng(p['lat']!, p['lng']!))
         .toList();
 
-    if (result != null &&
-        result['routes'] != null &&
-        (result['routes'] as List).isNotEmpty) {
+    String fuelType = "1-x";
+    if (settings.selectedFuels.isNotEmpty) {
+      final first = settings.selectedFuels.first;
+      fuelType = "${first.index + 1}-x";
+    }
+
+    try {
+      // calling minister website
+      final List<Station> fetchedStations = await StationService()
+          .fetchStationsOnRoute(points: ministerPoints, fuelType: fuelType);
+
+      stationsOnRoute = fetchedStations;
       hasSearched = true;
       notifyListeners();
+    } catch (e) {
+      logger.e("Errore durante il recupero dei distributori sul percorso: $e");
     }
+  }
+
+  void clear() {
+    startController.text = '';
+    destinationController.clear();
+    routePolylinePoints = [];
+    stationsOnRoute = [];
+    useCurrentLocationAsStart = true;
+    useCurrentLocationAsDestination = false;
+    notifyListeners();
   }
 
   void swapStartAndDestination() {
@@ -313,6 +345,14 @@ class RoutePlannerProvider extends ChangeNotifier {
     hasSearched = false;
 
     notifyListeners();
+  }
+
+  List<Station> getStationsFilteredBy(List<FuelType> selectedFuels) {
+    if (stationsOnRoute.isEmpty) return [];
+
+    return stationsOnRoute.where((station) {
+      return station.prices.keys.any((k) => selectedFuels.contains(k));
+    }).toList();
   }
 
   @override

@@ -90,6 +90,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get section_stations_list => 'Stations-service';
 
   @override
+  String get section_route_planner => 'Planifier trajet';
+
+  @override
   String get start_navigation_question => 'Démarrer la navigation ?';
 
   @override
@@ -231,4 +234,53 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_marker_fuel_auto_disabledwhy =>
       'Ce paramètre est désactivé lorsque vous sélectionnez un seul type de carburant.';
+
+  @override
+  String get other_infos_title => 'Autres informations';
+
+  @override
+  String get other_infos_notavailable =>
+      'Cette station-service ne fournit pas d\'autres informations.';
+
+  @override
+  String get autocomplete_compliance_google_text =>
+      'Technologie de saisie semi-automatique fournie par Google';
+
+  @override
+  String get routeplanner_editroute_button => 'Modifier l\'itinéraire';
+
+  @override
+  String get routeplanner_start_label => 'Point de départ';
+
+  @override
+  String get routeplanner_destination_label => 'Destination';
+
+  @override
+  String get routeplanner_setting_avoidtolls => 'Éviter les péages';
+
+  @override
+  String get routeplanner_reset_button => 'Réinitialiser';
+
+  @override
+  String get routeplanner_search_button => 'Rechercher';
+
+  @override
+  String get routeplanner_emptylist_placeholder_text =>
+      'Les stations-service le long de l\'itinéraire seront affichées ici.';
+
+  @override
+  String get routeplanner_toll_switch_desc_text =>
+      'Exclure les routes à péage du calcul de l\'itinéraire.';
+
+  @override
+  String get routeplanner_enter_start_placeholder =>
+      'Saisir le point de départ';
+
+  @override
+  String get routeplanner_enter_destination_placeholder =>
+      'Saisir la destination';
+
+  @override
+  String get routeplanner_usingcurrentlocation_text =>
+      'Utilisation de la position actuelle';
 }

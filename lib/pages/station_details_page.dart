@@ -157,7 +157,7 @@ class StationDetailsPage extends StatelessWidget {
                     const SizedBox(height: 4),
                     // showing error if empty
                     if (details.openingHours.isEmpty)
-                      Text(l.opening_hours_not_available)
+                      Text(l.opening_hours_not_available, style: TextStyle(color: Theme.of(context).colorScheme.secondary),)
                     else
                       // showing disclaimer and table with opening hours
                       Text(
@@ -222,7 +222,7 @@ class StationDetailsPage extends StatelessWidget {
                     const SizedBox(height: 4),
                     // showing error if empty
                     if (details.services.isEmpty)
-                      Text(l.facilities_not_available)
+                      Text(l.facilities_not_available, style: TextStyle(color: Theme.of(context).colorScheme.secondary),)
                     else
                       // showing list of facilities
                       Column(
@@ -236,39 +236,64 @@ class StationDetailsPage extends StatelessWidget {
                       ),
                     const SizedBox(height: 12),
 
-                    // showing other infos: phone, email, website
-                    if (details.phone?.isNotEmpty == true)
-                      InkWell(
-                        onTap: () => openPhone(details.phone!),
-                        child: Text(
-                          '${l.phone}: ${details.phone}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                    // other infos header
+                    Text(
+                      l.other_infos_title,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 4),
+                    // showing error if empty
+                    if (details.phone?.isEmpty == true && details.email?.isEmpty == true && details.website?.isEmpty == true)
+                      Text(l.other_infos_notavailable, style: TextStyle(color: Theme.of(context).colorScheme.secondary),)
+                    else
+                      // showing other infos: phone, email, website
+                      if (details.phone?.isNotEmpty == true)
+                        Row(
+                          children: [
+                            Text('${l.phone}: ',),
+                            InkWell(
+                              onTap: () => openPhone(details.phone!),
+                              child: Text(
+                                details.phone!,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
 
-                    if (details.email?.isNotEmpty == true)
-                      InkWell(
-                        onTap: () => openEmail(details.email!),
-                        child: Text(
-                          '${l.email}: ${details.email}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                      if (details.email?.isNotEmpty == true)
+                        Row(
+                          children: [
+                            Text('${l.email}: ',),
+                            InkWell(
+                              onTap: () => openEmail(details.email!),
+                              child: Text(
+                                details.email!,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
 
-                    if (details.website?.isNotEmpty == true)
-                      InkWell(
-                        onTap: () => openWebsite(details.website!),
-                        child: Text(
-                          '${l.website}: ${details.website}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                      if (details.website?.isNotEmpty == true)
+                        Row(
+                          children: [
+                            Text('${l.website}: '),
+                            InkWell(
+                              onTap: () => openWebsite(details.website!),
+                              child: Text(
+                                details.website!,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
                   ],
                 ),
               ),

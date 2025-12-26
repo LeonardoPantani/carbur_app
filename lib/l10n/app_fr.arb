@@ -112,6 +112,10 @@
     "@section_stations_list": {
         "description": "String visible in the bottom bar selection menu."
     },
+    "section_route_planner": "Planifier trajet",
+    "@section_route_planner": {
+        "description": "String visible in the bottom bar selection menu."
+    },
     "start_navigation_question": "Démarrer la navigation ?",
     "@start_navigation_question": {
         "description": "Title of dialog that appears when clicking on a marker on the map."
@@ -296,5 +300,61 @@
     "settings_marker_fuel_auto_disabledwhy": "Ce paramètre est désactivé lorsque vous sélectionnez un seul type de carburant.",
     "@settings_marker_fuel_auto_disabledwhy": {
         "description": "Explaination on why the preferred fuel type setting is not available."
+    },
+    "other_infos_title": "Autres informations",
+    "@other_infos_title": {
+        "description": "Other information header title (regarding a fuel station, like email, website or phone number)."
+    },
+    "other_infos_notavailable": "Cette station-service ne fournit pas d'autres informations.",
+    "@other_infos_notavailable": {
+        "description": "Message shown when no other information is available for the fuel station."
+    },
+    "autocomplete_compliance_google_text": "Technologie de saisie semi-automatique fournie par Google",
+    "@autocomplete_compliance_google_text": {
+        "description": "Text that appears at the bottom of the search address page."
+    },
+    "routeplanner_editroute_button": "Modifier l'itinéraire",
+    "@routeplanner_editroute_button": {
+        "description": "Text of button that appears after closing the menu of selection of destination."
+    },
+    "routeplanner_start_label": "Point de départ",
+    "@routeplanner_start_label": {
+        "description": "Label indicating the text area containing the start point address."
+    },
+    "routeplanner_destination_label": "Destination",
+    "@routeplanner_destination_label": {
+        "description": "Label indicating the text area containing the destination address."
+    },
+    "routeplanner_setting_avoidtolls": "Éviter les péages",
+    "@routeplanner_setting_avoidtolls": {
+        "description": "Switch that enables or disables tolls routes."
+    },
+    "routeplanner_reset_button": "Réinitialiser",
+    "@routeplanner_reset_button": {
+        "description": "Reset button."
+    },
+    "routeplanner_search_button": "Rechercher",
+    "@routeplanner_search_button": {
+        "description": "Search route button."
+    },
+    "routeplanner_emptylist_placeholder_text": "Les stations-service le long de l'itinéraire seront affichées ici.",
+    "@routeplanner_emptylist_placeholder_text": {
+        "description": "Placeholder for when the fuel stations list has not been populated yet."
+    },
+    "routeplanner_toll_switch_desc_text": "Exclure les routes à péage du calcul de l'itinéraire.",
+    "@routeplanner_toll_switch_desc_text": {
+        "description": "Descriptive text for avoid tolls button."
+    },
+    "routeplanner_enter_start_placeholder": "Saisir le point de départ",
+    "@routeplanner_enter_start_placeholder": {
+        "description": "Placeholder text in text area while entering text."
+    },
+    "routeplanner_enter_destination_placeholder": "Saisir la destination",
+    "@routeplanner_enter_destination_placeholder": {
+        "description": "Placeholder text in text area while entering text."
+    },
+    "routeplanner_usingcurrentlocation_text": "Utilisation de la position actuelle",
+    "@routeplanner_usingcurrentlocation_text": {
+        "description": "Inside text area of both start and destination points while current location is used."
     }
 }

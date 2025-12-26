@@ -1,10 +1,16 @@
+import 'package:carbur_app/extensions/navigation_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/route_planner_provider.dart';
+import '../l10n/app_localizations.dart';
+import '../providers/map_provider.dart';
+import '../providers/plan_route_provider.dart';
+import '../providers/settings_provider.dart';
 import '../utils/utils.dart';
 import 'search_place_page.dart';
+import 'widgets/common_map.dart';
+import 'widgets/station_list_tile.dart';
 
 class PlanRoutePage extends StatefulWidget {
   const PlanRoutePage({super.key});
@@ -15,8 +21,17 @@ class PlanRoutePage extends StatefulWidget {
 
 class _PlanRoutePageState extends State<PlanRoutePage> {
   GoogleMapController? _mapController;
-  final MapType _mapType = MapType.normal;
+  final DraggableScrollableController _sheetController =
+      DraggableScrollableController();
+
   bool _routeFitted = false;
+  bool _isMenuExpanded = true;
+
+  @override
+  void dispose() {
+    _sheetController.dispose();
+    super.dispose();
+  }
 
   static const LatLng _userLocation = LatLng(43.7167, 10.4017);
 
@@ -24,128 +39,382 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final provider = context.watch<RoutePlannerProvider>();
+    final routeProvider = context.watch<PlanRouteProvider>();
+    final mapProvider = context.read<MapProvider>();
+    final settings = context.read<SettingsProvider>();
 
+    // zooming map
     if (_mapController != null &&
-        provider.routePolylinePoints.isNotEmpty &&
+        routeProvider.routePolylinePoints.isNotEmpty &&
         !_routeFitted) {
-      final bounds = computeBounds(provider.routePolylinePoints);
-
-      _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 48));
-
+      final bounds = computeBounds(routeProvider.routePolylinePoints);
+      _mapController!.moveCamera(CameraUpdate.newLatLngBounds(bounds, 48));
       _routeFitted = true;
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (routeProvider.stationsOnRoute.isNotEmpty) {
+        mapProvider.rebuildMarkers(
+          stations: routeProvider.stationsOnRoute,
+          settings: settings,
+          brightness: Theme.of(context).brightness,
+          pixelRatio: MediaQuery.of(context).devicePixelRatio,
+          onStationTap: (s) => context.openStationDetails(s),
+        );
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<RoutePlannerProvider>();
+    final routeProvider = context.watch<PlanRouteProvider>();
+    final mapProvider = context.watch<MapProvider>();
     final String languageCode = Localizations.localeOf(context).languageCode;
 
-    final brightness = Theme.of(context).brightness;
-    final mapStyle = brightness == Brightness.dark
-        ? _darkMapStyle
-        : _lightMapStyle;
+    // detecting if we are in landscape or not
+    final size = MediaQuery.of(context).size;
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
-    return SingleChildScrollView(
-      child: Column(
+    return Scaffold(
+      body: Stack(
         children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.40,
-            width: double.infinity,
-            child: GoogleMap(
-              key: ValueKey(brightness),
-              style: mapStyle,
-              initialCameraPosition: const CameraPosition(
-                target: _userLocation,
-                zoom: 14,
-              ),
-              mapType: _mapType,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              compassEnabled: true,
-              tiltGesturesEnabled: false,
-              zoomControlsEnabled: false,
-              mapToolbarEnabled: false,
-              onMapCreated: (controller) {
-                _mapController = controller;
-              },
-              polylines: provider.routePolylinePoints.isEmpty
+          Positioned.fill(
+            child: CommonMap(
+              initialPosition: _userLocation,
+              markers: mapProvider.markers,
+              polylines: routeProvider.routePolylinePoints.isEmpty
                   ? {}
                   : {
                       Polyline(
                         polylineId: const PolylineId('route'),
-                        points: provider.routePolylinePoints,
-                        width: 4,
+                        points: routeProvider.routePolylinePoints,
+                        width: 5,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     },
+              onMapCreated: (controller) => _mapController = controller,
+              showMyLocation: true,
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildLocationField(
-                  label: 'Start point',
-                  controller: provider.startController,
-                  useCurrentLocation: provider.useCurrentLocationAsStart,
-                  onToggleCurrentLocation: provider.toggleStartCurrentLocation,
-                ),
+          // search menu on top
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 10,
+            left: 12,
+            // in landscape: fixed width at 50%, portrait: right padding
+            right: isLandscape ? null : 12,
+            width: isLandscape ? (size.width / 2) - 12 : null,
+            child: _isMenuExpanded
+                ? _buildExpandedCard(
+                    routeProvider,
+                    mapProvider,
+                    languageCode,
+                    isLandscape,
+                  )
+                : _buildCollapsedButton(),
+          ),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+          _buildDraggableSheet(routeProvider),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCollapsedButton() {
+    return Center(
+      child: Align(
+        alignment: MediaQuery.of(context).orientation == Orientation.landscape
+            ? Alignment.topLeft
+            : Alignment.center,
+        child: ActionChip(
+          avatar: const Icon(Icons.edit_location_alt, size: 18),
+          label: Text(
+            AppLocalizations.of(context)!.routeplanner_editroute_button,
+          ),
+          onPressed: () {
+            setState(() {
+              _isMenuExpanded = true;
+              if (_sheetController.isAttached) {
+                _sheetController.jumpTo(0.05);
+              }
+            });
+          },
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpandedCard(
+    PlanRouteProvider routeProvider,
+    MapProvider mapProvider,
+    String languageCode,
+    bool isLandscape,
+  ) {
+    return Card(
+      elevation: 8,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: isLandscape
+            // landscape layout: two columns
+            ? IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      iconSize: 20,
-                      tooltip: 'Swap start and destination',
-                      icon: const Icon(Icons.swap_vert),
-                      onPressed: provider.swapStartAndDestination,
+                    // column 1: Input (Start, Swap, Destination)
+                    Expanded(
+                      flex: 5,
+                      child: _buildInputsSection(routeProvider),
+                    ),
+                    const SizedBox(width: 12),
+                    // vertical dividing line
+                    VerticalDivider(
+                      width: 1,
+                      color: Theme.of(context).dividerColor,
+                    ),
+                    const SizedBox(width: 12),
+                    // column 2: actions (Tolls, Reset, Cancel, Search)
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildTollSwitch(routeProvider),
+                          _buildActionButtons(
+                            routeProvider,
+                            mapProvider,
+                            languageCode,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
+              )
+            // portait layout: single column
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildInputsSection(routeProvider),
+                  _buildTollSwitch(routeProvider),
+                  const SizedBox(height: 8),
+                  _buildActionButtons(routeProvider, mapProvider, languageCode),
+                ],
+              ),
+      ),
+    );
+  }
 
-                _buildLocationField(
-                  label: 'Destination',
-                  controller: provider.destinationController,
-                  useCurrentLocation: provider.useCurrentLocationAsDestination,
-                  onToggleCurrentLocation:
-                      provider.toggleDestinationCurrentLocation,
-                ),
+  Widget _buildInputsSection(PlanRouteProvider routeProvider) {
+    AppLocalizations l = AppLocalizations.of(context)!;
 
-                const SizedBox(height: 6),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildLocationField(
+          label: l.routeplanner_start_label,
+          controller: routeProvider.startController,
+          useCurrentLocation: routeProvider.useCurrentLocationAsStart,
+          onToggleCurrentLocation: routeProvider.toggleStartCurrentLocation,
+        ),
+        IconButton(
+          visualDensity: VisualDensity.compact,
+          icon: const Icon(Icons.swap_vert),
+          onPressed: routeProvider.swapStartAndDestination,
+        ),
+        _buildLocationField(
+          label: l.routeplanner_destination_label,
+          controller: routeProvider.destinationController,
+          useCurrentLocation: routeProvider.useCurrentLocationAsDestination,
+          onToggleCurrentLocation:
+              routeProvider.toggleDestinationCurrentLocation,
+        ),
+      ],
+    );
+  }
 
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Avoid tolls'),
-                  value: provider.avoidTolls,
-                  onChanged: provider.setAvoidTolls,
-                ),
+  Widget _buildTollSwitch(PlanRouteProvider routeProvider) {
+    AppLocalizations l = AppLocalizations.of(context)!;
 
-                const SizedBox(height: 6),
+    return SwitchListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+      title: Text(
+        l.routeplanner_setting_avoidtolls,
+        style: TextStyle(fontSize: 14),
+      ),
+      value: routeProvider.avoidTolls,
+      onChanged: (val) => routeProvider.setAvoidTolls(val),
+    );
+  }
 
-                ElevatedButton.icon(
-                  onPressed: provider.canSearch
-                      ? () {
-                          setState(() {
-                            _routeFitted = false;
-                          });
-                          provider.searchFuelStations(context, languageCode);
-                        }
-                      : null,
-                  icon: const Icon(Icons.local_gas_station),
-                  label: const Text(
-                    'Search fuel stations',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                ),
-              ],
+  Widget _buildActionButtons(
+    PlanRouteProvider routeProvider,
+    MapProvider mapProvider,
+    String languageCode,
+  ) {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    if (isLandscape) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(child: _buildResetButton(routeProvider, mapProvider)),
+              const SizedBox(width: 8),
+              Expanded(child: _buildCancelButton()),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _buildSearchButton(routeProvider, languageCode),
+        ],
+      );
+    }
+
+    // single row (portrait layout)
+    return Row(
+      children: [
+        _buildResetButton(routeProvider, mapProvider),
+        const Spacer(),
+        _buildCancelButton(),
+        const SizedBox(width: 8),
+        _buildSearchButton(routeProvider, languageCode),
+      ],
+    );
+  }
+
+  Widget _buildResetButton(
+    PlanRouteProvider routeProvider,
+    MapProvider mapProvider,
+  ) {
+    return TextButton.icon(
+      onPressed: () {
+        routeProvider.clear();
+        mapProvider.clearMarkers();
+        setState(() {
+          _routeFitted = false;
+          if (_sheetController.isAttached) {
+            _sheetController.jumpTo(0.05);
+          }
+        });
+      },
+      icon: const Icon(Icons.delete_outline, color: Colors.red),
+      label: Text(
+        AppLocalizations.of(context)!.routeplanner_reset_button,
+        style: TextStyle(color: Colors.red),
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  Widget _buildCancelButton() {
+    return TextButton(
+      onPressed: () => setState(() => _isMenuExpanded = false),
+      child: Text( AppLocalizations.of(context)!.cancel),
+    );
+  }
+
+  Widget _buildSearchButton(
+    PlanRouteProvider routeProvider,
+    String languageCode,
+  ) {
+    return ElevatedButton.icon(
+      onPressed: routeProvider.canSearch
+          ? () async {
+              setState(() {
+                _isMenuExpanded = false;
+                _routeFitted = false;
+              });
+              await routeProvider.searchFuelStations(context, languageCode);
+
+              if (_sheetController.isAttached &&
+                  routeProvider.stationsOnRoute.isNotEmpty) {
+                _sheetController.jumpTo(0.20);
+              }
+            }
+          : null,
+      icon: const Icon(Icons.search),
+      label: Text( AppLocalizations.of(context)!.routeplanner_search_button),
+    );
+  }
+
+  Widget _buildHandle(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 40,
+        height: 5,
+        margin: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.outlineVariant,
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDraggableSheet(PlanRouteProvider provider) {
+    return DraggableScrollableSheet(
+      controller: _sheetController,
+      initialChildSize: 0.05,
+      minChildSize: 0.05,
+      maxChildSize: 0.7,
+      builder: (context, scrollController) {
+        final bool isEmpty = provider.stationsOnRoute.isEmpty;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10)],
+          ),
+          child: ListView.builder(
+            physics: _isMenuExpanded
+                ? const NeverScrollableScrollPhysics()
+                : const AlwaysScrollableScrollPhysics(),
+            controller: scrollController,
+            itemCount: isEmpty ? 2 : provider.stationsOnRoute.length + 1,
+            itemBuilder: (context, index) {
+              if (index == 0) return _buildHandle(context);
+
+              if (isEmpty) {
+                return _buildEmptyState(context);
+              }
+
+              final station = provider.stationsOnRoute[index - 1];
+              return StationTile(station: station, showDistance: false);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.route_outlined,
+            size: 64,
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            AppLocalizations.of(context)!.routeplanner_emptylist_placeholder_text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -167,6 +436,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
             readOnly: true,
             decoration: InputDecoration(
               labelText: label,
+              hintText: AppLocalizations.of(context)!.routeplanner_usingcurrentlocation_text,
               border: const OutlineInputBorder(),
               enabled: !useCurrentLocation,
               prefixIcon: Icon(
@@ -176,13 +446,13 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
             onTap: useCurrentLocation
                 ? null
                 : () {
-                    context.read<RoutePlannerProvider>().startNewSession();
+                    context.read<PlanRouteProvider>().startNewSession();
 
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
-                            SearchPlacePage(isStart: label == 'Start point'),
+                            SearchPlacePage(isStart: label == AppLocalizations.of(context)!.routeplanner_start_label),
                       ),
                     );
                   },
@@ -199,43 +469,3 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
     );
   }
 }
-
-const String _darkMapStyle = '''
-[
-  {
-    "elementType": "geometry",
-    "stylers": [{"color": "#1d1d1d"}]
-  },
-  {
-    "elementType": "labels.text.fill",
-    "stylers": [{"color": "#8a8a8a"}]
-  },
-  {
-    "elementType": "labels.text.stroke",
-    "stylers": [{"color": "#1d1d1d"}]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry",
-    "stylers": [{"color": "#2c2c2c"}]
-  },
-  {
-    "featureType": "water",
-    "elementType": "geometry",
-    "stylers": [{"color": "#0e1626"}]
-  },
-  {
-    "featureType": "poi",
-    "stylers": [{"visibility": "off"}]
-  }
-]
-''';
-
-const String _lightMapStyle = '''
-[
-  {
-    "featureType": "poi",
-    "stylers": [{"visibility": "off"}]
-  }
-]
-''';

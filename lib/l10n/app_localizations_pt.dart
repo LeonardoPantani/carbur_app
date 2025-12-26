@@ -90,6 +90,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get section_stations_list => 'Postos de combustível';
 
   @override
+  String get section_route_planner => 'Planejar viagem';
+
+  @override
   String get start_navigation_question => 'Iniciar navegação?';
 
   @override
@@ -232,4 +235,52 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_marker_fuel_auto_disabledwhy =>
       'Esta configuração fica desativada quando apenas um tipo de combustível é selecionado.';
+
+  @override
+  String get other_infos_title => 'Outras informações';
+
+  @override
+  String get other_infos_notavailable =>
+      'Este posto de combustível não fornece outras informações.';
+
+  @override
+  String get autocomplete_compliance_google_text =>
+      'Tecnologia de preenchimento automático fornecida pelo Google';
+
+  @override
+  String get routeplanner_editroute_button => 'Editar rota';
+
+  @override
+  String get routeplanner_start_label => 'Ponto de partida';
+
+  @override
+  String get routeplanner_destination_label => 'Destino';
+
+  @override
+  String get routeplanner_setting_avoidtolls => 'Evitar pedágios';
+
+  @override
+  String get routeplanner_reset_button => 'Redefinir';
+
+  @override
+  String get routeplanner_search_button => 'Pesquisar';
+
+  @override
+  String get routeplanner_emptylist_placeholder_text =>
+      'Os postos de combustível ao longo da rota serão exibidos aqui.';
+
+  @override
+  String get routeplanner_toll_switch_desc_text =>
+      'Excluir rodovias com pedágio do cálculo da rota.';
+
+  @override
+  String get routeplanner_enter_start_placeholder =>
+      'Insira o ponto de partida';
+
+  @override
+  String get routeplanner_enter_destination_placeholder => 'Insira o destino';
+
+  @override
+  String get routeplanner_usingcurrentlocation_text =>
+      'Usando a localização atual';
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../providers/position_provider.dart';
-import '../providers/route_planner_provider.dart';
+import '../providers/plan_route_provider.dart';
 
 class SearchPlacePage extends StatelessWidget {
   final bool isStart;
@@ -11,10 +12,13 @@ class SearchPlacePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final routeProvider = context.watch<RoutePlannerProvider>();
+    final routeProvider = context.watch<PlanRouteProvider>();
     final locProvider = context.read<LocationProvider>();
+    final l = AppLocalizations.of(context)!;
 
     final String languageCode = Localizations.localeOf(context).languageCode;
+
+    final bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
     final controller = isStart
         ? routeProvider.startController
@@ -34,8 +38,8 @@ class SearchPlacePage extends StatelessWidget {
         title: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Search address',
+          decoration: InputDecoration(
+            hintText: isStart ? l.routeplanner_enter_start_placeholder : l.routeplanner_enter_destination_placeholder,
             border: InputBorder.none,
           ),
           onChanged: (value) {
@@ -57,22 +61,39 @@ class SearchPlacePage extends StatelessWidget {
           },
         ),
       ),
-      body: ListView.builder(
-        itemCount: suggestions.length,
-        itemBuilder: (context, index) {
-          final s = suggestions[index];
-          return ListTile(
-            leading: Icon(
-              placeTypeToIcon(s.types),
-              color: Theme.of(context).colorScheme.primary,
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: suggestions.length,
+              itemBuilder: (context, index) {
+                final s = suggestions[index];
+                return ListTile(
+                  leading: Icon(
+                    placeTypeToIcon(s.types),
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: Text(s.description),
+                  onTap: () {
+                    onSelect(s);
+                    Navigator.pop(context);
+                  },
+                );
+              },
             ),
-            title: Text(s.description),
-            onTap: () {
-              onSelect(s);
-              Navigator.pop(context);
-            },
-          );
-        },
+          ),
+          if(!isKeyboardVisible)
+            Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Text(
+                l.autocomplete_compliance_google_text,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

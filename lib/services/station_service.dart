@@ -256,4 +256,72 @@ class StationService {
 
     return jsonDecode(response.body);
   }
+
+  // fetch stations along route
+  Future<List<Station>> fetchStationsOnRoute({
+    required List<Map<String, double>> points,
+    String fuelType = "1-x",
+  }) async {
+    final uri = Uri.parse("https://carburanti.mise.gov.it/ospzApi/search/route");
+
+    // optimization for minister website
+    List<Map<String, double>> optimizedPoints = points;
+    if (points.length > 100) {
+      int skip = (points.length / 100).ceil();
+      optimizedPoints = [];
+      for (int i = 0; i < points.length; i += skip) {
+        optimizedPoints.add(points[i]);
+      }
+      if (optimizedPoints.last != points.last) {
+        optimizedPoints.add(points.last);
+      }
+    }
+
+    final body = {
+      "fuelType": fuelType,
+      "priceOrder": "asc",
+      "service": null,
+      "points": optimizedPoints,
+    };
+
+    try {
+      final response = await Future.any([
+        http.post(
+          uri,
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0",
+          },
+          body: jsonEncode(body),
+        ),
+        Future.delayed(const Duration(seconds: 15), () {
+          throw TimeoutException("Hard timeout ministero");
+        }),
+      ]);
+
+      if (response.statusCode != 200) {
+        logger.e("Errore API Ministero Route: ${response.statusCode}");
+        throw ApiException();
+      }
+
+      final Map<String, dynamic> json = jsonDecode(response.body);
+
+      if (json["success"] != true) {
+        throw ApiException();
+      }
+
+      final List results = json["results"];
+      return results.map((e) => _stationFromJson(e)).toList();
+      
+    } on TimeoutException {
+      logger.i("Timeout durante la ricerca sul percorso.");
+      throw ApiTimeoutException();
+    } on SocketException {
+      logger.i("Errore di rete durante la ricerca sul percorso.");
+      throw NetworkException();
+    } catch (e) {
+      logger.e("Errore generico fetchStationsOnRoute: $e");
+      throw ApiException();
+    }
+  }
 }

@@ -90,6 +90,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get section_stations_list => 'Gasolineras';
 
   @override
+  String get section_route_planner => 'Planifica tu ruta';
+
+  @override
   String get start_navigation_question => '¿Iniciar navegación?';
 
   @override
@@ -232,4 +235,52 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_marker_fuel_auto_disabledwhy =>
       'Esta configuración se desactiva cuando seleccionas solo un tipo de combustible.';
+
+  @override
+  String get other_infos_title => 'Otra información';
+
+  @override
+  String get other_infos_notavailable =>
+      'Esta gasolinera no proporciona otra información.';
+
+  @override
+  String get autocomplete_compliance_google_text =>
+      'Tecnología de autocompletado proporcionada por Google';
+
+  @override
+  String get routeplanner_editroute_button => 'Editar ruta';
+
+  @override
+  String get routeplanner_start_label => 'Punto de partida';
+
+  @override
+  String get routeplanner_destination_label => 'Destino';
+
+  @override
+  String get routeplanner_setting_avoidtolls => 'Evitar peajes';
+
+  @override
+  String get routeplanner_reset_button => 'Restablecer';
+
+  @override
+  String get routeplanner_search_button => 'Buscar';
+
+  @override
+  String get routeplanner_emptylist_placeholder_text =>
+      'Las gasolineras a lo largo de la ruta se mostrarán aquí.';
+
+  @override
+  String get routeplanner_toll_switch_desc_text =>
+      'Excluir carreteras de peaje del cálculo de la ruta.';
+
+  @override
+  String get routeplanner_enter_start_placeholder =>
+      'Introducir punto de partida';
+
+  @override
+  String get routeplanner_enter_destination_placeholder => 'Introducir destino';
+
+  @override
+  String get routeplanner_usingcurrentlocation_text =>
+      'Usando ubicación actual';
 }
