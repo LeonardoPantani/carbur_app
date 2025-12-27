@@ -84,7 +84,7 @@ class SearchPlacePage extends StatelessWidget {
           ),
           if(!isKeyboardVisible)
             Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(16.0),
               child: Text(
                 l.autocomplete_compliance_google_text,
                 style: TextStyle(

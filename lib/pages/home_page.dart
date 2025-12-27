@@ -32,16 +32,18 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: _buildActions(context),
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: [
-          StationsMap(),
-          StationsList(),
-          ChangeNotifierProvider(
-            create: (_) => MapProvider(), // this MapProvider is separated from the first one.
-            child: const PlanRoutePage(), // this beacause PlanRoutePage must have another map with no markers
-          ),
-        ],
+      body: SafeArea(
+        child: IndexedStack(
+          index: _currentIndex,
+          children: [
+            StationsMap(),
+            StationsList(),
+            ChangeNotifierProvider(
+              create: (_) => MapProvider(), // this MapProvider is separated from the first one.
+              child: const PlanRoutePage(), // this beacause PlanRoutePage must have another map with no markers
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: _buildBottomBar(context),
     );
