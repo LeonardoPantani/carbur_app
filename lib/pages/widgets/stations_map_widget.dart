@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../extensions/navigation_extensions.dart';
 import '../../providers/map_provider.dart';
-import '../../providers/position_provider.dart';
+import '../../providers/location_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/station_provider.dart';
 import 'common_map.dart';

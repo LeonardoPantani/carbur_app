@@ -5,7 +5,7 @@ import '../models/station.dart';
 import '../models/station_sort.dart';
 import '../services/station_service.dart';
 import '../utils/logger.dart';
-import 'position_provider.dart';
+import 'location_provider.dart';
 import 'settings_provider.dart';
 
 enum StationError { ministry, routes, network, unknown }

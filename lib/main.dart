@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'providers/map_provider.dart';
-import 'providers/position_provider.dart';
+import 'providers/location_provider.dart';
 import 'providers/plan_route_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/station_provider.dart';

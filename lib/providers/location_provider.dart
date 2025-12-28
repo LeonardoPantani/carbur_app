@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../utils/logger.dart';
 
@@ -13,6 +14,10 @@ class LocationProvider extends ChangeNotifier {
   LocationProvider() {
     _init();
   }
+
+  LatLng? get position => latitude != null && longitude != null
+      ? LatLng(latitude!, longitude!)
+      : null;
 
   Future<void> _init() async {
     if (_initialized) return;

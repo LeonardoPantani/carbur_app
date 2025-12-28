@@ -100,7 +100,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
 
           // search menu on top
           Positioned(
-            top: MediaQuery.of(context).padding.top + 10,
+            top: MediaQuery.of(context).padding.top + 5, // reduced top margin
             left: 12,
             // in landscape: fixed width at 50%, portrait: right padding
             right: isLandscape ? null : 12,
@@ -156,58 +156,70 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
     String languageCode,
     bool isLandscape,
   ) {
-    return Card(
-      elevation: 8,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: isLandscape
-            // landscape layout: two columns
-            ? IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // column 1: Input (Start, Swap, Destination)
-                    Expanded(
-                      flex: 5,
-                      child: _buildInputsSection(routeProvider),
-                    ),
-                    const SizedBox(width: 12),
-                    // vertical dividing line
-                    VerticalDivider(
-                      width: 1,
-                      color: Theme.of(context).dividerColor,
-                    ),
-                    const SizedBox(width: 12),
-                    // column 2: actions (Tolls, Reset, Cancel, Search)
-                    Expanded(
-                      flex: 5,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildTollSwitch(routeProvider),
-                          _buildActionButtons(
-                            routeProvider,
-                            mapProvider,
-                            languageCode,
+    final height = MediaQuery.of(context).size.height;
+    final padding = MediaQuery.of(context).padding;
+
+    // ensures card doesn't overflow screen
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: height - padding.top - 50,
+      ),
+      child: Card(
+        elevation: 8,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: SingleChildScrollView(
+          // allow scrolling if content is too tall
+          child: Padding(
+            padding: const EdgeInsets.all(8), // reduced padding
+            child: isLandscape
+                // landscape layout: two columns
+                ? IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // column 1: Input (Start, Swap, Destination)
+                        Expanded(
+                          flex: 5,
+                          child: _buildInputsSection(routeProvider),
+                        ),
+                        const SizedBox(width: 8),
+                        // vertical dividing line
+                        VerticalDivider(
+                          width: 1,
+                          color: Theme.of(context).dividerColor,
+                        ),
+                        const SizedBox(width: 8),
+                        // column 2: actions (Tolls, Reset, Cancel, Search)
+                        Expanded(
+                          flex: 5,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildTollSwitch(routeProvider),
+                              _buildActionButtons(
+                                routeProvider,
+                                mapProvider,
+                                languageCode,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              )
-            // portait layout: single column
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildInputsSection(routeProvider),
-                  _buildTollSwitch(routeProvider),
-                  const SizedBox(height: 8),
-                  _buildActionButtons(routeProvider, mapProvider, languageCode),
-                ],
-              ),
+                  )
+                // portait layout: single column
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildInputsSection(routeProvider),
+                      _buildTollSwitch(routeProvider),
+                      const SizedBox(height: 4),
+                      _buildActionButtons(routeProvider, mapProvider, languageCode),
+                    ],
+                  ),
+          ),
+        ),
       ),
     );
   }
@@ -224,10 +236,15 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
           useCurrentLocation: routeProvider.useCurrentLocationAsStart,
           onToggleCurrentLocation: routeProvider.toggleStartCurrentLocation,
         ),
-        IconButton(
-          visualDensity: VisualDensity.compact,
-          icon: const Icon(Icons.swap_vert),
-          onPressed: routeProvider.swapStartAndDestination,
+        // reduce height for swap button
+        SizedBox(
+          height: 30,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.swap_vert),
+            onPressed: routeProvider.swapStartAndDestination,
+          ),
         ),
         _buildLocationField(
           label: l.routeplanner_destination_label,
@@ -244,10 +261,12 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
     AppLocalizations l = AppLocalizations.of(context)!;
 
     return SwitchListTile(
+      dense: true, // compact list tile
+      visualDensity: VisualDensity.compact,
       contentPadding: const EdgeInsets.symmetric(horizontal: 4),
       title: Text(
         l.routeplanner_setting_avoidtolls,
-        style: TextStyle(fontSize: 14),
+        style: TextStyle(fontSize: 13),
       ),
       value: routeProvider.avoidTolls,
       onChanged: (val) => routeProvider.setAvoidTolls(val),
@@ -273,7 +292,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
               Expanded(child: _buildCancelButton()),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           _buildSearchButton(routeProvider, languageCode),
         ],
       );
@@ -296,6 +315,10 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
     MapProvider mapProvider,
   ) {
     return TextButton.icon(
+      style: TextButton.styleFrom(
+        visualDensity: VisualDensity.compact,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+      ),
       onPressed: () {
         routeProvider.clear();
         mapProvider.clearMarkers();
@@ -306,10 +329,10 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
           }
         });
       },
-      icon: const Icon(Icons.delete_outline, color: Colors.red),
+      icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
       label: Text(
         AppLocalizations.of(context)!.routeplanner_reset_button,
-        style: TextStyle(color: Colors.red),
+        style: TextStyle(color: Colors.red, fontSize: 13),
         overflow: TextOverflow.ellipsis,
       ),
     );
@@ -317,8 +340,15 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
 
   Widget _buildCancelButton() {
     return TextButton(
+      style: TextButton.styleFrom(
+        visualDensity: VisualDensity.compact,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+      ),
       onPressed: () => setState(() => _isMenuExpanded = false),
-      child: Text( AppLocalizations.of(context)!.cancel),
+      child: Text(
+        AppLocalizations.of(context)!.cancel,
+        style: const TextStyle(fontSize: 13),
+      ),
     );
   }
 
@@ -327,6 +357,10 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
     String languageCode,
   ) {
     return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        visualDensity: VisualDensity.compact,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+      ),
       onPressed: routeProvider.canSearch
           ? () async {
               setState(() {
@@ -341,8 +375,11 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
               }
             }
           : null,
-      icon: const Icon(Icons.search),
-      label: Text( AppLocalizations.of(context)!.routeplanner_search_button),
+      icon: const Icon(Icons.search, size: 20),
+      label: Text(
+        AppLocalizations.of(context)!.routeplanner_search_button,
+        style: const TextStyle(fontSize: 13),
+      ),
     );
   }
 
@@ -434,13 +471,17 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
           child: TextField(
             controller: controller,
             readOnly: true,
+            style: const TextStyle(fontSize: 13), // smaller font
             decoration: InputDecoration(
               labelText: label,
               hintText: AppLocalizations.of(context)!.routeplanner_usingcurrentlocation_text,
               border: const OutlineInputBorder(),
+              isDense: true, // makes text field compact
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               enabled: !useCurrentLocation,
               prefixIcon: Icon(
                 useCurrentLocation ? Icons.my_location : Icons.place,
+                size: 18,
               ),
             ),
             onTap: useCurrentLocation
@@ -458,11 +499,13 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
                   },
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
         IconButton(
+          visualDensity: VisualDensity.compact,
           onPressed: onToggleCurrentLocation,
           icon: Icon(
             useCurrentLocation ? Icons.my_location : Icons.location_disabled,
+            size: 20,
           ),
         ),
       ],

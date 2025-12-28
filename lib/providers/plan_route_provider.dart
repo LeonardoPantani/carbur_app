@@ -13,7 +13,7 @@ import '../models/station.dart';
 import '../services/station_service.dart';
 import '../utils/logger.dart';
 import '../utils/utils.dart';
-import 'position_provider.dart';
+import 'location_provider.dart';
 import 'settings_provider.dart';
 
 class PlaceSuggestion {

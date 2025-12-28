@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../providers/position_provider.dart';
+import '../../providers/location_provider.dart';
 import '../../providers/station_provider.dart';
 import 'station_list_tile.dart';
 

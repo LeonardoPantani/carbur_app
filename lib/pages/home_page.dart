@@ -21,8 +21,15 @@ class _HomePageState extends State<HomePage> {
 
   bool get _showSortMenu => _currentIndex == 1;
 
+  void _onNavSelected(int index) {
+    setState(() => _currentIndex = index);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // check orientation
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -32,6 +39,8 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: _buildActions(context),
       ),
+      // drawer only in landscape
+      drawer: isLandscape ? _buildDrawer(context) : null,
       body: SafeArea(
         child: IndexedStack(
           index: _currentIndex,
@@ -39,19 +48,81 @@ class _HomePageState extends State<HomePage> {
             StationsMap(),
             StationsList(),
             ChangeNotifierProvider(
-              create: (_) => MapProvider(), // this MapProvider is separated from the first one.
-              child: const PlanRoutePage(), // this beacause PlanRoutePage must have another map with no markers
+              create: (_) => MapProvider(), 
+              child: const PlanRoutePage(), 
             ),
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomBar(context),
+      // bottom bar only in portrait
+      bottomNavigationBar: isLandscape ? null : _buildBottomBar(context),
+    );
+  }
+
+  // New Drawer widget for landscape mode
+  Widget _buildDrawer(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Icon(Icons.local_gas_station, size: 32, color: Colors.white),
+                const SizedBox(height: 4),
+                const Text(
+                  'CarburApp',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.map),
+            title: Text(l.section_map),
+            selected: _currentIndex == 0,
+            onTap: () {
+              _onNavSelected(0);
+              Navigator.pop(context); // close drawer
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.list),
+            title: Text(l.section_stations_list),
+            selected: _currentIndex == 1,
+            onTap: () {
+              _onNavSelected(1);
+              Navigator.pop(context); // close drawer
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.directions),
+            title: Text(l.section_route_planner),
+            selected: _currentIndex == 2,
+            onTap: () {
+              _onNavSelected(2);
+              Navigator.pop(context); // close drawer
+            },
+          ),
+        ],
+      ),
     );
   }
 
   List<Widget> _buildActions(BuildContext context) {
     return [
-      if (_showSortMenu) const StationsSortWidget(), // stations sort only when list is selected
+      if (_showSortMenu) const StationsSortWidget(),
       IconButton(
         icon: const Icon(Icons.settings),
         onPressed: () {
@@ -67,9 +138,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildBottomBar(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: _currentIndex,
-      onTap: (index) {
-        setState(() => _currentIndex = index);
-      },
+      onTap: _onNavSelected,
       items: [
         BottomNavigationBarItem(
           icon: const Icon(Icons.map),
