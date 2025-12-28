@@ -100,8 +100,8 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
 
           // search menu on top
           Positioned(
-            top: MediaQuery.of(context).padding.top + 5, // reduced top margin
-            left: 12,
+            top: MediaQuery.of(context).padding.top + 5,
+            left: 12 + (isLandscape ? MediaQuery.of(context).padding.left : 0),
             // in landscape: fixed width at 50%, portrait: right padding
             right: isLandscape ? null : 12,
             width: isLandscape ? (size.width / 2) - 12 : null,
@@ -161,66 +161,86 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
 
     // ensures card doesn't overflow screen
     return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: height - padding.top - 50,
-      ),
+      constraints: BoxConstraints(maxHeight: height - padding.top - 50),
       child: Card(
         elevation: 8,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: SingleChildScrollView(
-          // allow scrolling if content is too tall
           child: Padding(
-            padding: const EdgeInsets.all(8), // reduced padding
+            padding: const EdgeInsets.all(12),
             child: isLandscape
-                // landscape layout: two columns
-                ? IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // column 1: Input (Start, Swap, Destination)
-                        Expanded(
-                          flex: 5,
-                          child: _buildInputsSection(routeProvider),
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // column 1: Input (Start, Swap, Destination)
+                      Expanded(
+                        flex: 5,
+                        child: _buildInputsSection(routeProvider),
+                      ),
+                      const SizedBox(width: 16),
+                      // column 2: actions (Tolls, Reset, Cancel, Search)
+                      Expanded(
+                        flex: 5,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 4),
+                            _buildTollSwitch(routeProvider),
+                            const SizedBox(height: 16),
+                            _buildActionButtons(
+                              routeProvider,
+                              mapProvider,
+                              languageCode,
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        // vertical dividing line
-                        VerticalDivider(
-                          width: 1,
-                          color: Theme.of(context).dividerColor,
-                        ),
-                        const SizedBox(width: 8),
-                        // column 2: actions (Tolls, Reset, Cancel, Search)
-                        Expanded(
-                          flex: 5,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _buildTollSwitch(routeProvider),
-                              _buildActionButtons(
-                                routeProvider,
-                                mapProvider,
-                                languageCode,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   )
-                // portait layout: single column
+                // portrait layout (vertical)
                 : Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildInputsSection(routeProvider),
+                      const SizedBox(height: 12),
                       _buildTollSwitch(routeProvider),
-                      const SizedBox(height: 4),
-                      _buildActionButtons(routeProvider, mapProvider, languageCode),
+                      const SizedBox(height: 12),
+                      _buildActionButtons(
+                        routeProvider,
+                        mapProvider,
+                        languageCode,
+                      ),
                     ],
                   ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTollSwitch(PlanRouteProvider routeProvider) {
+    AppLocalizations l = AppLocalizations.of(context)!;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(
+          child: Text(
+            l.routeplanner_setting_avoidtolls,
+            style: const TextStyle(fontSize: 13),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        SizedBox(
+          height: 30,
+          child: Switch(
+            value: routeProvider.avoidTolls,
+            onChanged: (val) => routeProvider.setAvoidTolls(val),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+      ],
     );
   }
 
@@ -254,22 +274,6 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
               routeProvider.toggleDestinationCurrentLocation,
         ),
       ],
-    );
-  }
-
-  Widget _buildTollSwitch(PlanRouteProvider routeProvider) {
-    AppLocalizations l = AppLocalizations.of(context)!;
-
-    return SwitchListTile(
-      dense: true, // compact list tile
-      visualDensity: VisualDensity.compact,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-      title: Text(
-        l.routeplanner_setting_avoidtolls,
-        style: TextStyle(fontSize: 13),
-      ),
-      value: routeProvider.avoidTolls,
-      onChanged: (val) => routeProvider.setAvoidTolls(val),
     );
   }
 
@@ -447,7 +451,9 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
           ),
           const SizedBox(height: 16),
           Text(
-            AppLocalizations.of(context)!.routeplanner_emptylist_placeholder_text,
+            AppLocalizations.of(
+              context,
+            )!.routeplanner_emptylist_placeholder_text,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
@@ -474,10 +480,15 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
             style: const TextStyle(fontSize: 13), // smaller font
             decoration: InputDecoration(
               labelText: label,
-              hintText: AppLocalizations.of(context)!.routeplanner_usingcurrentlocation_text,
+              hintText: AppLocalizations.of(
+                context,
+              )!.routeplanner_usingcurrentlocation_text,
               border: const OutlineInputBorder(),
               isDense: true, // makes text field compact
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 8,
+              ),
               enabled: !useCurrentLocation,
               prefixIcon: Icon(
                 useCurrentLocation ? Icons.my_location : Icons.place,
@@ -492,8 +503,13 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            SearchPlacePage(isStart: label == AppLocalizations.of(context)!.routeplanner_start_label),
+                        builder: (_) => SearchPlacePage(
+                          isStart:
+                              label ==
+                              AppLocalizations.of(
+                                context,
+                              )!.routeplanner_start_label,
+                        ),
                       ),
                     );
                   },

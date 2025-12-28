@@ -15,7 +15,7 @@ if (!envFile.exists()) {
     )
 }
 envFile.inputStream().use { dotenv.load(it) }
-val mapsApiKey = dotenv.getProperty("GOOGLE_MAPS_SDK_ANDROID_API_KEY")
+val googleMapsApiKey = dotenv.getProperty("GOOGLE_MAPS_SDK_ANDROID_API_KEY")
     ?: throw GradleException(
         "Missing GOOGLE_MAPS_SDK_ANDROID_API_KEY in .env"
     )
@@ -42,7 +42,7 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
-        manifestPlaceholders["mapsApiKey"] = mapsApiKey
+        manifestPlaceholders["googleMapsApiKey"] = googleMapsApiKey
     }
 
     buildTypes {

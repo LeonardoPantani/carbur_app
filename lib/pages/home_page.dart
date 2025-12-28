@@ -28,7 +28,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     // check orientation
-    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
     return Scaffold(
       appBar: AppBar(
@@ -42,14 +43,19 @@ class _HomePageState extends State<HomePage> {
       // drawer only in landscape
       drawer: isLandscape ? _buildDrawer(context) : null,
       body: SafeArea(
+        right: !isLandscape,
+        left: !isLandscape,
+        bottom: true,
+        top: true,
+
         child: IndexedStack(
           index: _currentIndex,
           children: [
             StationsMap(),
             StationsList(),
             ChangeNotifierProvider(
-              create: (_) => MapProvider(), 
-              child: const PlanRoutePage(), 
+              create: (_) => MapProvider(),
+              child: const PlanRoutePage(),
             ),
           ],
         ),
@@ -59,10 +65,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // New Drawer widget for landscape mode
+  // drawer widget for landscape mode
   Widget _buildDrawer(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -75,7 +81,11 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const Icon(Icons.local_gas_station, size: 32, color: Colors.white),
+                const Icon(
+                  Icons.local_gas_station,
+                  size: 32,
+                  color: Colors.white,
+                ),
                 const SizedBox(height: 4),
                 const Text(
                   'CarburApp',

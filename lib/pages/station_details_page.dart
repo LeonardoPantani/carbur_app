@@ -48,209 +48,228 @@ class StationDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l.station_details_title)),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // row that comprehends: title, address | brand logo image
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          // title, address
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // title (clickable)
-                              InkWell(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => AlertDialog(
-                                      content: Text(
-                                        l.station_identifier(station.id),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: Text(l.ok),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  station.name,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.headlineSmall,
-                                ),
-                              ),
-                              // address
-                              Text(
-                                details.address,
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        // logo
-                        Image.asset(
-                          station.brand.asset,
-                          width: 75,
-                          height: 75,
-                          fit: BoxFit.contain,
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // fuel prices header
-                    Text(
-                      l.fuel_prices_title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    // list of fuel prices (showing only selected in settings)
-                    Consumer<SettingsProvider>(
-                      builder: (context, settings, _) {
-                        final prices = station.visiblePrices(
-                          settings.selectedFuels,
-                        );
-
-                        if (prices.isEmpty) {
-                          return Text(
-                            l.fuel_prices_not_available,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          );
-                        }
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: prices.map((p) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
-                              child: Text(
-                                '${p.key.label(context)}: ${p.value.pricePerLiter.formatPrice(context)} €',
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                            );
-                          }).toList(),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 12),
-
-                    // opening hours headers
-                    Text(
-                      l.opening_hours_title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    // showing error if empty
-                    if (details.openingHours.isEmpty)
-                      Text(l.opening_hours_not_available, style: TextStyle(color: Theme.of(context).colorScheme.secondary),)
-                    else
-                      // showing disclaimer and table with opening hours
-                      Text(
-                        l.opening_hours_note,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    if (details.openingHours.isNotEmpty)
-                      Table(
-                        columnWidths: const {
-                          0: FlexColumnWidth(2),
-                          1: FlexColumnWidth(2),
-                          2: FlexColumnWidth(2),
-                        },
-                        border: TableBorder.symmetric(
-                          inside: BorderSide(
-                            color: Theme.of(context).dividerColor,
-                          ),
-                        ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // row that comprehends: title, address | brand logo image
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TableRow(
-                            children: [
-                              _th(context, l.weekday),
-                              _th(context, l.morning),
-                              _th(context, l.afternoon),
-                            ],
-                          ),
-                          ...List.generate(details.openingHours.length, (i) {
-                            final o = details.openingHours[i];
-
-                            String morning = '--';
-                            String afternoon = '--';
-
-                            if (!o.closed && !o.h24) {
-                              morning =
-                                  '${o.morningOpen ?? '--'}-${o.morningClose ?? '--'}';
-                              afternoon =
-                                  '${o.afternoonOpen ?? '--'}-${o.afternoonClose ?? '--'}';
-                            } else if (o.h24) {
-                              morning = l.open_24h;
-                              afternoon = l.open_24h;
-                            }
-
-                            return TableRow(
+                          Expanded(
+                            // title, address
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _td(context, weekDays[i]),
-                                _td(context, morning),
-                                _td(context, afternoon),
+                                // title (clickable)
+                                InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) => AlertDialog(
+                                        content: Text(
+                                          l.station_identifier(station.id),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: Text(l.ok),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    station.name,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.headlineSmall,
+                                  ),
+                                ),
+                                // address
+                                Text(
+                                  details.address,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
                               ],
-                            );
-                          }),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // logo
+                          Image.asset(
+                            station.brand.asset,
+                            width: 75,
+                            height: 75,
+                            fit: BoxFit.contain,
+                          ),
                         ],
                       ),
-                    const SizedBox(height: 12),
 
-                    // facilities header
-                    Text(
-                      l.facilities_title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    // showing error if empty
-                    if (details.services.isEmpty)
-                      Text(l.facilities_not_available, style: TextStyle(color: Theme.of(context).colorScheme.secondary),)
-                    else
-                      // showing list of facilities
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: details.services.map((f) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2),
-                            child: Text('• ${f.label(context)}'),
-                          );
-                        }).toList(),
+                      const SizedBox(height: 12),
+
+                      // fuel prices header
+                      Text(
+                        l.fuel_prices_title,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 4),
+                      // list of fuel prices (showing only selected in settings)
+                      Consumer<SettingsProvider>(
+                        builder: (context, settings, _) {
+                          final prices = station.visiblePrices(
+                            settings.selectedFuels,
+                          );
 
-                    // other infos header
-                    Text(
-                      l.other_infos_title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    // showing error if empty
-                    if (details.phone?.isEmpty == true && details.email?.isEmpty == true && details.website?.isEmpty == true)
-                      Text(l.other_infos_notavailable, style: TextStyle(color: Theme.of(context).colorScheme.secondary),)
-                    else
+                          if (prices.isEmpty) {
+                            return Text(
+                              l.fuel_prices_not_available,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            );
+                          }
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: prices.map((p) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 2,
+                                ),
+                                child: Text(
+                                  '${p.key.label(context)}: ${p.value.pricePerLiter.formatPrice(context)} €',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 12),
+
+                      // opening hours headers
+                      Text(
+                        l.opening_hours_title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      // showing error if empty
+                      if (details.openingHours.isEmpty)
+                        Text(
+                          l.opening_hours_not_available,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        )
+                      else
+                        // showing disclaimer and table with opening hours
+                        Text(
+                          l.opening_hours_note,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(fontStyle: FontStyle.italic),
+                        ),
+                      if (details.openingHours.isNotEmpty)
+                        Table(
+                          columnWidths: const {
+                            0: FlexColumnWidth(2),
+                            1: FlexColumnWidth(2),
+                            2: FlexColumnWidth(2),
+                          },
+                          border: TableBorder.symmetric(
+                            inside: BorderSide(
+                              color: Theme.of(context).dividerColor,
+                            ),
+                          ),
+                          children: [
+                            TableRow(
+                              children: [
+                                _th(context, l.weekday),
+                                _th(context, l.morning),
+                                _th(context, l.afternoon),
+                              ],
+                            ),
+                            ...List.generate(details.openingHours.length, (i) {
+                              final o = details.openingHours[i];
+
+                              String morning = '--';
+                              String afternoon = '--';
+
+                              if (!o.closed && !o.h24) {
+                                morning =
+                                    '${o.morningOpen ?? '--'}-${o.morningClose ?? '--'}';
+                                afternoon =
+                                    '${o.afternoonOpen ?? '--'}-${o.afternoonClose ?? '--'}';
+                              } else if (o.h24) {
+                                morning = l.open_24h;
+                                afternoon = l.open_24h;
+                              }
+
+                              return TableRow(
+                                children: [
+                                  _td(context, weekDays[i]),
+                                  _td(context, morning),
+                                  _td(context, afternoon),
+                                ],
+                              );
+                            }),
+                          ],
+                        ),
+                      const SizedBox(height: 12),
+
+                      // facilities header
+                      Text(
+                        l.facilities_title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      // showing error if empty
+                      if (details.services.isEmpty)
+                        Text(
+                          l.facilities_not_available,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        )
+                      else
+                        // showing list of facilities
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: details.services.map((f) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 2),
+                              child: Text('• ${f.label(context)}'),
+                            );
+                          }).toList(),
+                        ),
+                      const SizedBox(height: 12),
+
+                      // other infos header
+                      Text(
+                        l.other_infos_title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      // showing error if empty
+                      if (details.phone?.isEmpty == true &&
+                          details.email?.isEmpty == true &&
+                          details.website?.isEmpty == true)
+                        Text(
+                          l.other_infos_notavailable,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        )
+                      else
                       // showing other infos: phone, email, website
                       if (details.phone?.isNotEmpty == true)
                         Row(
                           children: [
-                            Text('${l.phone}: ',),
+                            Text('${l.phone}: '),
                             InkWell(
                               onTap: () => openPhone(details.phone!),
                               child: Text(
@@ -266,7 +285,7 @@ class StationDetailsPage extends StatelessWidget {
                       if (details.email?.isNotEmpty == true)
                         Row(
                           children: [
-                            Text('${l.email}: ',),
+                            Text('${l.email}: '),
                             InkWell(
                               onTap: () => openEmail(details.email!),
                               child: Text(
@@ -294,34 +313,35 @@ class StationDetailsPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            // showing at the bottom the back and navigate buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.arrow_back),
-                    label: Text(l.back),
-                    onPressed: () => Navigator.pop(context),
+              // showing at the bottom the back and navigate buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.arrow_back),
+                      label: Text(l.back),
+                      onPressed: () => Navigator.pop(context),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.map),
-                    label: Text(l.start_navigation),
-                    onPressed: () {
-                      openNavigation(station.latitude, station.longitude);
-                    },
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.map),
+                      label: Text(l.start_navigation),
+                      onPressed: () {
+                        openNavigation(station.latitude, station.longitude);
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
