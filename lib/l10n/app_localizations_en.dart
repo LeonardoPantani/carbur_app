@@ -280,4 +280,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get routeplanner_usingcurrentlocation_text => 'Using current location';
+
+  @override
+  String get button_retry => 'Try again';
+
+  @override
+  String get no_connection_title => 'No Internet connection';
+
+  @override
+  String get no_connection_description =>
+      'An active Internet connection is required to fetch the latest fuel station prices.';
 }

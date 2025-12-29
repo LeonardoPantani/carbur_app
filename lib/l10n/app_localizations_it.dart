@@ -282,4 +282,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get routeplanner_usingcurrentlocation_text => 'Usando posizione';
+
+  @override
+  String get button_retry => 'Riprova';
+
+  @override
+  String get no_connection_title => 'Connessione Internet assente';
+
+  @override
+  String get no_connection_description =>
+      'È richiesta una connessione ad Internet funzionante per scaricare i dati aggiornati dei distributori.';
 }

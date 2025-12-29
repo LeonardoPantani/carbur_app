@@ -605,6 +605,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Using current location'**
   String get routeplanner_usingcurrentlocation_text;
+
+  /// Button try again.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get button_retry;
+
+  /// This title appears when the app could not be opened because internet is not working. This only appears on the opening of the app, Internet connection is not checked any further.
+  ///
+  /// In en, this message translates to:
+  /// **'No Internet connection'**
+  String get no_connection_title;
+
+  /// Description for no internet connection page.
+  ///
+  /// In en, this message translates to:
+  /// **'An active Internet connection is required to fetch the latest fuel station prices.'**
+  String get no_connection_description;
 }
 
 class _AppLocalizationsDelegate

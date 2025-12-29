@@ -283,4 +283,14 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get routeplanner_usingcurrentlocation_text =>
       'Utilisation de la position actuelle';
+
+  @override
+  String get button_retry => 'Réessayer';
+
+  @override
+  String get no_connection_title => 'Pas de connexion Internet';
+
+  @override
+  String get no_connection_description =>
+      'Une connexion Internet active est nécessaire pour obtenir les dernières informations sur les stations-service.';
 }

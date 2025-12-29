@@ -356,5 +356,17 @@
     "routeplanner_usingcurrentlocation_text": "Utilisation de la position actuelle",
     "@routeplanner_usingcurrentlocation_text": {
         "description": "Inside text area of both start and destination points while current location is used."
+    },
+    "button_retry": "Réessayer",
+    "@button_retry": {
+        "description": "Button try again."
+    },
+    "no_connection_title": "Pas de connexion Internet",
+    "@no_connection_title": {
+        "description": "This title appears when the app could not be opened because internet is not working. This only appears on the opening of the app, Internet connection is not checked any further."
+    },
+    "no_connection_description": "Une connexion Internet active est nécessaire pour obtenir les dernières informations sur les stations-service.",
+    "@no_connection_description": {
+        "description": "Description for no internet connection page."
     }
 }

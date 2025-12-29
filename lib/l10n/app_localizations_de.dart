@@ -281,4 +281,14 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get routeplanner_usingcurrentlocation_text =>
       'Aktueller Standort wird verwendet';
+
+  @override
+  String get button_retry => 'Erneut versuchen';
+
+  @override
+  String get no_connection_title => 'Keine Internetverbindung';
+
+  @override
+  String get no_connection_description =>
+      'Um die aktuellsten Informationen zu den Tankstellen abzurufen, ist eine Internetverbindung erforderlich.';
 }

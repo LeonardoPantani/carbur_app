@@ -356,5 +356,17 @@
     "routeplanner_usingcurrentlocation_text": "Using current location",
     "@routeplanner_usingcurrentlocation_text": {
         "description": "Inside text area of both start and destination points while current location is used."
+    },
+    "button_retry": "Try again",
+    "@button_retry": {
+        "description": "Button try again."
+    },
+    "no_connection_title": "No Internet connection",
+    "@no_connection_title": {
+        "description": "This title appears when the app could not be opened because internet is not working. This only appears on the opening of the app, Internet connection is not checked any further."
+    },
+    "no_connection_description": "An active Internet connection is required to fetch the latest fuel station prices.",
+    "@no_connection_description": {
+        "description": "Description for no internet connection page."
     }
 }

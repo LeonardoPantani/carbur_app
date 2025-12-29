@@ -283,4 +283,14 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get routeplanner_usingcurrentlocation_text =>
       'Usando a localização atual';
+
+  @override
+  String get button_retry => 'Tentar novamente';
+
+  @override
+  String get no_connection_title => 'Sem conexão com a Internet';
+
+  @override
+  String get no_connection_description =>
+      'Para obter as informações mais recentes sobre os postos de combustível, é necessária uma conexão ativa com a Internet.';
 }

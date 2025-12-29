@@ -8,7 +8,7 @@ import 'providers/plan_route_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/station_provider.dart';
 
-import 'pages/home_page.dart';
+import 'pages/startup_check_page.dart';
 import 'l10n/app_localizations.dart';
 
 void main() {
@@ -20,9 +20,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => LocationProvider()),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => MapProvider()),
-        ChangeNotifierProvider(
-          create: (_) => PlanRouteProvider(),
-        ),
+        ChangeNotifierProvider(create: (_) => PlanRouteProvider()),
         ChangeNotifierProxyProvider2<
           LocationProvider,
           SettingsProvider,
@@ -77,7 +75,7 @@ class CarburApp extends StatelessWidget {
         Locale('pl'),
         Locale('pt'),
       ],
-      home: const HomePage(),
+      home: const StartupCheckPage(),
     );
   }
 }
