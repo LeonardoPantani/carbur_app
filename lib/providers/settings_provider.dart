@@ -6,28 +6,27 @@ import '../models/station_sort.dart';
 
 class SettingsProvider extends ChangeNotifier {
   final List<FuelType> availableFuels = FuelType.values;
-
   List<FuelType> selectedFuels = [FuelType.petrol];
   int radiusKm = 3;
+  FuelType preferredMarkerFuel = FuelType.petrol;
   StationSort sort = StationSort.best;
-  FuelType? preferredMarkerFuel;
-
-  bool configurationChanged = false;
 
   SettingsProvider() {
     _loadSettings();
   }
 
-  void _markChanged() {
-    configurationChanged = true;
-    notifyListeners();
+  void _ensureValidPreferredFuel() {
+    if (!selectedFuels.contains(preferredMarkerFuel)) {
+      preferredMarkerFuel = selectedFuels.first;
+      _savePreferredMarkerFuel();
+    }
   }
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
 
+    // loading [selected fuel] preference
     final stored = prefs.getStringList('selectedFuels');
-
     if (stored != null) {
       selectedFuels = stored.map((value) {
         final numeric = int.tryParse(value);
@@ -40,19 +39,25 @@ class SettingsProvider extends ChangeNotifier {
       selectedFuels = [FuelType.petrol];
     }
 
+    // loading [preferred marker fuel] preference
     final preferredCode = prefs.getInt('preferredMarkerFuel');
     if (preferredCode != null) {
-      final found = selectedFuels.where((f) => f.ministerCode == preferredCode);
-      preferredMarkerFuel = found.isNotEmpty ? found.first : null;
+      try {
+        preferredMarkerFuel = FuelType.values.firstWhere((f) => f.ministerCode == preferredCode);
+      } catch (_) {
+        preferredMarkerFuel = FuelType.petrol;
+      }
     }
+    _ensureValidPreferredFuel();
 
+    // loading [radius] preference
     radiusKm = prefs.getInt('radiusKm') ?? radiusKm;
 
+    // loading [sorting] preference (editable in the fuel stations page only)
     final sortIndex = prefs.getInt('stationSort');
     if (sortIndex != null) {
       sort = StationSort.values[sortIndex];
     }
-
     notifyListeners();
   }
 
@@ -77,16 +82,13 @@ class SettingsProvider extends ChangeNotifier {
 
   Future<void> _savePreferredMarkerFuel() async {
     final prefs = await SharedPreferences.getInstance();
-
-    if (preferredMarkerFuel == null) {
-      await prefs.remove('preferredMarkerFuel');
-    } else {
       await prefs.setInt(
         'preferredMarkerFuel',
-        preferredMarkerFuel!.ministerCode,
+        preferredMarkerFuel.ministerCode,
       );
-    }
   }
+
+  // --- PUBLIC METHODS ---
 
   void toggleFuel(FuelType fuel) {
     final isSelected = selectedFuels.contains(fuel);
@@ -96,16 +98,10 @@ class SettingsProvider extends ChangeNotifier {
     } else {
       selectedFuels.add(fuel);
     }
-
-    if (preferredMarkerFuel != null &&
-        !selectedFuels.contains(preferredMarkerFuel)) {
-      preferredMarkerFuel =
-          selectedFuels.isNotEmpty ? selectedFuels.first : null;
-      _savePreferredMarkerFuel();
-    }
-
+    
     _saveSelectedFuels();
-    _markChanged();
+    _ensureValidPreferredFuel();
+    notifyListeners();
   }
 
   void setSelectedFuels(List<FuelType> newFuels) {
@@ -117,40 +113,31 @@ class SettingsProvider extends ChangeNotifier {
     }
 
     selectedFuels = List.from(newFuels);
-    if (preferredMarkerFuel != null &&
-        !selectedFuels.contains(preferredMarkerFuel)) {
-      preferredMarkerFuel = selectedFuels.isNotEmpty
-          ? selectedFuels.first
-          : null;
-      _savePreferredMarkerFuel();
-    }
     _saveSelectedFuels();
-    _markChanged();
+    _ensureValidPreferredFuel();
+    notifyListeners();
   }
 
   void setRadius(int km) {
     if (km == radiusKm) return;
-
     radiusKm = km;
     _saveRadius();
-    _markChanged();
+    notifyListeners();
   }
 
   void setSort(StationSort newSort) {
     if (newSort == sort) return;
-
     sort = newSort;
     _saveSort();
-    _markChanged();
+    notifyListeners();
   }
 
-  void setPreferredMarkerFuel(FuelType? fuel) {
-    if (fuel != null && !selectedFuels.contains(fuel)) return;
-
+  void setPreferredMarkerFuel(FuelType fuel) {
+    if (!selectedFuels.contains(fuel)) return;
     if (preferredMarkerFuel == fuel) return;
 
     preferredMarkerFuel = fuel;
     _savePreferredMarkerFuel();
-    _markChanged();
+    notifyListeners();
   }
 }

@@ -42,14 +42,13 @@ class SettingsPage extends StatelessWidget {
 
                 ListTile(
                   title: Text(l.settings_marker_fuel),
-                  subtitle: Text(
-                    settings.preferredMarkerFuel?.label(context) ??
-                        l.settings_marker_fuel_auto,
-                  ),
+                  subtitle: Text(settings.preferredMarkerFuel.label(context)),
                   leading: const Icon(Icons.price_check),
                   trailing: const Icon(Icons.chevron_right),
                   enabled: settings.selectedFuels.length > 1,
-                  onTap: settings.selectedFuels.length > 1 ? () => _openMarkerFuelDialog(context, settings) : null,
+                  onTap: settings.selectedFuels.length > 1
+                      ? () => _openMarkerFuelDialog(context, settings)
+                      : null,
                 ),
               ],
             ),
@@ -193,10 +192,6 @@ class SettingsPage extends StatelessWidget {
             initialValue: tempValue,
             decoration: const InputDecoration(isDense: true),
             items: [
-              DropdownMenuItem<FuelType?>(
-                value: null,
-                child: Text(l.settings_marker_fuel_auto),
-              ),
               ...settings.selectedFuels.map(
                 (fuel) => DropdownMenuItem<FuelType?>(
                   value: fuel,
@@ -215,7 +210,7 @@ class SettingsPage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                settings.setPreferredMarkerFuel(tempValue);
+                settings.setPreferredMarkerFuel(tempValue!);
                 Navigator.pop(context);
               },
               child: Text(l.ok),

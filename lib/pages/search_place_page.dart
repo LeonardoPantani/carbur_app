@@ -41,6 +41,35 @@ class SearchPlacePage extends StatelessWidget {
           decoration: InputDecoration(
             hintText: isStart ? l.routeplanner_enter_start_placeholder : l.routeplanner_enter_destination_placeholder,
             border: InputBorder.none,
+            suffixIcon: ValueListenableBuilder<TextEditingValue>(
+              valueListenable: controller,
+              builder: (context, value, child) {
+                if (value.text.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return IconButton(
+                  icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  onPressed: () {
+                    controller.clear();
+                    if (isStart) {
+                      routeProvider.onStartTextChanged(
+                        '',
+                        languageCode,
+                        lat: locProvider.latitude,
+                        lng: locProvider.longitude,
+                      );
+                    } else {
+                      routeProvider.onDestinationTextChanged(
+                        '',
+                        languageCode,
+                        lat: locProvider.latitude,
+                        lng: locProvider.longitude,
+                      );
+                    }
+                  },
+                );
+              },
+            ),
           ),
           onChanged: (value) {
             if (isStart) {

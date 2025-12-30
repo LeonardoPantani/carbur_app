@@ -191,7 +191,7 @@ class StationService {
       startPlaceId != destinationPlaceId,
     ); // cannot go from one place to same place
 
-    logger.i("Preparazione api routes");
+    logger.i("Calcolo del percorso in macchina...");
 
     final uri = Uri.parse(
       'https://routes.googleapis.com/directions/v2:computeRoutes',

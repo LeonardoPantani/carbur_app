@@ -48,7 +48,7 @@ class LocationProvider extends ChangeNotifier {
       latitude = pos.latitude;
       longitude = pos.longitude;
 
-      logger.i("Coordinate ottenute: $latitude, $longitude");
+      logger.i("Posizione utente ottenuta.");
       notifyListeners();
     } catch (e) {
       logger.i("Errore ottenendo posizione: $e");

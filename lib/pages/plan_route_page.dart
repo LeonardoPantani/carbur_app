@@ -7,6 +7,7 @@ import '../l10n/app_localizations.dart';
 import '../providers/map_provider.dart';
 import '../providers/plan_route_provider.dart';
 import '../providers/settings_provider.dart';
+import '../utils/logger.dart';
 import '../utils/utils.dart';
 import 'search_place_page.dart';
 import 'widgets/common_map.dart';
@@ -35,33 +36,55 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
 
   static const LatLng _userLocation = LatLng(43.7167, 10.4017);
 
+  void _triggerRebuild(BuildContext context) {
+    final routeProvider = context.read<PlanRouteProvider>();
+    final mapProvider = context.read<MapProvider>();
+    final settings = context.read<SettingsProvider>();
+
+    // Rigenera solo se ci sono stazioni sulla rotta
+    if (routeProvider.stationsOnRoute.isNotEmpty) {
+      mapProvider.rebuildMarkers(
+        stations: routeProvider.stationsOnRoute,
+        settings: settings,
+        pixelRatio: MediaQuery.of(context).devicePixelRatio,
+        onStationTap: (s) => context.openStationDetails(s),
+      );
+    }
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     final routeProvider = context.watch<PlanRouteProvider>();
     final mapProvider = context.read<MapProvider>();
-    final settings = context.read<SettingsProvider>();
+    context.read<SettingsProvider>();
 
-    // zooming map
+    bool justFittedRoute = false;
+
+    // zooming map to fit new route
     if (_mapController != null &&
         routeProvider.routePolylinePoints.isNotEmpty &&
         !_routeFitted) {
+      logger.i("Indicazioni modificate. Cambio dello zoom.");
       final bounds = computeBounds(routeProvider.routePolylinePoints);
-      _mapController!.moveCamera(CameraUpdate.newLatLngBounds(bounds, 48));
+      _mapController!.moveCamera(CameraUpdate.newLatLngBounds(bounds, 48)).then((_) async {
+        final newZoom = await _mapController!.getZoomLevel();
+        mapProvider.updateZoom(newZoom);
+        if (mounted) {
+          _triggerRebuild(context);
+        }
+      });
       _routeFitted = true;
+      justFittedRoute = true;
     }
 
+    // trigger that regenerates markers
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (routeProvider.stationsOnRoute.isNotEmpty) {
-        mapProvider.rebuildMarkers(
-          stations: routeProvider.stationsOnRoute,
-          settings: settings,
-          brightness: Theme.of(context).brightness,
-          pixelRatio: MediaQuery.of(context).devicePixelRatio,
-          onStationTap: (s) => context.openStationDetails(s),
-        );
-      }
+      if (justFittedRoute) return;
+      
+      logger.i("Le dipendenze sono cambiate. Aggiornamento marker richiesto.");
+      _triggerRebuild(context);
     });
   }
 
@@ -94,6 +117,14 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
                       ),
                     },
               onMapCreated: (controller) => _mapController = controller,
+              onCameraMove: (position) {
+                if (mapProvider.updateZoom(position.zoom)) {
+                  logger.i(
+                    "Lo zoom della mappa è cambiato molto. Aggiornamento marker richiesto.",
+                  );
+                  _triggerRebuild(context);
+                }
+              },
               showMyLocation: true,
             ),
           ),

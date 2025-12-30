@@ -8,6 +8,7 @@ import '../../providers/map_provider.dart';
 import '../../providers/location_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/station_provider.dart';
+import '../../utils/logger.dart';
 import 'common_map.dart';
 
 class StationsMap extends StatefulWidget {
@@ -18,14 +19,31 @@ class StationsMap extends StatefulWidget {
 }
 
 class _StationsMapState extends State<StationsMap> {
+  void _triggerRebuild(BuildContext context) {
+    final stationsProvider = context.read<StationProvider>();
+    final mapProvider = context.read<MapProvider>();
+
+    mapProvider.rebuildMarkers(
+      stations: stationsProvider.mapStations,
+      settings: context.read<SettingsProvider>(),
+      pixelRatio: MediaQuery.of(context).devicePixelRatio,
+      onStationTap: (s) => context.openStationDetails(s),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final stationsProvider = context.watch<StationProvider>();
     final mapProvider = context.watch<MapProvider>();
     final positionProvider = context.watch<LocationProvider>();
+    context.watch<SettingsProvider>();
     final l = AppLocalizations.of(context)!;
 
     if (stationsProvider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (positionProvider.latitude == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -69,20 +87,9 @@ class _StationsMapState extends State<StationsMap> {
       );
     }
 
-    if (positionProvider.latitude == null ||
-        positionProvider.longitude == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    // trigger that regenerates markers
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      mapProvider.rebuildMarkers(
-        stations: stationsProvider.mapStations,
-        settings: context.read<SettingsProvider>(),
-        brightness: Theme.of(context).brightness,
-        pixelRatio: MediaQuery.of(context).devicePixelRatio,
-        onStationTap: (s) => context.openStationDetails(s),
-      );
+      logger.i("Le dipendenze sono cambiate. Aggiornamento marker richiesto.");
+      _triggerRebuild(context);
     });
 
     return CommonMap(
@@ -92,6 +99,14 @@ class _StationsMapState extends State<StationsMap> {
         positionProvider.longitude!,
       ),
       showMyLocation: true,
+      onCameraMove: (position) {
+        if (mapProvider.updateZoom(position.zoom)) {
+          logger.i(
+            "Lo zoom della mappa è cambiato molto. Aggiornamento marker richiesto.",
+          );
+          _triggerRebuild(context);
+        }
+      },
     );
   }
 }
