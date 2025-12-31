@@ -8,7 +8,7 @@ import '../providers/map_provider.dart';
 import '../providers/plan_route_provider.dart';
 import '../providers/settings_provider.dart';
 import '../utils/logger.dart';
-import '../utils/utils.dart';
+import '../utils/map_utils.dart';
 import 'search_place_page.dart';
 import 'widgets/common_map.dart';
 import 'widgets/station_list_tile.dart';

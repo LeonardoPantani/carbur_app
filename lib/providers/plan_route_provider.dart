@@ -12,7 +12,7 @@ import '../env/api_key_getter.dart';
 import '../models/station.dart';
 import '../services/station_service.dart';
 import '../utils/logger.dart';
-import '../utils/utils.dart';
+import '../utils/map_utils.dart';
 import 'location_provider.dart';
 import 'settings_provider.dart';
 
