@@ -288,9 +288,13 @@ class AppLocalizationsPl extends AppLocalizations {
   String get button_retry => 'Spróbuj ponownie';
 
   @override
-  String get no_connection_title => 'Brak połączenia z Internetem';
+  String get error_title_no_connection => 'Brak połączenia z Internetem';
 
   @override
-  String get no_connection_description =>
+  String get error_description_no_connection =>
       'Aby uzyskać najnowsze informacje o stacjach paliw, wymagane jest aktywne połączenie internetowe.';
+
+  @override
+  String get error_description_no_connection_station_details =>
+      'Nie masz połączenia z Internetem, ale nadal możesz nawigować do tej stacji paliw.';
 }

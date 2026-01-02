@@ -55,40 +55,57 @@ class _StationsMapState extends State<StationsMap> {
           await pos.refreshPosition();
           await stations.forceReload();
         },
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 96,
-                  color: Theme.of(context).colorScheme.error,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: SizedBox(
+                height: constraints.maxHeight,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          switch (stationsProvider.error!) {
+                            StationError.ministry => Icons.error_outline,
+                            StationError.routes => Icons.error_outline,
+                            StationError.network => Icons.wifi_off_outlined,
+                            StationError.unknown => Icons.error_outline,
+                          },
+                          size: 96,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          switch (stationsProvider.error!) {
+                            StationError.ministry =>
+                              l.error_description_api_ministry_notworking,
+                            StationError.routes =>
+                              l.error_description_api_routes_notworking,
+                            StationError.network =>
+                              l.error_description_no_connection,
+                            StationError.unknown => l.error_description_unknown,
+                          },
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  switch (stationsProvider.error!) {
-                    StationError.ministry =>
-                      l.error_description_api_ministry_notworking,
-                    StationError.routes =>
-                      l.error_description_api_routes_notworking,
-                    StationError.network =>
-                      l.error_description_api_ministry_notworking,
-                    StationError.unknown => l.error_description_unknown,
-                  },
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       );
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      logger.i("[Map Widget] Le dipendenze sono cambiate. Aggiornamento marker richiesto.");
+      logger.i(
+        "[Map Widget] Le dipendenze sono cambiate. Aggiornamento marker richiesto.",
+      );
       _triggerRebuild(context);
     });
 

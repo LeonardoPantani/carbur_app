@@ -288,9 +288,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get button_retry => 'Tentar novamente';
 
   @override
-  String get no_connection_title => 'Sem conexão com a Internet';
+  String get error_title_no_connection => 'Sem conexão com a Internet';
 
   @override
-  String get no_connection_description =>
+  String get error_description_no_connection =>
       'Para obter as informações mais recentes sobre os postos de combustível, é necessária uma conexão ativa com a Internet.';
+
+  @override
+  String get error_description_no_connection_station_details =>
+      'Não está conectado à Internet, mas você ainda pode navegar para este posto de combustível.';
 }

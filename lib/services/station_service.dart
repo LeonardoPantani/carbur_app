@@ -161,7 +161,7 @@ class StationService {
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode != 200) {
-        throw Exception('API details statusCode != 200');
+        throw ApiException();
       }
 
       final Map<String, dynamic> json =
@@ -169,7 +169,9 @@ class StationService {
 
       return StationDetails.fromJson(station: station, json: json);
     } on TimeoutException {
-      throw Exception('Timeout API details');
+      throw ApiTimeoutException();
+    } on SocketException {
+      throw NetworkException();
     }
   }
 
@@ -182,7 +184,7 @@ class StationService {
     String? startPlaceId,
     String? destinationPlaceId,
     required bool avoidTolls,
-    required String languageCode
+    required String languageCode,
   }) async {
     assert(
       !(useCurrentLocationAsStart && useCurrentLocationAsDestination),
@@ -261,7 +263,9 @@ class StationService {
   Future<List<Station>> fetchStationsOnRoute({
     required List<Map<String, double>> points,
   }) async {
-    final uri = Uri.parse("https://carburanti.mise.gov.it/ospzApi/search/route");
+    final uri = Uri.parse(
+      "https://carburanti.mise.gov.it/ospzApi/search/route",
+    );
 
     // optimization for minister website
     List<Map<String, double>> optimizedPoints = points;
@@ -310,7 +314,6 @@ class StationService {
 
       final List results = json["results"];
       return results.map((e) => _stationFromJson(e)).toList();
-      
     } on TimeoutException {
       logger.i("Timeout durante la ricerca sul percorso.");
       throw ApiTimeoutException();

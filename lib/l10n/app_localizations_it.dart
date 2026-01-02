@@ -287,9 +287,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get button_retry => 'Riprova';
 
   @override
-  String get no_connection_title => 'Connessione Internet assente';
+  String get error_title_no_connection => 'Connessione Internet assente';
 
   @override
-  String get no_connection_description =>
+  String get error_description_no_connection =>
       'È richiesta una connessione ad Internet funzionante per scaricare i dati aggiornati dei distributori.';
+
+  @override
+  String get error_description_no_connection_station_details =>
+      'Non sei connesso ad Internet, ma puoi comunque navigare verso questo distributore.';
 }

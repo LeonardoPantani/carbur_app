@@ -361,12 +361,16 @@
     "@button_retry": {
         "description": "Button try again."
     },
-    "no_connection_title": "Connessione Internet assente",
-    "@no_connection_title": {
+    "error_title_no_connection": "Connessione Internet assente",
+    "@error_title_no_connection": {
         "description": "This title appears when the app could not be opened because internet is not working. This only appears on the opening of the app, Internet connection is not checked any further."
     },
-    "no_connection_description": "È richiesta una connessione ad Internet funzionante per scaricare i dati aggiornati dei distributori.",
-    "@no_connection_description": {
+    "error_description_no_connection": "È richiesta una connessione ad Internet funzionante per scaricare i dati aggiornati dei distributori.",
+    "@error_description_no_connection": {
         "description": "Description for no internet connection page."
+    },
+    "error_description_no_connection_station_details": "Non sei connesso ad Internet, ma puoi comunque navigare verso questo distributore.",
+    "@error_description_no_connection_station_details": {
+        "description": "Description for the station details page when there is not Internet connection."
     }
 }

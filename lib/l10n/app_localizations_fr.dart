@@ -288,9 +288,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get button_retry => 'Réessayer';
 
   @override
-  String get no_connection_title => 'Pas de connexion Internet';
+  String get error_title_no_connection => 'Pas de connexion Internet';
 
   @override
-  String get no_connection_description =>
+  String get error_description_no_connection =>
       'Une connexion Internet active est nécessaire pour obtenir les dernières informations sur les stations-service.';
+
+  @override
+  String get error_description_no_connection_station_details =>
+      'Vous n\'êtes pas connecté à Internet, mais vous pouvez toujours naviguer vers questa station-service.';
 }

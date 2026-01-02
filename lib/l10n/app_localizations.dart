@@ -612,17 +612,23 @@ abstract class AppLocalizations {
   /// **'Try again'**
   String get button_retry;
 
-  /// This title appears when the app could not be opened because internet is not working. This only appears on the opening of the app, Internet connection is not checked any further.
+  /// This title appears when the app could not be opened because Internet is not working. This only appears on the opening of the app, Internet connection is not checked any further.
   ///
   /// In en, this message translates to:
   /// **'No Internet connection'**
-  String get no_connection_title;
+  String get error_title_no_connection;
 
-  /// Description for no internet connection page.
+  /// Description for no Internet connection page.
   ///
   /// In en, this message translates to:
   /// **'An active Internet connection is required to fetch the latest fuel station prices.'**
-  String get no_connection_description;
+  String get error_description_no_connection;
+
+  /// Description for the station details page when there is not Internet connection.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not connected to the Internet, but you can still navigate to this fuel station.'**
+  String get error_description_no_connection_station_details;
 }
 
 class _AppLocalizationsDelegate

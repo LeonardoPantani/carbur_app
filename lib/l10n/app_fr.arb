@@ -361,12 +361,16 @@
     "@button_retry": {
         "description": "Button try again."
     },
-    "no_connection_title": "Pas de connexion Internet",
-    "@no_connection_title": {
+    "error_title_no_connection": "Pas de connexion Internet",
+    "@error_title_no_connection": {
         "description": "This title appears when the app could not be opened because internet is not working. This only appears on the opening of the app, Internet connection is not checked any further."
     },
-    "no_connection_description": "Une connexion Internet active est nécessaire pour obtenir les dernières informations sur les stations-service.",
-    "@no_connection_description": {
+    "error_description_no_connection": "Une connexion Internet active est nécessaire pour obtenir les dernières informations sur les stations-service.",
+    "@error_description_no_connection": {
         "description": "Description for no internet connection page."
+    },
+    "error_description_no_connection_station_details": "Vous n'êtes pas connecté à Internet, mais vous pouvez toujours naviguer vers questa station-service.",
+    "@error_description_no_connection_station_details": {
+        "description": "Description for the station details page when there is not Internet connection."
     }
 }

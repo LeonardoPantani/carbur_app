@@ -37,6 +37,7 @@ class StationProvider extends ChangeNotifier {
     const fetchRadiusKm = 10;
 
     isLoading = true;
+    error = null;
     notifyListeners();
 
     try {
@@ -89,7 +90,7 @@ class StationProvider extends ChangeNotifier {
   }
 
   Future<void> forceReload() async {
-    logger.i("forzando ricarica");
+    logger.i("Forzando ricarica.");
     return loadStations();
   }
 

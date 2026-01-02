@@ -288,9 +288,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get button_retry => 'Reintentar';
 
   @override
-  String get no_connection_title => 'Sin conexión a Internet';
+  String get error_title_no_connection => 'Sin conexión a Internet';
 
   @override
-  String get no_connection_description =>
+  String get error_description_no_connection =>
       'Es necesaria una conexión a Internet para obtener la información más reciente sobre las gasolineras.';
+
+  @override
+  String get error_description_no_connection_station_details =>
+      'No estás conectado a Internet, pero aún puoi navegar hacia esta gasolinera.';
 }

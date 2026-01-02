@@ -286,9 +286,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get button_retry => 'Erneut versuchen';
 
   @override
-  String get no_connection_title => 'Keine Internetverbindung';
+  String get error_title_no_connection => 'Keine Internetverbindung';
 
   @override
-  String get no_connection_description =>
-      'Um die aktuellsten Informationen zu den Tankstellen abzurufen, ist eine Internetverbindung erforderlich.';
+  String get error_description_no_connection =>
+      'Eine aktive Internetverbindung ist erforderlich, um die aktuellen Tankstellenpreise abzurufen.';
+
+  @override
+  String get error_description_no_connection_station_details =>
+      'Du bist nicht mit dem Internet verbunden, aber du kannst trotzdem zu dieser Tankstelle navigieren.';
 }

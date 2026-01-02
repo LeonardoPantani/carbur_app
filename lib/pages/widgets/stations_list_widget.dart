@@ -12,52 +12,67 @@ class StationsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<StationProvider>();
+    final stationsProvider = context.watch<StationProvider>();
     AppLocalizations l = AppLocalizations.of(context)!;
 
-    if (provider.isLoading) {
+    if (stationsProvider.isLoading) {
       return RefreshIndicator(
         onRefresh: () async {},
         child: const ShimmerStationList(),
       );
     }
 
-    if (provider.error != null) {
+    if (stationsProvider.error != null) {
       return RefreshIndicator(
         onRefresh: () => _onRefresh(context),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 96,
-                  color: Theme.of(context).colorScheme.error,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: SizedBox(
+                height: constraints.maxHeight,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          switch (stationsProvider.error!) {
+                            StationError.ministry => Icons.error_outline,
+                            StationError.routes => Icons.error_outline,
+                            StationError.network => Icons.wifi_off_outlined,
+                            StationError.unknown => Icons.error_outline,
+                          },
+                          size: 96,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          switch (stationsProvider.error!) {
+                            StationError.ministry =>
+                              l.error_description_api_ministry_notworking,
+                            StationError.routes =>
+                              l.error_description_api_routes_notworking,
+                            StationError.network =>
+                              l.error_description_no_connection,
+                            StationError.unknown => l.error_description_unknown,
+                          },
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  switch (provider.error!) {
-                    StationError.ministry =>
-                      l.error_description_api_ministry_notworking,
-                    StationError.routes =>
-                      l.error_description_api_routes_notworking,
-                    StationError.network =>
-                      l.error_description_api_ministry_notworking,
-                    StationError.unknown => l.error_description_unknown,
-                  },
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       );
     }
 
-    if (provider.listStations.isEmpty) {
+    if (stationsProvider.listStations.isEmpty) {
       return RefreshIndicator(
         onRefresh: () => _onRefresh(context),
         child: ListView(
@@ -80,16 +95,16 @@ class StationsList extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Text(
-              l.stations_found(provider.listStations.length),
+              l.stations_found(stationsProvider.listStations.length),
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
           Expanded(
             child: ListView.builder(
               key: ValueKey(Theme.of(context).brightness),
-              itemCount: provider.listStations.length,
+              itemCount: stationsProvider.listStations.length,
               itemBuilder: (context, index) {
-                final station = provider.listStations[index];
+                final station = stationsProvider.listStations[index];
                 return StationTile(station: station);
               },
             ),
@@ -121,7 +136,7 @@ class ShimmerStationList extends StatelessWidget {
       itemBuilder: (context, index) {
         if (index == 0) {
           return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Shimmer.fromColors(
@@ -141,7 +156,15 @@ class ShimmerStationList extends StatelessWidget {
           baseColor: base,
           highlightColor: highlight,
           child: ListTile(
-            leading: Container(width: 75, height: 75, color: highlight),
+            contentPadding: const EdgeInsets.fromLTRB(12, 6, 16, 4),
+            horizontalTitleGap: 12,
+            leading: SizedBox(
+              width: 60,
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Container(color: highlight),
+              ),
+            ),
             title: Container(
               height: 16,
               width: double.infinity,
@@ -157,7 +180,7 @@ class ShimmerStationList extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.6,
                   color: highlight,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 10),
                 Container(
                   height: 12,
                   width: MediaQuery.of(context).size.width * 0.35,
@@ -165,7 +188,7 @@ class ShimmerStationList extends StatelessWidget {
                 ),
               ],
             ),
-            trailing: Container(height: 16, width: 40, color: highlight),
+            trailing: Container(height: 30, width: 20, color: highlight),
           ),
         );
       },

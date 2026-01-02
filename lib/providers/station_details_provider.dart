@@ -11,25 +11,45 @@ class StationDetailsProvider extends ChangeNotifier {
   final Station station;
   final StationService _service = StationService();
 
+  static final Map<int, StationDetails> _memoryCache = {};
+
   StationDetails? details;
   bool isLoading = false;
   StationError? error;
 
   StationDetailsProvider(this.station);
 
-  Future<void> loadDetails() async {
-    isLoading = true;
+ Future<void> loadDetails() async {
     error = null;
-    notifyListeners();
-
-    try {
-      details = await _service.fetchDetails(station);
-    } catch (e) {
-      error = _mapExceptionToError(e);
+    // looking for data in cache
+    if (_memoryCache.containsKey(station.id)) {
+      details = _memoryCache[station.id];
+      isLoading = false;
+      notifyListeners(); 
+    } else {
+      // we load them if we do not have details in cache
+      isLoading = true;
+      notifyListeners();
     }
 
-    isLoading = false;
-    notifyListeners();
+    try {
+      // trying to obtain new details
+      final freshDetails = await _service.fetchDetails(station);
+      
+      // if i am able (internet working & minister website working)
+      _memoryCache[station.id] = freshDetails;
+      details = freshDetails;
+      
+    } catch (e) {
+      // if we do not have any details saved we show the error, otherwise we show them from cache
+      if (details == null) {
+        // Solo se non abbiamo nulla mostriamo l'errore
+        error = _mapExceptionToError(e);
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   StationError _mapExceptionToError(Object e) {
