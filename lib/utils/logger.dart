@@ -4,6 +4,8 @@ final logger = Logger(
   printer: PrettyPrinter(
     methodCount: 0,
     errorMethodCount: 5,
-    dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
+    colors: false,
+    printEmojis: false,
+    noBoxingByDefault: true,
   ),
 );

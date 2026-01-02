@@ -80,6 +80,8 @@ class PlanRouteProvider extends ChangeNotifier {
     return !(bothCurrent || startInvalid || destinationInvalid || samePlace);
   }
 
+  List<Station> _allStations = [];
+
   List<Station> stationsOnRoute = [];
 
   PlanRouteProvider() {
@@ -291,18 +293,14 @@ class PlanRouteProvider extends ChangeNotifier {
         .map((p) => LatLng(p['lat']!, p['lng']!))
         .toList();
 
-    String fuelType = "1-x";
-    if (settings.selectedFuels.isNotEmpty) {
-      final first = settings.selectedFuels.first;
-      fuelType = "${first.index + 1}-x";
-    }
-
     try {
       // calling minister website
       final List<Station> fetchedStations = await StationService()
-          .fetchStationsOnRoute(points: ministerPoints, fuelType: fuelType);
+          .fetchStationsOnRoute(points: ministerPoints);
 
-      stationsOnRoute = fetchedStations;
+      _allStations = fetchedStations;
+      updateFuelFilter(settings.selectedFuels);
+
       hasSearched = true;
       notifyListeners();
     } catch (e) {
@@ -310,10 +308,25 @@ class PlanRouteProvider extends ChangeNotifier {
     }
   }
 
+  void updateFuelFilter(List<FuelType> selectedFuels) {
+    if (_allStations.isEmpty) {
+      stationsOnRoute = [];
+      notifyListeners();
+      return;
+    }
+
+    stationsOnRoute = _allStations.where((station) {
+      return station.prices.keys.any((k) => selectedFuels.contains(k));
+    }).toList();
+
+    notifyListeners();
+  }
+
   void clear() {
     startController.text = '';
     destinationController.clear();
     routePolylinePoints = [];
+    _allStations = [];
     stationsOnRoute = [];
     useCurrentLocationAsStart = true;
     useCurrentLocationAsDestination = false;
@@ -345,14 +358,6 @@ class PlanRouteProvider extends ChangeNotifier {
     hasSearched = false;
 
     notifyListeners();
-  }
-
-  List<Station> getStationsFilteredBy(List<FuelType> selectedFuels) {
-    if (stationsOnRoute.isEmpty) return [];
-
-    return stationsOnRoute.where((station) {
-      return station.prices.keys.any((k) => selectedFuels.contains(k));
-    }).toList();
   }
 
   @override

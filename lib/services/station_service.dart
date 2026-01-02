@@ -260,7 +260,6 @@ class StationService {
   // fetch stations along route
   Future<List<Station>> fetchStationsOnRoute({
     required List<Map<String, double>> points,
-    String fuelType = "1-x",
   }) async {
     final uri = Uri.parse("https://carburanti.mise.gov.it/ospzApi/search/route");
 
@@ -278,7 +277,6 @@ class StationService {
     }
 
     final body = {
-      "fuelType": fuelType,
       "priceOrder": "asc",
       "service": null,
       "points": optimizedPoints,

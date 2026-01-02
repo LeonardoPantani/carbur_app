@@ -58,7 +58,6 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
 
     final routeProvider = context.watch<PlanRouteProvider>();
     final mapProvider = context.read<MapProvider>();
-    context.read<SettingsProvider>();
 
     bool justFittedRoute = false;
 
@@ -68,13 +67,15 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
         !_routeFitted) {
       logger.i("Indicazioni modificate. Cambio dello zoom.");
       final bounds = computeBounds(routeProvider.routePolylinePoints);
-      _mapController!.moveCamera(CameraUpdate.newLatLngBounds(bounds, 48)).then((_) async {
-        final newZoom = await _mapController!.getZoomLevel();
-        mapProvider.updateZoom(newZoom);
-        if (mounted) {
-          _triggerRebuild(context);
-        }
-      });
+      _mapController!.moveCamera(CameraUpdate.newLatLngBounds(bounds, 48)).then(
+        (_) async {
+          final newZoom = await _mapController!.getZoomLevel();
+          mapProvider.updateZoom(newZoom);
+          if (mounted) {
+            _triggerRebuild(context);
+          }
+        },
+      );
       _routeFitted = true;
       justFittedRoute = true;
     }
@@ -82,8 +83,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
     // trigger that regenerates markers
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (justFittedRoute) return;
-      
-      logger.i("Le dipendenze sono cambiate. Aggiornamento marker richiesto.");
+      logger.i("[Plan Route] Le dipendenze sono cambiate. Aggiornamento marker richiesto.");
       _triggerRebuild(context);
     });
   }
@@ -511,9 +511,6 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
             style: const TextStyle(fontSize: 13), // smaller font
             decoration: InputDecoration(
               labelText: label,
-              hintText: AppLocalizations.of(
-                context,
-              )!.routeplanner_usingcurrentlocation_text,
               border: const OutlineInputBorder(),
               isDense: true, // makes text field compact
               contentPadding: const EdgeInsets.symmetric(

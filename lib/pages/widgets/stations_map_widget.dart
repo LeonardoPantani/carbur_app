@@ -88,7 +88,7 @@ class _StationsMapState extends State<StationsMap> {
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      logger.i("Le dipendenze sono cambiate. Aggiornamento marker richiesto.");
+      logger.i("[Map Widget] Le dipendenze sono cambiate. Aggiornamento marker richiesto.");
       _triggerRebuild(context);
     });
 

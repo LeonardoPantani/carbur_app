@@ -55,7 +55,7 @@ class SettingsPage extends StatelessWidget {
           ),
 
           Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: 24),
             child: InkWell(
               onTap: () {
                 openWebsite("https://github.com/LeonardoPantani");
