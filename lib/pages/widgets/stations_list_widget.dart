@@ -25,6 +25,14 @@ class StationsList extends StatelessWidget {
       );
     }
 
+    bool isFavLoading = favoritesProvider.showFavoritesOnly && favoritesProvider.isLoading;
+    if (stationsProvider.isLoading || isFavLoading) {
+      return RefreshIndicator(
+        onRefresh: () async {},
+        child: const ShimmerStationList(),
+      );
+    }
+
     if (stationsProvider.error != null) {
       return RefreshIndicator(
         onRefresh: () => _onRefresh(context),
@@ -78,11 +86,7 @@ class StationsList extends StatelessWidget {
     List<Station> stationsToShow;
 
     if (favoritesProvider.showFavoritesOnly) {
-      stationsToShow = favoritesProvider.favoriteStations;
-
-      if (stationsToShow.isEmpty && !favoritesProvider.isLoading) {
-        favoritesProvider.refreshData();
-      }
+      stationsToShow = stationsProvider.sortStations(favoritesProvider.favoriteStations);
     } else {
       stationsToShow = stationsProvider.listStations;
     }
@@ -162,7 +166,12 @@ class StationsList extends StatelessWidget {
   Future<void> _onRefresh(BuildContext context) async {
     final pos = context.read<LocationProvider>();
     final stations = context.read<StationProvider>();
+    final favorites = context.read<FavoritesProvider>();
+    
     await pos.refreshPosition();
+    if (favorites.showFavoritesOnly) {
+      await favorites.refreshData();
+    }
     await stations.forceReload();
   }
 }

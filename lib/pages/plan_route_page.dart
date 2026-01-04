@@ -41,7 +41,6 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
     final mapProvider = context.read<MapProvider>();
     final settings = context.read<SettingsProvider>();
 
-    // Rigenera solo se ci sono stazioni sulla rotta
     if (routeProvider.stationsOnRoute.isNotEmpty) {
       mapProvider.rebuildMarkers(
         stations: routeProvider.stationsOnRoute,

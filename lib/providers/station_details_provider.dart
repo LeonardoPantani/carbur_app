@@ -43,7 +43,6 @@ class StationDetailsProvider extends ChangeNotifier {
     } catch (e) {
       // if we do not have any details saved we show the error, otherwise we show them from cache
       if (details == null) {
-        // Solo se non abbiamo nulla mostriamo l'errore
         error = _mapExceptionToError(e);
       }
     } finally {

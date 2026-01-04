@@ -109,14 +109,25 @@ class StationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  List<Station> sortStations(List<Station> input) {
+    if (_settings == null) return input;
+    final copy = List<Station>.from(input);
+    _performSort(copy, _settings!.selectedFuels, _sort);
+    return copy;
+  }
+
   void _applySorting(List<FuelType> fuels) {
-    if (_sort == StationSort.best) {
-      _applyBestSorting(fuels);
+    _performSort(stations, fuels, _sort);
+  }
+
+  void _performSort(List<Station> targetList, List<FuelType> fuels, StationSort sortMode) {
+    if (sortMode == StationSort.best) {
+      _applyBestSorting(targetList, fuels);
       return;
     }
 
-    stations.sort((a, b) {
-      switch (_sort) {
+    targetList.sort((a, b) {
+      switch (sortMode) {
         case StationSort.price:
           final pa = _lowestPrice(a, fuels);
           final pb = _lowestPrice(b, fuels);
@@ -158,36 +169,20 @@ class StationProvider extends ChangeNotifier {
   }
 
   /*
-      First we calculate max() and min() of the following parameters from all stations found within range:
-      - distance
-      - price
-      - update time
-
-      Then we normalize. Distance and Price must be lower while Update Time must be most recent (higher):
-        d'_s = (d_s - min(d))/(max(d)-min(d))
-        p'_s = (p_s - min(p))/(max(p)-min(p))
-        t'_s = (max(t)-t_s)/(max(t)-min(t))
-      
-      We now have values between [0, 1], Distance and Price near 0 are good, Update Time near 1 is good.
-
-      Finally we calculate the cost function:
-        score = w_d * d'_s + w_p * p'_s + w_t * t'_s
-      with the following constraint (vincolo):
-        w_d + w_p + w_t = 1
+      Ordinamento "Best" refactorizzato per accettare una lista target
   */
+  void _applyBestSorting(List<Station> targetList, List<FuelType> fuels) {
+    if (targetList.isEmpty) return;
 
-  void _applyBestSorting(List<FuelType> fuels) {
-    if (stations.isEmpty) return;
-
-    final prices = stations
+    final prices = targetList
         .map((s) => _lowestPrice(s, fuels))
         .where((p) => p.isFinite)
         .toList();
 
     if (prices.isEmpty) return;
 
-    final distances = stations.map((s) => s.distanceKm).toList();
-    final times = stations
+    final distances = targetList.map((s) => s.distanceKm).toList();
+    final times = targetList
         .map((s) => s.lastUpdate.millisecondsSinceEpoch)
         .toList();
 
@@ -218,7 +213,7 @@ class StationProvider extends ChangeNotifier {
       return wPrice * pNorm + wDistance * dNorm + wTime * tNorm;
     }
 
-    stations.sort((a, b) => score(a).compareTo(score(b)));
+    targetList.sort((a, b) => score(a).compareTo(score(b)));
   }
 
   void _handleAutoUpdates() {
@@ -249,7 +244,6 @@ class StationProvider extends ChangeNotifier {
     }
   }
 
-  // ignore: unused_element
   Future<void> _refineTopDrivingDistances(
     double fromLat,
     double fromLng,
