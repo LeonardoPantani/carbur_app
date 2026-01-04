@@ -92,6 +92,15 @@
             }
         }
     },
+    "stations_favorited": "Hai {count, plural, one{1 distributore salvato} other{{count} distributori salvati}} nei preferiti.",
+    "@stations_favorited": {
+        "description": "Header before list of favorited stations that tells how many stations have been saved by the user as favorites.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
     "last_update": "Aggiornato il {date} alle {time}",
     "@last_update": {
         "description": "Last update date and time for a fuel station.",
@@ -372,5 +381,33 @@
     "error_description_no_connection_station_details": "Non sei connesso ad Internet, ma puoi comunque navigare verso questo distributore.",
     "@error_description_no_connection_station_details": {
         "description": "Description for the station details page when there is not Internet connection."
+    },
+    "favorites_empty": "Non hai distributori tra i preferiti.",
+    "@favorites_empty": {
+        "description": "This text appears in the favorites list when empty."
+    },
+    "favorites_shownearbystations": "Mostra distributori nelle vicinanze",
+    "@favorites_shownearbystations": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations list page."
+    },
+    "favorites_showonlyfavorites": "Mostra solo i preferiti.",
+    "@favorites_showonlyfavorites": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations list page."
+    },
+    "favorites_add_to_favorites": "Aggiungi ai preferiti.",
+    "@favorites_add_to_favorites": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations details page."
+    },
+    "favorites_remove_from_favorites": "Rimuovi dai preferiti.",
+    "@favorites_remove_from_favorites": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations details page."
+    },
+    "favorites_removed": "Distributore rimosso dai preferiti.",
+    "@favorites_removed": {
+        "description": "This text appears in the snackbar informing the user that the fuel station has been removed from their favorites."
+    },
+    "favorites_added": "Distributore aggiunto ai preferiti.",
+    "@favorites_added": {
+        "description": "This text appears in the snackbar informing the user that the fuel station has been added to their favorites."
     }
 }

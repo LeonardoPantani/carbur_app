@@ -79,6 +79,17 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String stations_favorited(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count distributori salvati',
+      one: '1 distributore salvato',
+    );
+    return 'Hai $_temp0 nei preferiti.';
+  }
+
+  @override
   String last_update(Object date, Object time) {
     return 'Aggiornato il $date alle $time';
   }
@@ -296,4 +307,26 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get error_description_no_connection_station_details =>
       'Non sei connesso ad Internet, ma puoi comunque navigare verso questo distributore.';
+
+  @override
+  String get favorites_empty => 'Non hai distributori tra i preferiti.';
+
+  @override
+  String get favorites_shownearbystations =>
+      'Mostra distributori nelle vicinanze';
+
+  @override
+  String get favorites_showonlyfavorites => 'Mostra solo i preferiti.';
+
+  @override
+  String get favorites_add_to_favorites => 'Aggiungi ai preferiti.';
+
+  @override
+  String get favorites_remove_from_favorites => 'Rimuovi dai preferiti.';
+
+  @override
+  String get favorites_removed => 'Distributore rimosso dai preferiti.';
+
+  @override
+  String get favorites_added => 'Distributore aggiunto ai preferiti.';
 }

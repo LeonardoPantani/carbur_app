@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
 import '../pages/settings_page.dart';
+import '../providers/favorites_provider.dart';
 import '../providers/map_provider.dart';
 import 'widgets/stations_list_widget.dart';
 import 'widgets/stations_map_widget.dart';
@@ -131,8 +132,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<Widget> _buildActions(BuildContext context) {
+    final favoritesProvider = context.watch<FavoritesProvider>();
+    final isFilterActive = favoritesProvider.showFavoritesOnly;
+    final l = AppLocalizations.of(context)!;
+
     return [
-      if (_showSortMenu) const StationsSortWidget(),
+      if (_showSortMenu) ...[
+        IconButton(
+          icon: Icon(
+            isFilterActive ? Icons.star : Icons.star_outline,
+            color: isFilterActive ? Colors.amber : null,
+          ),
+          tooltip: isFilterActive ? l.favorites_shownearbystations : l.favorites_showonlyfavorites,
+          onPressed: () => favoritesProvider.toggleFilter(),
+        ),
+        const StationsSortWidget(),
+      ],
       IconButton(
         icon: const Icon(Icons.settings),
         onPressed: () {

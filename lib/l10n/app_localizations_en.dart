@@ -79,6 +79,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String stations_favorited(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stations',
+      one: '1 station',
+    );
+    return 'You have $_temp0 saved in your favorites.';
+  }
+
+  @override
   String last_update(Object date, Object time) {
     return 'Updated on $date at $time';
   }
@@ -294,4 +305,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get error_description_no_connection_station_details =>
       'You are not connected to the Internet, but you can still navigate to this fuel station.';
+
+  @override
+  String get favorites_empty => 'You haven\'t saved any fuel station yet.';
+
+  @override
+  String get favorites_shownearbystations => 'Show nearby fuel stations';
+
+  @override
+  String get favorites_showonlyfavorites => 'Show only favorites.';
+
+  @override
+  String get favorites_add_to_favorites => 'Add to favorites.';
+
+  @override
+  String get favorites_remove_from_favorites => 'Remove from favorites.';
+
+  @override
+  String get favorites_removed => 'Fuel station removed from favorites.';
+
+  @override
+  String get favorites_added => 'Fuel station added to favorites.';
 }

@@ -42,6 +42,19 @@ class Station {
       distanceKm = value;
     }
   }
+
+  Station copyWithCoordinates({required double lat, required double lng}) {
+    return Station(
+      id: id,
+      name: name,
+      brandString: brand.name,
+      lastUpdate: lastUpdate,
+      latitude: lat,
+      longitude: lng,
+      distanceKm: distanceKm,
+      prices: prices,
+    );
+  }
 }
 
 Brand _parseBrand(String raw) {

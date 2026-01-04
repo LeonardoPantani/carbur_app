@@ -79,6 +79,17 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String stations_favorited(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tankstellen',
+      one: '1 Tankstelle',
+    );
+    return 'Du hast $_temp0 in deinen Favoriten gespeichert.';
+  }
+
+  @override
   String last_update(Object date, Object time) {
     return 'Aktualisiert am $date um $time';
   }
@@ -295,4 +306,26 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get error_description_no_connection_station_details =>
       'Du bist nicht mit dem Internet verbunden, aber du kannst trotzdem zu dieser Tankstelle navigieren.';
+
+  @override
+  String get favorites_empty => 'Du hast noch keine Tankstellen gespeichert.';
+
+  @override
+  String get favorites_shownearbystations =>
+      'Nahegelegene Tankstellen anzeigen';
+
+  @override
+  String get favorites_showonlyfavorites => 'Nur Favoriten anzeigen.';
+
+  @override
+  String get favorites_add_to_favorites => 'Zu den Favoriten hinzufügen.';
+
+  @override
+  String get favorites_remove_from_favorites => 'Aus den Favoriten entfernen.';
+
+  @override
+  String get favorites_removed => 'Tankstelle aus den Favoriten entfernt.';
+
+  @override
+  String get favorites_added => 'Tankstelle zu den Favoriten hinzugefügt.';
 }

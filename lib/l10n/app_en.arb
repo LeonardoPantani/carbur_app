@@ -92,6 +92,15 @@
             }
         }
     },
+    "stations_favorited": "You have {count, plural, one{1 station} other{{count} stations}} saved in your favorites.",
+    "@stations_favorited": {
+        "description": "Header before list of favorited stations that tells how many stations have been saved by the user as favorites.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
     "last_update": "Updated on {date} at {time}",
     "@last_update": {
         "description": "Last update date and time for a fuel station.",
@@ -372,5 +381,33 @@
     "error_description_no_connection_station_details": "You are not connected to the Internet, but you can still navigate to this fuel station.",
     "@error_description_no_connection_station_details": {
         "description": "Description for the station details page when there is not Internet connection."
+    },
+    "favorites_empty": "You haven't saved any fuel station yet.",
+    "@favorites_empty": {
+        "description": "This text appears in the favorites list when empty."
+    },
+    "favorites_shownearbystations": "Show nearby fuel stations",
+    "@favorites_shownearbystations": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations list page."
+    },
+    "favorites_showonlyfavorites": "Show only favorites.",
+    "@favorites_showonlyfavorites": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations list page."
+    },
+    "favorites_add_to_favorites": "Add to favorites.",
+    "@favorites_add_to_favorites": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations details page."
+    },
+    "favorites_remove_from_favorites": "Remove from favorites.",
+    "@favorites_remove_from_favorites": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations details page."
+    },
+    "favorites_removed": "Fuel station removed from favorites.",
+    "@favorites_removed": {
+        "description": "This text appears in the snackbar informing the user that the fuel station has been removed from their favorites."
+    },
+    "favorites_added": "Fuel station added to favorites.",
+    "@favorites_added": {
+        "description": "This text appears in the snackbar informing the user that the fuel station has been added to their favorites."
     }
 }

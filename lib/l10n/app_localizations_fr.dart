@@ -79,6 +79,17 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String stations_favorited(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stations-service enregistrées',
+      one: '1 station-service enregistrée',
+    );
+    return 'Vous avez $_temp0 dans vos favoris.';
+  }
+
+  @override
   String last_update(Object date, Object time) {
     return 'Mis à jour le $date à $time';
   }
@@ -297,4 +308,27 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get error_description_no_connection_station_details =>
       'Vous n\'êtes pas connecté à Internet, mais vous pouvez toujours naviguer vers questa station-service.';
+
+  @override
+  String get favorites_empty =>
+      'Vous n\'avez encore enregistré aucune station-service.';
+
+  @override
+  String get favorites_shownearbystations =>
+      'Afficher les stations-service à proximité';
+
+  @override
+  String get favorites_showonlyfavorites => 'Afficher uniquement les favoris.';
+
+  @override
+  String get favorites_add_to_favorites => 'Ajouter aux favoris.';
+
+  @override
+  String get favorites_remove_from_favorites => 'Retirer des favoris.';
+
+  @override
+  String get favorites_removed => 'Station-service retirée des favoris.';
+
+  @override
+  String get favorites_added => 'Station-service ajoutée aux favoris.';
 }

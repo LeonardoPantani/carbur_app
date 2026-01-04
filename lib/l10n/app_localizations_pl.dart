@@ -79,6 +79,19 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String stations_favorited(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stacji',
+      many: '$count stacji',
+      few: '$count stacje',
+      one: '1 stację',
+    );
+    return 'Masz $_temp0 zapisaną w ulubionych.';
+  }
+
+  @override
   String last_update(Object date, Object time) {
     return 'Zaktualizowano $date o $time';
   }
@@ -297,4 +310,25 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get error_description_no_connection_station_details =>
       'Nie masz połączenia z Internetem, ale nadal możesz nawigować do tej stacji paliw.';
+
+  @override
+  String get favorites_empty => 'Nie zapisałeś jeszcze żadnej stacji paliw.';
+
+  @override
+  String get favorites_shownearbystations => 'Pokaż pobliskie stacje paliw';
+
+  @override
+  String get favorites_showonlyfavorites => 'Pokaż tylko ulubione.';
+
+  @override
+  String get favorites_add_to_favorites => 'Dodaj do ulubionych.';
+
+  @override
+  String get favorites_remove_from_favorites => 'Usuń z ulubionych.';
+
+  @override
+  String get favorites_removed => 'Stacja paliw usunięta z ulubionych.';
+
+  @override
+  String get favorites_added => 'Stacja paliw dodana do ulubionych.';
 }

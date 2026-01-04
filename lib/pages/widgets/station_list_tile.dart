@@ -32,10 +32,7 @@ class StationTile extends StatelessWidget {
         width: 75,
         child: AspectRatio(
           aspectRatio: 1,
-          child: Image.asset(
-            station.brand.asset,
-            fit: BoxFit.contain,
-          ),
+          child: Image.asset(station.brand.asset, fit: BoxFit.contain),
         ),
       ),
       title: Text(
@@ -56,50 +53,62 @@ class StationTile extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             l.last_update(
-              DateFormat.MMMMd(Localizations.localeOf(context).toString()).format(station.lastUpdate),
-              DateFormat.Hm(Localizations.localeOf(context).toString()).format(station.lastUpdate),
+              DateFormat.MMMMd(
+                Localizations.localeOf(context).toString(),
+              ).format(station.lastUpdate),
+              DateFormat.Hm(
+                Localizations.localeOf(context).toString(),
+              ).format(station.lastUpdate),
             ),
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
       ),
-      trailing: showDistance ? Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-            station.distanceKm.formatDistance(context),
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          Text("km", style: Theme.of(context).textTheme.bodySmall),
-        ],
-      ) : null,
+      trailing: showDistance
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                  Text(
+                    station.distanceKm.formatDistance(context),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text("km", style: Theme.of(context).textTheme.bodySmall),
+                ],
+            )
+          : null,
       onTap: () => context.openStationDetails(station),
     );
   }
 
-  List<InlineSpan> _buildPriceSpans(BuildContext context, Station station, SettingsProvider settings) {
+  List<InlineSpan> _buildPriceSpans(
+    BuildContext context,
+    Station station,
+    SettingsProvider settings,
+  ) {
     final prices = station.visiblePrices(settings.selectedFuels);
     final spans = <InlineSpan>[];
     for (int i = 0; i < prices.length; i++) {
       spans.add(TextSpan(text: "${prices[i].key.label(context)}: "));
-      spans.add(WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary,
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Text(
-            "${prices[i].value.pricePerLiter.formatPrice(context)} €",
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onPrimary,
-              fontWeight: FontWeight.bold,
+      spans.add(
+        WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              "${prices[i].value.pricePerLiter.formatPrice(context)} €",
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
-      ));
+      );
       if (i < prices.length - 1) spans.add(const TextSpan(text: " • "));
     }
     return spans;

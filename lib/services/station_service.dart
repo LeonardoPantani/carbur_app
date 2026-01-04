@@ -325,4 +325,64 @@ class StationService {
       throw ApiException();
     }
   }
+
+  Future<List<Station>> fetchStationsByIds(List<int> ids) async {
+    if (ids.isEmpty) return [];
+    final futures = ids.map((id) => fetchStationById(id));
+    final results = await Future.wait(futures);
+    return results.whereType<Station>().toList();
+  }
+
+  Future<Station?> fetchStationById(int id) async {
+    try {
+      final uri = Uri.parse('https://carburanti.mise.gov.it/ospzApi/registry/servicearea/$id');
+      final response = await http.get(uri).timeout(const Duration(seconds: 10));
+      
+      if (response.statusCode != 200) return null;
+      final json = jsonDecode(response.body);
+      
+      return _stationFromDetailsJson(json); 
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Station _stationFromDetailsJson(Map<String, dynamic> json) {
+    final fuels = <FuelType, FuelPrice>{};
+    DateTime? lastUpdate;
+
+    if (json["fuels"] != null) {
+      for (final fuelJson in json["fuels"]) {
+        final type = _fuelTypeFromMinisterId(fuelJson["fuelId"]);
+        if (type != null) {
+          final price = FuelPrice(
+            type: type,
+            pricePerLiter: (fuelJson["price"] as num).toDouble(),
+            isSelf: fuelJson["isSelf"] ?? true,
+          );
+          fuels[type] = price;
+          
+          if (fuelJson["insertDate"] != null) {
+            final dt = DateTime.tryParse(fuelJson["insertDate"]);
+            if (dt != null) {
+              if (lastUpdate == null || dt.isAfter(lastUpdate)) {
+                lastUpdate = dt;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return Station(
+      id: json["id"],
+      name: json["name"] ?? json["nomeImpianto"] ?? "Stazione",
+      brandString: json["brand"] ?? "Sconosciuto",
+      lastUpdate: lastUpdate ?? DateTime.now(),
+      latitude: 0.0, 
+      longitude: 0.0,
+      distanceKm: 0.0, 
+      prices: fuels,
+    );
+  }
 }

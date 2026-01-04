@@ -228,6 +228,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{1 station found around you.} other{{count} stations found around you.}}'**
   String stations_found(int count);
 
+  /// Header before list of favorited stations that tells how many stations have been saved by the user as favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {count, plural, one{1 station} other{{count} stations}} saved in your favorites.'**
+  String stations_favorited(int count);
+
   /// Last update date and time for a fuel station.
   ///
   /// In en, this message translates to:
@@ -629,6 +635,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You are not connected to the Internet, but you can still navigate to this fuel station.'**
   String get error_description_no_connection_station_details;
+
+  /// This text appears in the favorites list when empty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t saved any fuel station yet.'**
+  String get favorites_empty;
+
+  /// This text appears as a tooltip when tapping and holding the star button in the stations list page.
+  ///
+  /// In en, this message translates to:
+  /// **'Show nearby fuel stations'**
+  String get favorites_shownearbystations;
+
+  /// This text appears as a tooltip when tapping and holding the star button in the stations list page.
+  ///
+  /// In en, this message translates to:
+  /// **'Show only favorites.'**
+  String get favorites_showonlyfavorites;
+
+  /// This text appears as a tooltip when tapping and holding the star button in the stations details page.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to favorites.'**
+  String get favorites_add_to_favorites;
+
+  /// This text appears as a tooltip when tapping and holding the star button in the stations details page.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from favorites.'**
+  String get favorites_remove_from_favorites;
+
+  /// This text appears in the snackbar informing the user that the fuel station has been removed from their favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel station removed from favorites.'**
+  String get favorites_removed;
+
+  /// This text appears in the snackbar informing the user that the fuel station has been added to their favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel station added to favorites.'**
+  String get favorites_added;
 }
 
 class _AppLocalizationsDelegate

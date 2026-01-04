@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../models/station.dart';
 import '../../providers/location_provider.dart';
 import '../../providers/station_provider.dart';
+import '../../providers/favorites_provider.dart';
 import 'station_list_tile.dart';
 
 class StationsList extends StatelessWidget {
@@ -13,6 +15,7 @@ class StationsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stationsProvider = context.watch<StationProvider>();
+    final favoritesProvider = context.watch<FavoritesProvider>();
     AppLocalizations l = AppLocalizations.of(context)!;
 
     if (stationsProvider.isLoading) {
@@ -72,15 +75,47 @@ class StationsList extends StatelessWidget {
       );
     }
 
-    if (stationsProvider.listStations.isEmpty) {
+    List<Station> stationsToShow;
+
+    if (favoritesProvider.showFavoritesOnly) {
+      stationsToShow = favoritesProvider.favoriteStations;
+
+      if (stationsToShow.isEmpty && !favoritesProvider.isLoading) {
+        favoritesProvider.refreshData();
+      }
+    } else {
+      stationsToShow = stationsProvider.listStations;
+    }
+
+    if (stationsToShow.isEmpty) {
       return RefreshIndicator(
         onRefresh: () => _onRefresh(context),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
-            Center(
-              heightFactor: 10,
-              child: Text(AppLocalizations.of(context)!.no_stations_found),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      favoritesProvider.showFavoritesOnly
+                          ? Icons.star_border
+                          : Icons.local_gas_station_outlined,
+                      size: 64,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      favoritesProvider.showFavoritesOnly
+                          ? l.favorites_empty
+                          : l.no_stations_found,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -94,18 +129,28 @@ class StationsList extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Text(
-              l.stations_found(stationsProvider.listStations.length),
-              style: Theme.of(context).textTheme.bodySmall,
+            child: Row(
+              children: [
+                Text(
+                  favoritesProvider.showFavoritesOnly
+                      ? l.stations_favorited(stationsToShow.length)
+                      : l.stations_found(stationsToShow.length),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
             ),
           ),
+
           Expanded(
             child: ListView.builder(
               key: ValueKey(Theme.of(context).brightness),
-              itemCount: stationsProvider.listStations.length,
+              itemCount: stationsToShow.length,
               itemBuilder: (context, index) {
-                final station = stationsProvider.listStations[index];
-                return StationTile(station: station);
+                final station = stationsToShow[index];
+                return StationTile(
+                  station: station,
+                  showDistance: !favoritesProvider.showFavoritesOnly,
+                );
               },
             ),
           ),

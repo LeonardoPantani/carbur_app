@@ -10,6 +10,7 @@ import '../l10n/app_localizations.dart';
 import '../providers/settings_provider.dart';
 import '../providers/station_details_provider.dart';
 import '../providers/station_provider.dart';
+import '../providers/favorites_provider.dart';
 import '../utils/hyperlink_utils.dart';
 
 class StationDetailsPage extends StatelessWidget {
@@ -18,14 +19,17 @@ class StationDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stationsProvider = context.watch<StationDetailsProvider>();
+    final favoritesProvider = context.watch<FavoritesProvider>();
     final l = AppLocalizations.of(context)!;
     final station = stationsProvider.station;
+    final isFavorite = favoritesProvider.isFavorite(station.id);
 
     Widget content;
 
     if (stationsProvider.isLoading) {
       content = const Center(child: CircularProgressIndicator());
-    } else if (stationsProvider.error != null || stationsProvider.details == null) {
+    } else if (stationsProvider.error != null ||
+        stationsProvider.details == null) {
       content = RefreshIndicator(
         onRefresh: () => stationsProvider.loadDetails(),
         child: LayoutBuilder(
@@ -341,7 +345,31 @@ class StationDetailsPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(l.station_details_title)),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(
+              isFavorite ? Icons.star : Icons.star_border,
+              color: isFavorite ? Colors.amber : null,
+            ),
+            tooltip: isFavorite
+                ? l.favorites_remove_from_favorites
+                : l.favorites_add_to_favorites,
+            onPressed: () {
+              favoritesProvider.toggleFavorite(station);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    isFavorite ? l.favorites_removed : l.favorites_added,
+                  ),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+            },
+          ),
+        ],
+        title: Text(l.station_details_title),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -365,9 +393,15 @@ class StationDetailsPage extends StatelessWidget {
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.map),
                       label: Text(l.start_navigation),
-                      onPressed: () {
-                        openNavigation(station.latitude, station.longitude);
-                      },
+                      onPressed:
+                          (station.latitude == 0 && station.longitude == 0)
+                          ? null
+                          : () {
+                              openNavigation(
+                                station.latitude,
+                                station.longitude,
+                              );
+                            },
                     ),
                   ),
                 ],

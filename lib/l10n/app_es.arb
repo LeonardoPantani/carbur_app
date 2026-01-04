@@ -92,6 +92,15 @@
             }
         }
     },
+    "stations_favorited": "Tienes {count, plural, one{1 gasolinera} other{{count} gasolineras}} guardada(s) en favoritos.",
+    "@stations_favorited": {
+        "description": "Header before list of favorited stations that tells how many stations have been saved by the user as favorites.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
     "last_update": "Actualizado el {date} a las {time}",
     "@last_update": {
         "description": "Last update date and time for a fuel station.",
@@ -372,5 +381,33 @@
     "error_description_no_connection_station_details": "No estás conectado a Internet, pero aún puoi navegar hacia esta gasolinera.",
     "@error_description_no_connection_station_details": {
         "description": "Description for the station details page when there is not Internet connection."
+    },
+    "favorites_empty": "Aún no has guardado ninguna estación de servicio.",
+    "@favorites_empty": {
+        "description": "This text appears in the favorites list when empty."
+    },
+    "favorites_shownearbystations": "Mostrar estaciones de servicio cercanas",
+    "@favorites_shownearbystations": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations list page."
+    },
+    "favorites_showonlyfavorites": "Mostrar solo favoritos.",
+    "@favorites_showonlyfavorites": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations list page."
+    },
+    "favorites_add_to_favorites": "Añadir a favoritos.",
+    "@favorites_add_to_favorites": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations details page."
+    },
+    "favorites_remove_from_favorites": "Eliminar de favoritos.",
+    "@favorites_remove_from_favorites": {
+        "description": "This text appears as a tooltip when tapping and holding the star button in the stations details page."
+    },
+    "favorites_removed": "Estación de servicio eliminada de favoritos.",
+    "@favorites_removed": {
+        "description": "This text appears in the snackbar informing the user that the fuel station has been removed from their favorites."
+    },
+    "favorites_added": "Estación de servicio añadida a favoritos.",
+    "@favorites_added": {
+        "description": "This text appears in the snackbar informing the user that the fuel station has been added to their favorites."
     }
 }

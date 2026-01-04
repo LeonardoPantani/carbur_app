@@ -79,6 +79,17 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String stations_favorited(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count postos',
+      one: '1 posto',
+    );
+    return 'Você tem $_temp0 salvos nos favoritos.';
+  }
+
+  @override
   String last_update(Object date, Object time) {
     return 'Atualizado em $date às $time';
   }
@@ -297,4 +308,29 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get error_description_no_connection_station_details =>
       'Não está conectado à Internet, mas você ainda pode navegar para este posto de combustível.';
+
+  @override
+  String get favorites_empty =>
+      'Você ainda não salvou nenhum posto de combustível.';
+
+  @override
+  String get favorites_shownearbystations =>
+      'Mostrar postos de combustível próximos';
+
+  @override
+  String get favorites_showonlyfavorites => 'Mostrar apenas favoritos.';
+
+  @override
+  String get favorites_add_to_favorites => 'Adicionar aos favoritos.';
+
+  @override
+  String get favorites_remove_from_favorites => 'Remover dos favoritos.';
+
+  @override
+  String get favorites_removed =>
+      'Posto de combustível removido dos favoritos.';
+
+  @override
+  String get favorites_added =>
+      'Posto de combustível adicionado aos favoritos.';
 }
