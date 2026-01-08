@@ -1,13 +1,8 @@
 import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart';
-
 import 'env.dart';
 
 class ApiKeyGetter {
   static String get maps {
-    if (kIsWeb) {
-      return Env.googleMapsJsApiKey;
-    }
     if (Platform.isAndroid) {
       return Env.googleMapsSdkAndroidApiKey;
     }

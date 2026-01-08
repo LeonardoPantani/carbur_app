@@ -15,61 +15,64 @@ class SettingsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l.settings_title)),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              children: [
-                ListTile(
-                  title: Text(l.settings_fuel_types),
-                  subtitle: Text(
-                    settings.selectedFuels
-                        .map((f) => f.label(context))
-                        .join(", "),
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                children: [
+                  ListTile(
+                    title: Text(l.settings_fuel_types),
+                    subtitle: Text(
+                      settings.selectedFuels
+                          .map((f) => f.label(context))
+                          .join(", "),
+                    ),
+                    leading: const Icon(Icons.local_gas_station),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _openFuelSelectionDialog(context, settings),
                   ),
-                  leading: const Icon(Icons.local_gas_station),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _openFuelSelectionDialog(context, settings),
-                ),
-
-                ListTile(
-                  title: Text(l.settings_search_radius),
-                  subtitle: Text("${settings.radiusKm} km"),
-                  leading: const Icon(Icons.my_location),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _openRadiusDialog(context, settings),
-                ),
-
-                ListTile(
-                  title: Text(l.settings_marker_fuel),
-                  subtitle: Text(settings.preferredMarkerFuel.label(context)),
-                  leading: const Icon(Icons.price_check),
-                  trailing: const Icon(Icons.chevron_right),
-                  enabled: settings.selectedFuels.length > 1,
-                  onTap: settings.selectedFuels.length > 1
-                      ? () => _openMarkerFuelDialog(context, settings)
-                      : null,
-                ),
-              ],
+        
+                  ListTile(
+                    title: Text(l.settings_search_radius),
+                    subtitle: Text("${settings.radiusKm} km"),
+                    leading: const Icon(Icons.my_location),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _openRadiusDialog(context, settings),
+                  ),
+        
+                  ListTile(
+                    title: Text(l.settings_marker_fuel),
+                    subtitle: Text(settings.preferredMarkerFuel.label(context)),
+                    leading: const Icon(Icons.price_check),
+                    trailing: const Icon(Icons.chevron_right),
+                    enabled: settings.selectedFuels.length > 1,
+                    onTap: settings.selectedFuels.length > 1
+                        ? () => _openMarkerFuelDialog(context, settings)
+                        : null,
+                  ),
+                ],
+              ),
             ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.only(bottom: 24),
-            child: InkWell(
-              onTap: () {
-                openWebsite("https://github.com/LeonardoPantani");
-              },
-              child: Text(
-                l.settings_footer_madeby("Leonardo Pantani"),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Theme.of(context).textTheme.bodySmall?.color,
+        
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24),
+              child: InkWell(
+                onTap: () {
+                  openWebsite("https://github.com/LeonardoPantani");
+                },
+                child: Text(
+                  l.settings_footer_madeby("Leonardo Pantani"),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).textTheme.bodySmall?.color,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
