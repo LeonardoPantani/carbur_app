@@ -1,0 +1,63 @@
+import '../models/station.dart';
+import '../models/station_details.dart';
+import '../services/fuel_station_service.dart';
+import '../services/routing_service.dart';
+import '../utils/logger.dart';
+
+class StationRepository {
+  final FuelStationService _fuelService;
+  final RoutingService _routingService;
+
+  StationRepository({
+    FuelStationService? fuelService,
+    RoutingService? routingService,
+  })  : _fuelService = fuelService ?? FuelStationService(),
+        _routingService = routingService ?? RoutingService();
+
+  Future<List<Station>> fetchStationsWithDrivingDistances({
+    required double lat,
+    required double lng,
+    required int radiusKm,
+  }) async {
+    final stations = await _fuelService.fetchStations(
+      lat: lat,
+      lng: lng,
+      radiusKm: radiusKm,
+    );
+
+    if (stations.isEmpty) return [];
+
+    final candidates = List<Station>.from(stations)
+      ..sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
+
+    final topCandidates = candidates.take(10).toList();
+
+    logger.i("Calcolo distanze reali per ${topCandidates.length} stazioni...");
+    final stopwatch = Stopwatch()..start();
+
+    final futures = topCandidates.map((station) async {
+      try {
+        final realDistance = await _routingService.fetchDrivingDistanceKm(
+          fromLat: lat,
+          fromLng: lng,
+          toLat: station.latitude,
+          toLng: station.longitude,
+        );
+        station.distanceKm = realDistance;
+        return true; 
+      } catch (e) {
+        return false;
+      }
+    });
+
+    await Future.wait(futures);
+    stopwatch.stop();
+    logger.i("Distanze calcolate in ${stopwatch.elapsedMilliseconds}ms");
+    
+    return stations;
+  }
+
+  Future<StationDetails> getStationDetails(Station station) {
+    return _fuelService.fetchDetails(station);
+  }
+}

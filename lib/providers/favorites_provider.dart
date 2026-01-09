@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/station.dart';
-import '../services/station_service.dart';
+import '../services/fuel_station_service.dart';
 
 class FavoritesProvider extends ChangeNotifier {
-  final StationService _service = StationService();
+  final FuelStationService _service = FuelStationService();
 
   final Map<int, ({double lat, double lng})> _savedCoords = {};
 

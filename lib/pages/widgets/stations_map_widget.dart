@@ -36,7 +36,8 @@ class _StationsMapState extends State<StationsMap> {
     final stationsProvider = context.watch<StationProvider>();
     final mapProvider = context.watch<MapProvider>();
     final positionProvider = context.watch<LocationProvider>();
-    context.watch<SettingsProvider>();
+    final settings = context.read<SettingsProvider>();
+
     final l = AppLocalizations.of(context)!;
 
     if (stationsProvider.isLoading) {
@@ -51,9 +52,17 @@ class _StationsMapState extends State<StationsMap> {
       return RefreshIndicator(
         onRefresh: () async {
           final pos = context.read<LocationProvider>();
-          final stations = context.read<StationProvider>();
           await pos.refreshPosition();
-          await stations.forceReload();
+
+          if (pos.latitude != null) {
+            await stationsProvider.loadStations(
+                lat: pos.latitude!,
+                lng: pos.longitude!,
+                radiusKm: settings.radiusKm,
+                fuels: settings.selectedFuels,
+                sort: settings.sort,
+            );
+          }
         },
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {

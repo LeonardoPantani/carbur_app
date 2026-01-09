@@ -1,126 +1,137 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import '../exceptions/custom_exceptions.dart';
 import '../models/fuel_type.dart';
 import '../models/station.dart';
 import '../models/station_sort.dart';
-import '../services/station_service.dart';
+import '../repositories/station_repository.dart';
 import '../utils/logger.dart';
-import 'location_provider.dart';
-import 'settings_provider.dart';
 
 enum StationError { ministry, routes, network, unknown }
 
 class StationProvider extends ChangeNotifier {
-  final StationService _service = StationService();
+  final StationRepository _repository = StationRepository();
 
-  LocationProvider? _pos;
-  SettingsProvider? _settings;
+  double? _lastFetchLat;
+  double? _lastFetchLng;
+  int? _lastFetchRadius;
 
-  StationSort _sort = StationSort.best;
-  StationSort get currentSort => _sort;
-
-  bool isLoading = true;
-  StationError? error;
-
+  int _filterRadiusKm = 10;
+  List<FuelType> _filterFuels = [];
+  StationSort _currentSort = StationSort.best;
   List<Station> _allStations = [];
+
   List<Station> stations = [];
+  bool isLoading = false;
+  StationError? error;
+  StationSort get currentSort => _currentSort;
 
-  List<FuelType> _lastFuels = [];
-  int? _lastRadiusKm;
+  // ---- public methods
+  Future<void> loadStations({
+    required double lat,
+    required double lng,
+    required int radiusKm,
+    required List<FuelType> fuels,
+    required StationSort sort,
+  }) async {
+    // checking if we need to reload
+    final movedTooMuch = _lastFetchLat == null || _lastFetchLng == null
+        ? true
+        : _movedMoreThanXMeters(100, lat, lng, _lastFetchLat!, _lastFetchLng!);
+    bool needsNetworkFetch =
+        _allStations.isEmpty ||
+        movedTooMuch ||
+        (_lastFetchRadius != null && radiusKm > _lastFetchRadius!);
 
-  Future<void> loadStations() async {
-    if (_pos == null || _settings == null) return;
+    _filterRadiusKm = radiusKm;
+    _filterFuels = List.from(fuels);
+    _currentSort = sort;
 
-    final lat = _pos!.latitude!;
-    final lng = _pos!.longitude!;
-    final radiusKm = _settings!.radiusKm;
-    const fetchRadiusKm = 10;
+    if (needsNetworkFetch) {
+      _lastFetchLat = lat;
+      _lastFetchLng = lng;
+      _lastFetchRadius = radiusKm;
 
+      await _fetchFromNetwork();
+    } else {
+      logger.i("Parametri di rete invariati. Applico solo filtri locali.");
+      _applyLocalFilters();
+    }
+  }
+
+  List<Station> get listStations {
+    return _filterByFuel(
+      stations,
+    ).where((s) => s.distanceKm <= _filterRadiusKm).toList();
+  }
+
+  List<Station> get mapStations {
+    const mapRadiusKm = 10.0;
+    return _filterByFuel(
+      _allStations,
+    ).where((s) => s.distanceKm <= mapRadiusKm).toList();
+  }
+
+  void setSorting(StationSort sort) {
+    logger.i("Cambiando ordinamento a ${sort.toString()}");
+    _currentSort = sort;
+    _performSort(stations, _filterFuels, _currentSort);
+    notifyListeners();
+  }
+
+  List<Station> sortStations(List<Station> input) {
+    final copy = List<Station>.from(input);
+    _performSort(copy, _filterFuels, _currentSort);
+    return copy;
+  }
+
+  // ---- private methods
+  Future<void> _fetchFromNetwork() async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      final stopwatch = Stopwatch()..start();
-      logger.i("Contattando il sito del ministero.");
-      _allStations = await _service.fetchStations(
-        lat: lat,
-        lng: lng,
-        radiusKm: fetchRadiusKm,
-      );
-      stopwatch.stop();
-      logger.i(
-        "Dati dal ministero ricevuti. Latenza: ${stopwatch.elapsedMilliseconds} ms",
+      logger.i("Inizio download dati dal Repository...");
+      _allStations = await _repository.fetchStationsWithDrivingDistances(
+        lat: _lastFetchLat!,
+        lng: _lastFetchLng!,
+        radiusKm: _lastFetchRadius!,
       );
 
-      stations = _allStations;
-      _lastRadiusKm = radiusKm;
-
-      // updating driving distances dinamically
-      _refineTopDrivingDistances(lat, lng).then((_) {
-        _applySorting(_settings!.selectedFuels);
-        notifyListeners();
-      });
+      _applyLocalFilters();
     } catch (e) {
+      logger.e("Errore fetch: $e");
       error = _mapExceptionToError(e);
       _allStations = [];
       stations = [];
+      notifyListeners();
+    } finally {
       isLoading = false;
       notifyListeners();
-      return;
     }
-
-    isLoading = false;
-    _applyFuelFilter(_settings!.selectedFuels);
   }
 
-  void _applyFuelFilter(List<FuelType> fuels) {
-    if (fuels.isEmpty) {
+  void _applyLocalFilters() {
+    if (_filterFuels.isEmpty) {
       stations = List.from(_allStations);
     } else {
       stations = _allStations.where((s) {
-        return s.prices.keys.any((k) => fuels.contains(k));
+        return s.prices.keys.any((k) => _filterFuels.contains(k));
       }).toList();
     }
 
-    _applySorting(fuels);
-    _lastFuels = List.from(fuels);
+    _performSort(stations, _filterFuels, _currentSort);
 
     notifyListeners();
   }
 
-  Future<void> forceReload() async {
-    logger.i("Forzando ricarica.");
-    return loadStations();
-  }
-
-  void updateDependencies(LocationProvider pos, SettingsProvider settings) {
-    _pos = pos;
-    _settings = settings;
-    _sort = settings.sort;
-
-    _handleAutoUpdates();
-  }
-
-  void setSorting(StationSort sort) {
-    logger.i("cambiando ordinamento a ${sort.toString()}");
-    _sort = sort;
-    _applySorting(_settings!.selectedFuels);
-    notifyListeners();
-  }
-
-  List<Station> sortStations(List<Station> input) {
-    if (_settings == null) return input;
-    final copy = List<Station>.from(input);
-    _performSort(copy, _settings!.selectedFuels, _sort);
-    return copy;
-  }
-
-  void _applySorting(List<FuelType> fuels) {
-    _performSort(stations, fuels, _sort);
-  }
-
-  void _performSort(List<Station> targetList, List<FuelType> fuels, StationSort sortMode) {
+  void _performSort(
+    List<Station> targetList,
+    List<FuelType> fuels,
+    StationSort sortMode,
+  ) {
     if (sortMode == StationSort.best) {
       _applyBestSorting(targetList, fuels);
       return;
@@ -145,32 +156,14 @@ class StationProvider extends ChangeNotifier {
     });
   }
 
-  List<Station> get listStations {
-    final radiusKm = _settings!.radiusKm;
-    return _filterByFuel(
-      stations,
-    ).where((s) => s.distanceKm <= radiusKm).toList();
-  }
-
-  List<Station> get mapStations {
-    const mapRadiusKm = 10.0;
-    return _filterByFuel(
-      _allStations,
-    ).where((s) => s.distanceKm <= mapRadiusKm).toList();
-  }
-
   List<Station> _filterByFuel(List<Station> input) {
-    final fuels = _settings!.selectedFuels;
-    if (fuels.isEmpty) return List.from(input);
+    if (_filterFuels.isEmpty) return List.from(input);
 
     return input.where((s) {
-      return s.prices.keys.any((k) => fuels.contains(k));
+      return s.prices.keys.any((k) => _filterFuels.contains(k));
     }).toList();
   }
 
-  /*
-      Ordinamento "Best" refactorizzato per accettare una lista target
-  */
   void _applyBestSorting(List<Station> targetList, List<FuelType> fuels) {
     if (targetList.isEmpty) return;
 
@@ -216,75 +209,6 @@ class StationProvider extends ChangeNotifier {
     targetList.sort((a, b) => score(a).compareTo(score(b)));
   }
 
-  void _handleAutoUpdates() {
-    if (_pos == null || _settings == null) return;
-
-    if (_pos!.isLoading || _pos!.latitude == null) {
-      return;
-    }
-
-    if (_lastRadiusKm == null) {
-      logger.i(
-        "L'ultimo raggio di ricerca era nullo (primo caricamento o refresh forzato).",
-      );
-      loadStations();
-      return;
-    }
-
-    if (_settings!.radiusKm != _lastRadiusKm) {
-      logger.i("Il raggio nuovo è diverso da quello precedente.");
-      loadStations();
-      return;
-    }
-
-    if (_settings!.selectedFuels != _lastFuels) {
-      logger.i("Il filtro dei distributori è cambiato.");
-      _applyFuelFilter(_settings!.selectedFuels);
-      return;
-    }
-  }
-
-  Future<void> _refineTopDrivingDistances(
-    double fromLat,
-    double fromLng,
-  ) async {
-    final stopwatch = Stopwatch()..start();
-    logger.i("Ottenendo distanze reali in auto...");
-    final candidates = List<Station>.from(_allStations)
-      ..sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
-
-    final topCandidates = candidates.take(20).toList();
-
-    final futures = topCandidates.map((station) async {
-      try {
-        final realDistance = await _service.fetchDrivingDistanceKm(
-          fromLat: fromLat,
-          fromLng: fromLng,
-          toLat: station.latitude,
-          toLng: station.longitude,
-        );
-        return MapEntry(station, realDistance);
-      } catch (_) {
-        return null;
-      }
-    }).toList();
-
-    final results = await Future.wait(futures);
-
-    for (final entry in results) {
-      if (entry == null) continue;
-      entry.key.distanceKm = entry.value;
-    }
-
-    final radiusKm = _settings!.radiusKm;
-    stations = _allStations.where((s) => s.distanceKm <= radiusKm).toList();
-
-    stopwatch.stop();
-    logger.i(
-      "Distanze reali ottenute. Latenza: ${stopwatch.elapsedMilliseconds} ms",
-    );
-  }
-
   double _lowestPrice(Station s, List<FuelType> fuels) {
     final matches = s.prices.entries
         .where((e) => fuels.contains(e.key))
@@ -305,5 +229,21 @@ class StationProvider extends ChangeNotifier {
       return StationError.network;
     }
     return StationError.unknown;
+  }
+
+  bool _movedMoreThanXMeters(
+    int meters,
+    double lat,
+    double lng,
+    double lastLat,
+    double lastLng,
+  ) {
+    const metersPerDegree = 111000.0;
+
+    final dLat = (lat - lastLat) * metersPerDegree;
+    final dLng = (lng - lastLng) * metersPerDegree * cos(lat * pi / 180);
+
+    final distanceSquared = dLat * dLat + dLng * dLng;
+    return distanceSquared > meters * meters;
   }
 }

@@ -23,17 +23,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => MapProvider()),
         ChangeNotifierProvider(create: (_) => PlanRouteProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
-        ChangeNotifierProxyProvider2<
-          LocationProvider,
-          SettingsProvider,
-          StationProvider
-        >(
-          create: (_) => StationProvider(),
-          update: (_, pos, settings, stationProvider) {
-            stationProvider!.updateDependencies(pos, settings);
-            return stationProvider;
-          },
-        ),
+        ChangeNotifierProvider(create: (_) => StationProvider()),
       ],
       child: const CarburApp(),
     ),

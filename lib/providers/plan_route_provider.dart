@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:carbur_app/models/fuel_type.dart' show FuelType;
+import 'package:carbur_app/services/fuel_station_service.dart';
+import 'package:carbur_app/services/routing_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -10,7 +12,6 @@ import 'package:provider/provider.dart';
 
 import '../env/api_key_getter.dart';
 import '../models/station.dart';
-import '../services/station_service.dart';
 import '../utils/logger.dart';
 import '../utils/map_utils.dart';
 import 'location_provider.dart';
@@ -266,36 +267,40 @@ class PlanRouteProvider extends ChangeNotifier {
     final location = context.read<LocationProvider>();
     final settings = context.read<SettingsProvider>();
 
+    final FuelStationService fuelStationService = FuelStationService();
+    final RoutingService routingService = RoutingService();
+
     final double? lat = location.latitude;
     final double? lng = location.longitude;
 
-    final result = await StationService().computeRoute(
-      avoidTolls: avoidTolls,
-      languageCode: languageCode,
-      useCurrentLocationAsStart: useCurrentLocationAsStart,
-      useCurrentLocationAsDestination: useCurrentLocationAsDestination,
-      startPlaceId: startPlaceId,
-      destinationPlaceId: destinationPlaceId,
-      lat: lat,
-      lng: lng,
-    );
-
-    final routes = result?['routes'];
-    if (routes == null || routes.isEmpty) return;
-
-    final encodedPolyline = routes[0]['polyline']['encodedPolyline'] as String;
-    final pointsJson = decodePolylineToPoints(encodedPolyline);
-
-    final List<Map<String, double>> ministerPoints = pointsJson
-        .map((p) => {"lat": p['lat']!, "lng": p['lng']!})
-        .toList();
-    routePolylinePoints = ministerPoints
-        .map((p) => LatLng(p['lat']!, p['lng']!))
-        .toList();
-
     try {
+      final result = await routingService.computeRoute(
+        avoidTolls: avoidTolls,
+        languageCode: languageCode,
+        useCurrentLocationAsStart: useCurrentLocationAsStart,
+        useCurrentLocationAsDestination: useCurrentLocationAsDestination,
+        startPlaceId: startPlaceId,
+        destinationPlaceId: destinationPlaceId,
+        lat: lat,
+        lng: lng,
+      );
+
+      final routes = result?['routes'];
+      if (routes == null || routes.isEmpty) return;
+
+      final encodedPolyline =
+          routes[0]['polyline']['encodedPolyline'] as String;
+      final pointsJson = decodePolylineToPoints(encodedPolyline);
+
+      final List<Map<String, double>> ministerPoints = pointsJson
+          .map((p) => {"lat": p['lat']!, "lng": p['lng']!})
+          .toList();
+      routePolylinePoints = ministerPoints
+          .map((p) => LatLng(p['lat']!, p['lng']!))
+          .toList();
+
       // calling minister website
-      final List<Station> fetchedStations = await StationService()
+      final List<Station> fetchedStations = await fuelStationService
           .fetchStationsOnRoute(points: ministerPoints);
 
       _allStations = fetchedStations;

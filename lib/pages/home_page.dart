@@ -5,7 +5,10 @@ import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 import '../pages/settings_page.dart';
 import '../providers/favorites_provider.dart';
+import '../providers/location_provider.dart';
 import '../providers/map_provider.dart';
+import '../providers/settings_provider.dart';
+import '../providers/station_provider.dart';
 import 'widgets/stations_list_widget.dart';
 import 'widgets/stations_map_widget.dart';
 import 'widgets/stations_sort_widget.dart';
@@ -24,6 +27,44 @@ class _HomePageState extends State<HomePage> {
 
   void _onNavSelected(int index) {
     setState(() => _currentIndex = index);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initData();
+    });
+  }
+
+  void _initData() async {
+    final loc = context.read<LocationProvider>();
+    final settings = context.read<SettingsProvider>();
+    final stations = context.read<StationProvider>();
+
+    if (loc.latitude == null || loc.longitude == null) {
+       await loc.refreshPosition(); 
+    }
+
+    if (loc.latitude != null && loc.longitude != null && mounted) {
+      stations.loadStations(
+        lat: loc.latitude!,
+        lng: loc.longitude!,
+        radiusKm: settings.radiusKm,
+        fuels: settings.selectedFuels,
+        sort: settings.sort,
+      );
+    }
+  }
+
+  void _openSettings() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SettingsPage()),
+    );
+    if (mounted) {
+      _initData();
+    }
   }
 
   @override
@@ -143,20 +184,14 @@ class _HomePageState extends State<HomePage> {
             isFilterActive ? Icons.star : Icons.star_outline,
             color: isFilterActive ? Colors.amber : null,
           ),
-          tooltip: isFilterActive ? l.favorites_shownearbystations : l.favorites_showonlyfavorites,
+          tooltip: isFilterActive
+              ? l.favorites_shownearbystations
+              : l.favorites_showonlyfavorites,
           onPressed: () => favoritesProvider.toggleFilter(),
         ),
         const StationsSortWidget(),
       ],
-      IconButton(
-        icon: const Icon(Icons.settings),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const SettingsPage()),
-          );
-        },
-      ),
+      IconButton(icon: const Icon(Icons.settings), onPressed: _openSettings),
     ];
   }
 

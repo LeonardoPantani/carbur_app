@@ -5,6 +5,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/station.dart';
 import '../../providers/location_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../../providers/station_provider.dart';
 import '../../providers/favorites_provider.dart';
 import 'station_list_tile.dart';
@@ -165,14 +166,25 @@ class StationsList extends StatelessWidget {
 
   Future<void> _onRefresh(BuildContext context) async {
     final pos = context.read<LocationProvider>();
+    final settings = context.read<SettingsProvider>();
     final stations = context.read<StationProvider>();
     final favorites = context.read<FavoritesProvider>();
     
     await pos.refreshPosition();
+
+    if (pos.latitude != null) {
+       await stations.loadStations(
+          lat: pos.latitude!,
+          lng: pos.longitude!,
+          radiusKm: settings.radiusKm,
+          fuels: settings.selectedFuels,
+          sort: settings.sort,
+       );
+    }
+
     if (favorites.showFavoritesOnly) {
       await favorites.refreshData();
     }
-    await stations.forceReload();
   }
 }
 

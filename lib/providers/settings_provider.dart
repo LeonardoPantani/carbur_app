@@ -88,8 +88,7 @@ class SettingsProvider extends ChangeNotifier {
       );
   }
 
-  // --- PUBLIC METHODS ---
-
+  // ---- public methods
   void toggleFuel(FuelType fuel) {
     final isSelected = selectedFuels.contains(fuel);
 
