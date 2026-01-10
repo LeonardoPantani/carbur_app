@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
 import '../providers/location_provider.dart';
+import 'search_place_page.dart';
 
 class StartupCheckPage extends StatefulWidget {
   const StartupCheckPage({super.key});
@@ -38,7 +39,9 @@ class _StartupCheckPageState extends State<StartupCheckPage> {
 
   Future<void> _checkConnection() async {
     if (!mounted) return;
-    setState(() { _hasConnection = null; });
+    setState(() {
+      _hasConnection = null;
+    });
     try {
       final result = await InternetAddress.lookup('carburanti.mise.gov.it');
       if (mounted) {
@@ -47,17 +50,24 @@ class _StartupCheckPageState extends State<StartupCheckPage> {
         });
       }
     } on SocketException catch (_) {
-      if (mounted) setState(() { _hasConnection = false; });
+      if (mounted) {
+        setState(() {
+          _hasConnection = false;
+        });
+      }
     }
   }
 
   Future<void> _handleLocationPermission() async {
-    setState(() { _isCheckingLocation = true; });
+    setState(() {
+      _isCheckingLocation = true;
+    });
 
     // do we have the permission already
     LocationPermission permission = await Geolocator.checkPermission();
 
-    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
       // we do not have the required permission
       if (mounted) {
         await _showLocationDisclosureDialog(context);
@@ -72,19 +82,23 @@ class _StartupCheckPageState extends State<StartupCheckPage> {
   }
 
   void _goToHome() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomePage()),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const HomePage()));
   }
 
   Future<void> _showLocationDisclosureDialog(BuildContext context) async {
     final l = AppLocalizations.of(context)!;
-    
+
     await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        icon: Icon(Icons.location_on_outlined, size: 48, color: Theme.of(context).primaryColor),
+        icon: Icon(
+          Icons.location_on_outlined,
+          size: 48,
+          color: Theme.of(context).primaryColor,
+        ),
         title: Text(l.dialog_location_permission_title),
         content: Text(
           l.dialog_location_permission_description,
@@ -92,13 +106,22 @@ class _StartupCheckPageState extends State<StartupCheckPage> {
         ),
         actions: [
           TextButton(
+            // add manually location
             onPressed: () {
               Navigator.pop(ctx);
-              _goToHome();
+              context.read<LocationProvider>().startSearchSession();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const SearchPlacePage(mode: SearchMode.manualLocation),
+                ),
+              );
             },
             child: Text(l.button_add_manually),
           ),
           FilledButton(
+            // authorize app to use location
             onPressed: () async {
               Navigator.pop(ctx);
               await context.read<LocationProvider>().initializeLocation();

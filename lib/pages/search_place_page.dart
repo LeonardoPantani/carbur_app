@@ -4,129 +4,228 @@ import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/location_provider.dart';
 import '../providers/plan_route_provider.dart';
+import '../services/google_places_service.dart';
+import 'home_page.dart'; // Importa il nuovo servizio
+
+enum SearchMode { start, destination, manualLocation }
 
 class SearchPlacePage extends StatelessWidget {
-  final bool isStart;
+  final SearchMode mode;
 
-  const SearchPlacePage({super.key, required this.isStart});
+  const SearchPlacePage({super.key, required this.mode});
 
   @override
   Widget build(BuildContext context) {
+    // A seconda della modalità, scegliamo il provider e i controller giusti
     final routeProvider = context.watch<PlanRouteProvider>();
-    final locProvider = context.read<LocationProvider>();
+    final locProvider = context.watch<LocationProvider>();
     final l = AppLocalizations.of(context)!;
-
     final String languageCode = Localizations.localeOf(context).languageCode;
 
-    final bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+    TextEditingController controller;
+    List<PlaceSuggestion> suggestions;
+    Function(String) onChanged;
+    Function(PlaceSuggestion) onSelect;
+    VoidCallback onClear;
+    String hintText;
 
-    final controller = isStart
-        ? routeProvider.startController
-        : routeProvider.destinationController;
+    // Configurazione dinamica in base alla modalità
+    switch (mode) {
+      case SearchMode.start:
+        controller = routeProvider.startController;
+        suggestions = routeProvider.startSuggestions;
+        onChanged = (val) => routeProvider.onStartTextChanged(
+          val,
+          languageCode,
+          lat: locProvider.latitude,
+          lng: locProvider.longitude,
+        );
+        onSelect = (s) {
+          routeProvider.selectStartPlace(s);
+          Navigator.pop(context);
+        };
+        onClear = () => routeProvider.onStartTextChanged('', languageCode);
+        hintText = l.routeplanner_enter_start_placeholder;
+        break;
+      case SearchMode.destination:
+        controller = routeProvider.destinationController;
+        suggestions = routeProvider.destinationSuggestions;
+        onChanged = (val) => routeProvider.onDestinationTextChanged(
+          val,
+          languageCode,
+          lat: locProvider.latitude,
+          lng: locProvider.longitude,
+        );
+        onSelect = (s) {
+          routeProvider.selectDestinationPlace(s);
+          Navigator.pop(context);
+        };
+        onClear = () =>
+            routeProvider.onDestinationTextChanged('', languageCode);
+        hintText = l.routeplanner_enter_destination_placeholder;
+        break;
+      case SearchMode.manualLocation:
+        controller = locProvider.searchController;
+        suggestions = locProvider.searchSuggestions;
+        onChanged = (val) => locProvider.onSearchTextChanged(val, languageCode);
 
-    final suggestions = isStart
-        ? routeProvider.startSuggestions
-        : routeProvider.destinationSuggestions;
+        // --- MODIFICA QUI ---
+        onSelect = (s) async {
+          // 1. Aspettiamo che il provider ottenga le coordinate (IMPORTANTE!)
+          await locProvider.selectPlace(s);
 
-    final onSelect = isStart
-        ? routeProvider.selectStartPlace
-        : routeProvider.selectDestinationPlace;
+          if (context.mounted) {
+            // 2. Invece di pop(), navighiamo esplicitamente verso la Home
+            // pushAndRemoveUntil rimuove tutte le schermate precedenti (splash, login, etc)
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const HomePage()),
+              (route) => false,
+            );
+          }
+        };
+        // --------------------
+
+        onClear = () => locProvider.onSearchTextChanged('', languageCode);
+        hintText = "Inserisci città o indirizzo";
+        break;
+    }
+
+    // Usiamo i luoghi salvati dal LocationProvider (condivisi per semplicità)
+    final savedPlaces = locProvider.savedPlaces;
+    final showSavedPlaces = controller.text.isEmpty;
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: true,
         title: TextField(
           controller: controller,
           autofocus: true,
           decoration: InputDecoration(
-            hintText: isStart ? l.routeplanner_enter_start_placeholder : l.routeplanner_enter_destination_placeholder,
+            hintText: hintText,
             border: InputBorder.none,
-            suffixIcon: ValueListenableBuilder<TextEditingValue>(
-              valueListenable: controller,
-              builder: (context, value, child) {
-                if (value.text.isEmpty) {
-                  return const SizedBox.shrink();
-                }
-                return IconButton(
-                  icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                  onPressed: () {
-                    controller.clear();
-                    if (isStart) {
-                      routeProvider.onStartTextChanged(
-                        '',
-                        languageCode,
-                        lat: locProvider.latitude,
-                        lng: locProvider.longitude,
-                      );
-                    } else {
-                      routeProvider.onDestinationTextChanged(
-                        '',
-                        languageCode,
-                        lat: locProvider.latitude,
-                        lng: locProvider.longitude,
-                      );
-                    }
-                  },
-                );
-              },
-            ),
+            suffixIcon: controller.text.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      controller.clear();
+                      onClear();
+                    },
+                  )
+                : null,
           ),
-          onChanged: (value) {
-            if (isStart) {
-              routeProvider.onStartTextChanged(
-                value,
-                languageCode,
-                lat: locProvider.latitude,
-                lng: locProvider.longitude,
-              );
-            } else {
-              routeProvider.onDestinationTextChanged(
-                value,
-                languageCode,
-                lat: locProvider.latitude,
-                lng: locProvider.longitude,
-              );
-            }
-          },
+          onChanged: onChanged,
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: suggestions.length,
-              itemBuilder: (context, index) {
-                final s = suggestions[index];
-                return ListTile(
-                  leading: Icon(
-                    placeTypeToIcon(s.types),
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  title: Text(s.description),
-                  onTap: () {
-                    onSelect(s);
-                    Navigator.pop(context);
-                  },
-                );
-              },
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: showSavedPlaces && savedPlaces.isNotEmpty
+                  ? _buildSavedPlacesList(
+                      context,
+                      savedPlaces,
+                      onSelect,
+                      locProvider,
+                    )
+                  : _buildSuggestionsList(
+                      context,
+                      suggestions,
+                      onSelect,
+                      locProvider,
+                    ),
             ),
-          ),
-          if(!isKeyboardVisible)
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                l.autocomplete_compliance_google_text,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-              ),
-            ),
-        ],
+            _buildGoogleFooter(context, l),
+          ],
+        ),
       ),
     );
   }
 
+  Widget _buildSavedPlacesList(
+    BuildContext context,
+    List<PlaceSuggestion> places,
+    Function(PlaceSuggestion) onSelect,
+    LocationProvider locProvider,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            "Luoghi Salvati", // Aggiungi a localizations
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: places.length,
+            itemBuilder: (context, index) {
+              final s = places[index];
+              return ListTile(
+                leading: const Icon(Icons.bookmark, color: Colors.orange),
+                title: Text(s.description),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () => locProvider.toggleSavedPlace(s),
+                ),
+                onTap: () => onSelect(s),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSuggestionsList(
+    BuildContext context,
+    List<PlaceSuggestion> suggestions,
+    Function(PlaceSuggestion) onSelect,
+    LocationProvider locProvider,
+  ) {
+    return ListView.builder(
+      itemCount: suggestions.length,
+      itemBuilder: (context, index) {
+        final s = suggestions[index];
+        final isSaved = locProvider.isPlaceSaved(s.placeId);
+
+        return ListTile(
+          leading: Icon(placeTypeToIcon(s.types)),
+          title: Text(s.description),
+          trailing: IconButton(
+            icon: Icon(
+              isSaved ? Icons.bookmark : Icons.bookmark_border,
+              color: isSaved ? Colors.orange : null,
+            ),
+            onPressed: () => locProvider.toggleSavedPlace(s),
+          ),
+          onTap: () => onSelect(s),
+        );
+      },
+    );
+  }
+
+  Widget _buildGoogleFooter(BuildContext context, AppLocalizations l) {
+    if (MediaQuery.of(context).viewInsets.bottom > 0) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Text(
+        l.autocomplete_compliance_google_text,
+        style: TextStyle(
+          fontSize: 12,
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  // ... (Tieni il metodo placeTypeToIcon esistente) ...
   IconData placeTypeToIcon(List<String> types) {
     for (final type in types) {
       switch (type) {

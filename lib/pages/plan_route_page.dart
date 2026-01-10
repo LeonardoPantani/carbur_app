@@ -82,7 +82,9 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
     // trigger that regenerates markers
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (justFittedRoute) return;
-      logger.i("[Plan Route] Le dipendenze sono cambiate. Aggiornamento marker richiesto.");
+      logger.i(
+        "[Plan Route] Le dipendenze sono cambiate. Aggiornamento marker richiesto.",
+      );
       _triggerRebuild(context);
     });
   }
@@ -281,6 +283,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildLocationField(
+          isStart: true,
           label: l.routeplanner_start_label,
           controller: routeProvider.startController,
           useCurrentLocation: routeProvider.useCurrentLocationAsStart,
@@ -297,6 +300,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
           ),
         ),
         _buildLocationField(
+          isStart: false,
           label: l.routeplanner_destination_label,
           controller: routeProvider.destinationController,
           useCurrentLocation: routeProvider.useCurrentLocationAsDestination,
@@ -356,6 +360,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
       onPressed: () {
         routeProvider.clear();
         mapProvider.clearMarkers();
+        
         setState(() {
           _routeFitted = false;
           if (_sheetController.isAttached) {
@@ -496,6 +501,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
   }
 
   Widget _buildLocationField({
+    required bool isStart,
     required String label,
     required TextEditingController controller,
     required bool useCurrentLocation,
@@ -530,13 +536,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => SearchPlacePage(
-                          isStart:
-                              label ==
-                              AppLocalizations.of(
-                                context,
-                              )!.routeplanner_start_label,
-                        ),
+                        builder: (_) => SearchPlacePage(mode: isStart? SearchMode.start : SearchMode.destination),
                       ),
                     );
                   },

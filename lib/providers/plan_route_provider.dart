@@ -1,32 +1,21 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
 
 import 'package:carbur_app/models/fuel_type.dart' show FuelType;
 import 'package:carbur_app/services/fuel_station_service.dart';
 import 'package:carbur_app/services/routing_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
-import '../env/api_key_getter.dart';
 import '../models/station.dart';
+import '../services/google_places_service.dart';
 import '../utils/logger.dart';
 import '../utils/map_utils.dart';
 import 'location_provider.dart';
 import 'settings_provider.dart';
 
-class PlaceSuggestion {
-  final String description;
-  final String placeId;
-  final List<String> types;
-
-  PlaceSuggestion(this.description, this.placeId, this.types);
-}
-
 class PlanRouteProvider extends ChangeNotifier {
-  static final String _apiKeyAutocomplete = ApiKeyGetter.autoCompleteMaps;
+  final GooglePlacesService _placesService = GooglePlacesService();
 
   final TextEditingController startController = TextEditingController();
   final TextEditingController destinationController = TextEditingController();
@@ -94,23 +83,11 @@ class PlanRouteProvider extends ChangeNotifier {
     }
   }
 
-  /* ---------------- SESSION TOKEN ---------------- */
-  String _generateSessionToken() {
-    logger.i("Generando nuovo session token per l'autocompletamento.");
-    final random = Random.secure();
-    final values = List<int>.generate(16, (i) => random.nextInt(256));
-    values[6] = (values[6] & 0x0f) | 0x40;
-    values[8] = (values[8] & 0x3f) | 0x80;
-    final hex = values.map((e) => e.toRadixString(16).padLeft(2, '0')).join();
-    return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20)}';
-  }
-
   void startNewSession() {
-    _sessionToken ??= _generateSessionToken();
+    _sessionToken = DateTime.now().millisecondsSinceEpoch.toString();
   }
 
   /* ---------------- START ---------------- */
-
   void toggleStartCurrentLocation() {
     useCurrentLocationAsStart = !useCurrentLocationAsStart;
 
@@ -138,7 +115,7 @@ class PlanRouteProvider extends ChangeNotifier {
     }
     _startDebounce?.cancel();
     _startDebounce = Timer(const Duration(milliseconds: 400), () {
-      _fetchAutocomplete(value, languageCode, lat: lat, lng: lng).then((
+      _placesService.fetchAutocomplete(value, languageCode, _sessionToken!, lat: lat, lng: lng).then((
         results,
       ) {
         startSuggestions = results;
@@ -185,7 +162,7 @@ class PlanRouteProvider extends ChangeNotifier {
     }
     _destinationDebounce?.cancel();
     _destinationDebounce = Timer(const Duration(milliseconds: 400), () {
-      _fetchAutocomplete(value, languageCode, lat: lat, lng: lng).then((
+      _placesService.fetchAutocomplete(value, languageCode, _sessionToken!, lat: lat, lng: lng).then((
         results,
       ) {
         destinationSuggestions = results;
@@ -201,61 +178,6 @@ class PlanRouteProvider extends ChangeNotifier {
     destinationPlaceId = suggestion.placeId;
     _sessionToken = null;
     notifyListeners();
-  }
-
-  /* ---------------- GOOGLE PLACES ---------------- */
-
-  Future<List<PlaceSuggestion>> _fetchAutocomplete(
-    String input,
-    String languageCode, {
-    double? lat,
-    double? lng,
-    String? excludePlaceId,
-  }) async {
-    _sessionToken ??= _generateSessionToken();
-
-    final Map<String, String> parameters = {
-      'input': input,
-      'key': _apiKeyAutocomplete,
-      'language': languageCode,
-      'sessiontoken': _sessionToken!,
-    };
-
-    if (lat != null && lng != null) {
-      parameters['locationbias'] = "circle:50000@$lat,$lng";
-    }
-
-    logger.i(
-      "Facendo chiamata API per autocompletamento. Testo: $input, Token: $_sessionToken",
-    );
-
-    final uri = Uri.https(
-      'maps.googleapis.com',
-      '/maps/api/place/autocomplete/json',
-      parameters,
-    );
-
-    try {
-      final response = await http.get(uri);
-      final data = jsonDecode(response.body);
-
-      if (data['status'] == 'OK') {
-        return (data['predictions'] as List)
-            .map(
-              (p) => PlaceSuggestion(
-                p['description'],
-                p['place_id'],
-                List<String>.from(p['types'] ?? const []),
-              ),
-            )
-            .where((p) => p.placeId != excludePlaceId)
-            .toList();
-      }
-      return [];
-    } catch (e) {
-      logger.e("Errore ricerca: $e");
-      return [];
-    }
   }
 
   /* ---------------- ACTION ---------------- */
@@ -330,6 +252,8 @@ class PlanRouteProvider extends ChangeNotifier {
   void clear() {
     startController.text = '';
     destinationController.clear();
+    startPlaceId = null;
+    destinationPlaceId = null;
     routePolylinePoints = [];
     _allStations = [];
     stationsOnRoute = [];
