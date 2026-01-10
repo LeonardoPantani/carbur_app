@@ -117,7 +117,7 @@ class SettingsPage extends StatelessWidget {
               ),
               actions: [
                 TextButton(
-                  child: Text(l.cancel),
+                  child: Text(l.button_cancel),
                   onPressed: () => Navigator.pop(context),
                 ),
                 TextButton(
@@ -127,7 +127,7 @@ class SettingsPage extends StatelessWidget {
                           settings.setSelectedFuels(tempFuels);
                           Navigator.pop(context);
                         },
-                  child: Text(l.ok),
+                  child: Text(l.button_ok),
                 ),
               ],
             );
@@ -165,11 +165,11 @@ class SettingsPage extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              child: Text(l.cancel),
+              child: Text(l.button_cancel),
               onPressed: () => Navigator.pop(context),
             ),
             TextButton(
-              child: Text(l.ok),
+              child: Text(l.button_ok),
               onPressed: () {
                 settings.setRadius(tempValue);
                 Navigator.pop(context);
@@ -209,14 +209,14 @@ class SettingsPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(l.cancel),
+              child: Text(l.button_cancel),
             ),
             TextButton(
               onPressed: () {
                 settings.setPreferredMarkerFuel(tempValue!);
                 Navigator.pop(context);
               },
-              child: Text(l.ok),
+              child: Text(l.button_ok),
             ),
           ],
         );

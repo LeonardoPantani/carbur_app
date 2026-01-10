@@ -113,7 +113,7 @@ class StationDetailsPage extends StatelessWidget {
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
-                                  child: Text(l.ok),
+                                  child: Text(l.button_ok),
                                 ),
                               ],
                             ),

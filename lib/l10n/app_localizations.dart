@@ -183,20 +183,26 @@ abstract class AppLocalizations {
   /// Button label to close a dialog.
   ///
   /// In en, this message translates to:
-  /// **'Close'**
-  String get close;
+  /// **'button_close'**
+  String get button_close;
 
   /// Confirmation button label.
   ///
   /// In en, this message translates to:
-  /// **'OK'**
-  String get ok;
+  /// **'button_ok'**
+  String get button_ok;
+
+  /// Continue button label.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get button_continue;
 
   /// Button label to cancel an operation.
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
-  String get cancel;
+  String get button_cancel;
 
   /// Filter button to allows the user to choose the station with the cheapest price.
   ///
@@ -677,6 +683,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fuel station added to favorites.'**
   String get favorites_added;
+
+  /// This title is from the dialog that appears while asking for user's location permission.
+  ///
+  /// In en, this message translates to:
+  /// **'Location usage'**
+  String get dialog_location_permission_title;
+
+  /// This text is from the dialog that appears while asking for user's location permission. It explains easily why it is needed.
+  ///
+  /// In en, this message translates to:
+  /// **'CarburApp collects data about your location to show you the nearest fuel stations and calculate distances, even when the app is in use.\n\nYour location is not shared for advertising purposes.'**
+  String get dialog_location_permission_description;
+
+  /// Button label for when user does not want to provide access to their location.
+  ///
+  /// In en, this message translates to:
+  /// **'Add manually'**
+  String get button_add_manually;
 }
 
 class _AppLocalizationsDelegate

@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:carbur_app/pages/home_page.dart';
+import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
+import '../providers/location_provider.dart';
 
 class StartupCheckPage extends StatefulWidget {
   const StartupCheckPage({super.key});
@@ -15,42 +18,105 @@ class StartupCheckPage extends StatefulWidget {
 class _StartupCheckPageState extends State<StartupCheckPage> {
   // null = loading, true = connected, false = not connected
   bool? _hasConnection;
+  bool _isCheckingLocation = false;
 
   @override
   void initState() {
     super.initState();
-    _checkConnection();
+    _startChecks();
+  }
+
+  Future<void> _startChecks() async {
+    // Internet check
+    await _checkConnection();
+
+    if (_hasConnection == true && mounted) {
+      // handling location permission
+      await _handleLocationPermission();
+    }
   }
 
   Future<void> _checkConnection() async {
-    setState(() {
-      _hasConnection = null;
-    });
-
+    if (!mounted) return;
+    setState(() { _hasConnection = null; });
     try {
       final result = await InternetAddress.lookup('carburanti.mise.gov.it');
-
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      if (mounted) {
         setState(() {
-          _hasConnection = true;
-        });
-      } else {
-        setState(() {
-          _hasConnection = false;
+          _hasConnection = result.isNotEmpty && result[0].rawAddress.isNotEmpty;
         });
       }
     } on SocketException catch (_) {
-      setState(() {
-        _hasConnection = false;
-      });
+      if (mounted) setState(() { _hasConnection = false; });
     }
+  }
+
+  Future<void> _handleLocationPermission() async {
+    setState(() { _isCheckingLocation = true; });
+
+    // do we have the permission already
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      // we do not have the required permission
+      if (mounted) {
+        await _showLocationDisclosureDialog(context);
+      }
+    } else {
+      // we already have the permission
+      if (mounted) {
+        await context.read<LocationProvider>().initializeLocation();
+        _goToHome();
+      }
+    }
+  }
+
+  void _goToHome() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const HomePage()),
+    );
+  }
+
+  Future<void> _showLocationDisclosureDialog(BuildContext context) async {
+    final l = AppLocalizations.of(context)!;
+    
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        icon: Icon(Icons.location_on_outlined, size: 48, color: Theme.of(context).primaryColor),
+        title: Text(l.dialog_location_permission_title),
+        content: Text(
+          l.dialog_location_permission_description,
+          textAlign: TextAlign.justify,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _goToHome();
+            },
+            child: Text(l.button_add_manually),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await context.read<LocationProvider>().initializeLocation();
+              if (mounted) _goToHome();
+            },
+            child: Text(l.button_continue),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    // checking connection
-    if (_hasConnection == null) {
+
+    // checking connection or location
+    if (_hasConnection == null || _isCheckingLocation) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
@@ -61,7 +127,7 @@ class _StartupCheckPageState extends State<StartupCheckPage> {
 
     // we are not connected to the internet
     return RefreshIndicator(
-      onRefresh: () => _checkConnection(),
+      onRefresh: () => _startChecks(),
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           return SingleChildScrollView(

@@ -47,13 +47,16 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get close => 'Fechar';
+  String get button_close => 'Fechar';
 
   @override
-  String get ok => 'OK';
+  String get button_ok => 'button_ok';
 
   @override
-  String get cancel => 'Cancelar';
+  String get button_continue => 'Continue';
+
+  @override
+  String get button_cancel => 'Cancel';
 
   @override
   String get sort_cheaper => 'Mais barato';
@@ -333,4 +336,14 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get favorites_added =>
       'Posto de combustível adicionado aos favoritos.';
+
+  @override
+  String get dialog_location_permission_title => 'Location usage';
+
+  @override
+  String get dialog_location_permission_description =>
+      'CarburApp collects data about your location to show you the nearest fuel stations and calculate distances, even when the app is in use.\n\nYour location is not shared for advertising purposes.';
+
+  @override
+  String get button_add_manually => 'Add manually';
 }

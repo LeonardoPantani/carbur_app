@@ -380,7 +380,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
       ),
       onPressed: () => setState(() => _isMenuExpanded = false),
       child: Text(
-        AppLocalizations.of(context)!.cancel,
+        AppLocalizations.of(context)!.button_cancel,
         style: const TextStyle(fontSize: 13),
       ),
     );

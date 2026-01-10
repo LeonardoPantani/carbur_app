@@ -5,34 +5,41 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../utils/logger.dart';
 
 class LocationProvider extends ChangeNotifier {
-  bool _initialized = false;
-  bool isLoading = true;
+  bool isLoading = false;
 
   double? latitude;
   double? longitude;
-
-  LocationProvider() {
-    _init();
-  }
 
   LatLng? get position => latitude != null && longitude != null
       ? LatLng(latitude!, longitude!)
       : null;
 
-  Future<void> _init() async {
-    if (_initialized) return;
-    _initialized = true;
-    logger.i("Caricamento posizione...");
-    await _requestLocationPermission();
-    await _getCurrentPosition();
-  }
+  Future<bool> initializeLocation() async {
+    isLoading = true;
+    notifyListeners();
 
-  Future<void> _requestLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
 
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied || 
+          permission == LocationPermission.deniedForever) {
+        logger.w("Permesso posizione negato dall'utente.");
+        isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+      await _getCurrentPosition();
+      return true;
+    } catch (e) {
+      logger.e("Errore inizializzazione posizione: $e");
+      isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 

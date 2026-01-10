@@ -55,12 +55,12 @@
             }
         }
     },
-    "close": "Chiudi",
-    "@close": {
+    "button_close": "Chiudi",
+    "@button_close": {
         "description": "Button label to close a dialog."
     },
-    "ok": "OK",
-    "@ok": {
+    "button_ok": "button_ok",
+    "@button_ok": {
         "description": "Confirmation button label."
     },
     "cancel": "Annulla",
