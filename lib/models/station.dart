@@ -16,6 +16,13 @@ enum Brand {
   unknown,
 }
 
+enum StationSort {
+  best,
+  price,
+  distance,
+  updatedAt,
+}
+
 class Station {
   final int id;
   final String name;

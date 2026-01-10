@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/fuel_type.dart';
-import '../models/station_sort.dart';
+import '../models/station.dart';
 
 class SettingsProvider extends ChangeNotifier {
   final List<FuelType> availableFuels = FuelType.values;

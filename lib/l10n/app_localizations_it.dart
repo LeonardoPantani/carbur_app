@@ -15,7 +15,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get fuel_petrol => 'Benzina';
 
   @override
-  String get fuel_diesel => 'Gasolio';
+  String get fuel_diesel => 'Diesel';
 
   @override
   String get fuel_methane => 'Metano';

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../exceptions/custom_exceptions.dart';
 import '../models/fuel_type.dart';
 import '../models/station.dart';
-import '../models/station_sort.dart';
 import '../repositories/station_repository.dart';
 import '../utils/logger.dart';
 
