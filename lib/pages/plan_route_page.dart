@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../exceptions/custom_exceptions.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/map_provider.dart';
 import '../providers/plan_route_provider.dart';
@@ -49,6 +50,27 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
         onStationTap: (s) => context.openStationDetails(s),
       );
     }
+  }
+
+  void _showErrorSnackbar(Object error) {
+    final l = AppLocalizations.of(context)!;
+    String message;
+
+    if (error is ApiException || error is ApiTimeoutException || error is NoRouteException) {
+      message = l.error_description_api_routes_notworking;
+    } else if (error is NetworkException) {
+      message = l.error_description_no_connection;
+    } else {
+      message = l.error_description_unknown;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: const TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -360,7 +382,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
       onPressed: () {
         routeProvider.clear();
         mapProvider.clearMarkers();
-        
+
         setState(() {
           _routeFitted = false;
           if (_sheetController.isAttached) {
@@ -406,11 +428,17 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
                 _isMenuExpanded = false;
                 _routeFitted = false;
               });
-              await routeProvider.searchFuelStations(context, languageCode);
+              try {
+                await routeProvider.searchFuelStations(context, languageCode);
 
-              if (_sheetController.isAttached &&
-                  routeProvider.stationsOnRoute.isNotEmpty) {
-                _sheetController.jumpTo(0.20);
+                if (_sheetController.isAttached &&
+                    routeProvider.stationsOnRoute.isNotEmpty) {
+                  _sheetController.jumpTo(0.20);
+                }
+              } catch (e) {
+                if (mounted) {
+                  _showErrorSnackbar(e);
+                }
               }
             }
           : null,
@@ -536,7 +564,11 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => SearchPlacePage(mode: isStart? SearchMode.start : SearchMode.destination),
+                        builder: (_) => SearchPlacePage(
+                          mode: isStart
+                              ? SearchMode.start
+                              : SearchMode.destination,
+                        ),
                       ),
                     );
                   },

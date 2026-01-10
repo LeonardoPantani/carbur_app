@@ -232,6 +232,7 @@ class PlanRouteProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       logger.e("Errore durante il recupero dei distributori sul percorso: $e");
+      rethrow;
     }
   }
 
