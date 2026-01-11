@@ -52,7 +52,7 @@ class _StationsMapState extends State<StationsMap> {
       return RefreshIndicator(
         onRefresh: () async {
           final pos = context.read<LocationProvider>();
-          await pos.refreshPosition();
+          await pos.tryInitializeLocation();
 
           if (pos.latitude != null) {
             await stationsProvider.loadStations(

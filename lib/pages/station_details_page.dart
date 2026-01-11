@@ -21,6 +21,7 @@ class StationDetailsPage extends StatelessWidget {
     final stationsProvider = context.watch<StationDetailsProvider>();
     final favoritesProvider = context.watch<FavoritesProvider>();
     final l = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
     final station = stationsProvider.station;
     final isFavorite = favoritesProvider.isFavorite(station.id);
 
@@ -359,10 +360,23 @@ class StationDetailsPage extends StatelessWidget {
               favoritesProvider.toggleFavorite(station);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(
-                    isFavorite ? l.favorites_removed : l.favorites_added,
+                  backgroundColor: colorScheme.secondary,
+                  content: Row(
+                    children: [
+                      Icon(
+                        isFavorite ? Icons.remove : Icons.add,
+                        color: colorScheme.onSecondary,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          isFavorite ? l.favorites_removed : l.favorites_added,
+                          style: TextStyle(color: colorScheme.onSecondary),
+                        ),
+                      ),
+                    ],
                   ),
-                  duration: const Duration(seconds: 1),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },

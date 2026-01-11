@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
     final stations = context.read<StationProvider>();
 
     if (loc.latitude == null || loc.longitude == null) {
-       await loc.refreshPosition(); 
+       await loc.tryInitializeLocation(); 
     }
 
     if (loc.latitude != null && loc.longitude != null && mounted) {

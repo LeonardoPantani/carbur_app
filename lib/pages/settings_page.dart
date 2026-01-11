@@ -22,6 +22,16 @@ class SettingsPage extends StatelessWidget {
             Expanded(
               child: ListView(
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                    child: Text(
+                      l.settings_category_general,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+
                   ListTile(
                     title: Text(l.settings_fuel_types),
                     subtitle: Text(
@@ -33,7 +43,7 @@ class SettingsPage extends StatelessWidget {
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => _openFuelSelectionDialog(context, settings),
                   ),
-        
+
                   ListTile(
                     title: Text(l.settings_search_radius),
                     subtitle: Text("${settings.radiusKm} km"),
@@ -41,7 +51,7 @@ class SettingsPage extends StatelessWidget {
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => _openRadiusDialog(context, settings),
                   ),
-        
+
                   ListTile(
                     title: Text(l.settings_marker_fuel),
                     subtitle: Text(settings.preferredMarkerFuel.label(context)),
@@ -52,10 +62,31 @@ class SettingsPage extends StatelessWidget {
                         ? () => _openMarkerFuelDialog(context, settings)
                         : null,
                   ),
+
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                    child: Text(
+                      l.settings_category_legal,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+
+                  ListTile(
+                    title: const Text("Privacy Policy"),
+                    leading: const Icon(Icons.privacy_tip_outlined),
+                    trailing: const Icon(Icons.open_in_new),
+                    onTap: () {
+                      openWebsite(
+                        "https://www.iubenda.com/privacy-policy/53116542",
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
-        
+
             Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: InkWell(

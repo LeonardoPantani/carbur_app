@@ -170,7 +170,7 @@ class StationsList extends StatelessWidget {
     final stations = context.read<StationProvider>();
     final favorites = context.read<FavoritesProvider>();
     
-    await pos.refreshPosition();
+    await pos.tryInitializeLocation();
 
     if (pos.latitude != null) {
        await stations.loadStations(

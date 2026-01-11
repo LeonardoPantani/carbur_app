@@ -50,13 +50,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get button_close => 'Fermer';
 
   @override
-  String get button_ok => 'button_ok';
+  String get button_ok => 'Ok';
 
   @override
-  String get button_continue => 'Continue';
+  String get button_continue => 'Continuer';
 
   @override
-  String get button_cancel => 'Cancel';
+  String get button_cancel => 'Annuler';
+
+  @override
+  String get button_back => 'Retour';
+
+  @override
+  String get button_opensettings => 'Ouvrir les paramètres';
 
   @override
   String get sort_cheaper => 'Moins cher';
@@ -128,7 +134,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get facilities_not_available =>
-      'Cette station-service ne fournit pas d’informations sur ses services.';
+      'Cette station-service ne fournit pas d\'informations sur ses services.';
 
   @override
   String get facility_food_and_beverage => 'Restauration et boissons';
@@ -176,7 +182,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get website => 'Site web';
 
   @override
-  String get opening_hours_title => 'Horaires d’ouverture';
+  String get opening_hours_title => 'Horaires d\'ouverture';
 
   @override
   String get opening_hours_note =>
@@ -184,7 +190,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get opening_hours_not_available =>
-      'Cette station-service ne fournit pas d’informations sur ses horaires d’ouverture.';
+      'Cette station-service ne fournit pas d\'informations sur ses horaires d\'ouverture.';
 
   @override
   String get weekday => 'Jour';
@@ -336,12 +342,48 @@ class AppLocalizationsFr extends AppLocalizations {
   String get favorites_added => 'Station-service ajoutée aux favoris.';
 
   @override
-  String get dialog_location_permission_title => 'Location usage';
+  String get dialog_location_permission_title =>
+      'Utilisation de la localisation';
 
   @override
   String get dialog_location_permission_description =>
-      'CarburApp collects data about your location to show you the nearest fuel stations and calculate distances, even when the app is in use.\n\nYour location is not shared for advertising purposes.';
+      'CarburApp utilise votre localisation pour afficher les stations-service proches et calculer les distances.\n\nElle ne sera pas partagée avec des tiers.\n\nSi vous le souhaitez, vous pouvez saisir une adresse manuellement.';
 
   @override
-  String get button_add_manually => 'Add manually';
+  String get button_add_manually => 'Saisir la localisation';
+
+  @override
+  String get saved_places => 'Lieux enregistrés';
+
+  @override
+  String get enter_address_placeholder => 'Saisir une adresse';
+
+  @override
+  String get error_snackbar_location_permission_no =>
+      'Oups, vous avez probablement appuyé sur \"non\" par erreur. Réessayez. Si vous avez changé d’avis, vous pouvez toujours saisir la localisation manuellement.';
+
+  @override
+  String get error_snackbar_gps_turned_off =>
+      'Le GPS est désactivé. Activez-le et continuez.';
+
+  @override
+  String get error_dialog_title_location_permission_required =>
+      'Votre intervention est requise';
+
+  @override
+  String get error_dialog_description_location_permission_required =>
+      'Vous avez refusé l’accès à la localisation.\n\nPour l’utiliser, vous devez activer l’autorisation manuellement dans les paramètres.';
+
+  @override
+  String get button_tooltip_remove_places_from_saved =>
+      'Supprimer le lieu enregistré';
+
+  @override
+  String get snackbar_location_permission_yes => 'Bon choix !';
+
+  @override
+  String get settings_category_general => 'Général';
+
+  @override
+  String get settings_category_legal => 'Mentions légales';
 }

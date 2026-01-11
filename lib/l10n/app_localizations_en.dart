@@ -50,13 +50,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get button_close => 'button_close';
 
   @override
-  String get button_ok => 'button_ok';
+  String get button_ok => 'Ok';
 
   @override
   String get button_continue => 'Continue';
 
   @override
   String get button_cancel => 'Cancel';
+
+  @override
+  String get button_back => 'Back';
+
+  @override
+  String get button_opensettings => 'Open Settings';
 
   @override
   String get sort_cheaper => 'Cheapest';
@@ -335,8 +341,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dialog_location_permission_description =>
-      'CarburApp collects data about your location to show you the nearest fuel stations and calculate distances, even when the app is in use.\n\nYour location is not shared for advertising purposes.';
+      'CarburApp uses your location to show nearby fuel stations and calculate distances.\n\nIt will not be shared with third parties.\n\nIf you prefer, you can enter an address manually.';
 
   @override
-  String get button_add_manually => 'Add manually';
+  String get button_add_manually => 'Enter location';
+
+  @override
+  String get saved_places => 'Saved places';
+
+  @override
+  String get enter_address_placeholder => 'Enter address';
+
+  @override
+  String get error_snackbar_location_permission_no =>
+      'Oops, you probably tapped \"no\" by mistake. Try again. If you changed your mind, you can still enter the location manually.';
+
+  @override
+  String get error_snackbar_gps_turned_off =>
+      'GPS is disabled. Enable it and continue.';
+
+  @override
+  String get error_dialog_title_location_permission_required =>
+      'Your intervention is required';
+
+  @override
+  String get error_dialog_description_location_permission_required =>
+      'You denied access to location.\n\nTo use it, you must manually enable the permission in Settings.';
+
+  @override
+  String get button_tooltip_remove_places_from_saved => 'Delete saved place';
+
+  @override
+  String get snackbar_location_permission_yes => 'Great choice!';
+
+  @override
+  String get settings_category_general => 'General';
+
+  @override
+  String get settings_category_legal => 'Legal';
 }

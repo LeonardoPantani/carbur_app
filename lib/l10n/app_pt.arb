@@ -59,7 +59,7 @@
     "@button_close": {
         "description": "Button label to close a dialog."
     },
-    "button_ok": "button_ok",
+    "button_ok": "Ok",
     "@button_ok": {
         "description": "Confirmation button label."
     },
@@ -409,5 +409,73 @@
     "favorites_added": "Posto de combustível adicionado aos favoritos.",
     "@favorites_added": {
         "description": "This text appears in the snackbar informing the user that the fuel station has been added to their favorites."
+    },
+    "button_continue": "Continuar",
+    "@button_continue": {
+        "description": "Continue button label."
+    },
+    "button_cancel": "Cancelar",
+    "@button_cancel": {
+        "description": "Button label to cancel an operation."
+    },
+    "button_back": "Voltar",
+    "@button_back": {
+        "description": "Back button label."
+    },
+    "button_opensettings": "Abrir configurações",
+    "@button_opensettings": {
+        "description": "Open settings button label."
+    },
+    "dialog_location_permission_title": "Uso da localização",
+    "@dialog_location_permission_title": {
+        "description": "This title is from the dialog that appears while asking for user's location permission."
+    },
+    "dialog_location_permission_description": "O CarburApp usa sua localização para mostrar postos próximos e calcular distâncias.\n\nEla não será compartilhada com terceiros.\n\nSe preferir, você pode inserir um endereço manualmente.",
+    "@dialog_location_permission_description": {
+        "description": "This text is from the dialog that appears while asking for user's location permission. It explains easily why it is needed."
+    },
+    "button_add_manually": "Inserir localização",
+    "@button_add_manually": {
+        "description": "Button label for when user does not want to provide access to their location."
+    },
+    "saved_places": "Locais salvos",
+    "@saved_places": {
+        "description": "Header of list of saved places of user."
+    },
+    "enter_address_placeholder": "Inserir endereço",
+    "@enter_address_placeholder": {
+        "description": "This text appears as a placeholder in the screen that appears if users does not grant location permission and instead inserts a location manually."
+    },
+    "error_snackbar_location_permission_no": "Ops, você provavelmente tocou em \"não\" por engano. Tente novamente. Se mudou de ideia, ainda pode inserir a localização manualmente.",
+    "@error_snackbar_location_permission_no": {
+        "description": "This text appears in a snackbar when the user first presses 'continue' on the location permission dialog and then presses on don't allow later."
+    },
+    "error_snackbar_gps_turned_off": "O GPS está desativado. Ative-o e continue.",
+    "@error_snackbar_gps_turned_off": {
+        "description": "This text appears in a snackbar when the user does not have location enabled."
+    },
+    "error_dialog_title_location_permission_required": "Sua intervenção é necessária",
+    "@error_dialog_title_location_permission_required": {
+        "description": "Title of dialog that appears if user said to use location but has permanently disabled to location permission."
+    },
+    "error_dialog_description_location_permission_required": "Você negou o acesso à localização.\n\nPara usá-la, é necessário ativar a permissão manualmente nas Configurações.",
+    "@error_dialog_description_location_permission_required": {
+        "description": "Description of dialog that appears if user said to use location but has permanently disabled to location permission."
+    },
+    "button_tooltip_remove_places_from_saved": "Excluir local salvo",
+    "@button_tooltip_remove_places_from_saved": {
+        "description": "This tooltip refers to the bin button near a saved places list entry."
+    },
+    "snackbar_location_permission_yes": "Boa escolha!",
+    "@snackbar_location_permission_yes": {
+        "description": "This text appears in a snackbar when the user enables location usage."
+    },
+    "settings_category_general": "Geral",
+    "@settings_category_general": {
+        "description": "General settings category title."
+    },
+    "settings_category_legal": "Legal",
+    "@settings_category_legal": {
+        "description": "Legal settings category title."
     }
 }

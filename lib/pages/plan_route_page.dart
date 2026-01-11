@@ -8,6 +8,7 @@ import '../l10n/app_localizations.dart';
 import '../providers/map_provider.dart';
 import '../providers/plan_route_provider.dart';
 import '../providers/settings_provider.dart';
+import '../providers/location_provider.dart';
 import '../utils/logger.dart';
 import '../utils/map_utils.dart';
 import 'search_place_page.dart';
@@ -35,7 +36,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
     super.dispose();
   }
 
-  static const LatLng _userLocation = LatLng(43.7167, 10.4017);
+  static const LatLng _defaultLocation = LatLng(0, 0);
 
   void _triggerRebuild(BuildContext context) {
     final routeProvider = context.read<PlanRouteProvider>();
@@ -115,6 +116,8 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
   Widget build(BuildContext context) {
     final routeProvider = context.watch<PlanRouteProvider>();
     final mapProvider = context.watch<MapProvider>();
+    final locationProvider = context.watch<LocationProvider>();
+    final initialPosition = locationProvider.position ?? _defaultLocation;
     final String languageCode = Localizations.localeOf(context).languageCode;
 
     // detecting if we are in landscape or not
@@ -127,7 +130,7 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
         children: [
           Positioned.fill(
             child: CommonMap(
-              initialPosition: _userLocation,
+              initialPosition: initialPosition,
               markers: mapProvider.markers,
               polylines: routeProvider.routePolylinePoints.isEmpty
                   ? {}

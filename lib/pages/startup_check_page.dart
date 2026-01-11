@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:carbur_app/pages/home_page.dart';
 import 'package:provider/provider.dart';
 
@@ -16,32 +16,46 @@ class StartupCheckPage extends StatefulWidget {
   State<StartupCheckPage> createState() => _StartupCheckPageState();
 }
 
-class _StartupCheckPageState extends State<StartupCheckPage> {
+class _StartupCheckPageState extends State<StartupCheckPage>
+    with WidgetsBindingObserver {
   // null = loading, true = connected, false = not connected
   bool? _hasConnection;
-  bool _isCheckingLocation = false;
+  bool _returningFromSettings = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _startChecks();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _returningFromSettings) {
+      _returningFromSettings = false;
+      if (mounted) {
+        setState(() => _hasConnection = null);
+      }
+      _startChecks();
+    }
+  }
+
   Future<void> _startChecks() async {
-    // Internet check
     await _checkConnection();
 
     if (_hasConnection == true && mounted) {
-      // handling location permission
-      await _handleLocationPermission();
+      await _handleLocationPermissionFlow();
     }
   }
 
   Future<void> _checkConnection() async {
     if (!mounted) return;
-    setState(() {
-      _hasConnection = null;
-    });
     try {
       final result = await InternetAddress.lookup('carburanti.mise.gov.it');
       if (mounted) {
@@ -51,32 +65,21 @@ class _StartupCheckPageState extends State<StartupCheckPage> {
       }
     } on SocketException catch (_) {
       if (mounted) {
-        setState(() {
-          _hasConnection = false;
-        });
+        setState(() => _hasConnection = false);
       }
     }
   }
 
-  Future<void> _handleLocationPermission() async {
-    setState(() {
-      _isCheckingLocation = true;
-    });
+  Future<void> _handleLocationPermissionFlow() async {
+    final locProvider = context.read<LocationProvider>();
 
-    // do we have the permission already
-    LocationPermission permission = await Geolocator.checkPermission();
+    bool success = await locProvider.tryInitializeLocation();
 
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      // we do not have the required permission
+    if (success && mounted) {
+      _goToHome();
+    } else {
       if (mounted) {
         await _showLocationDisclosureDialog(context);
-      }
-    } else {
-      // we already have the permission
-      if (mounted) {
-        await context.read<LocationProvider>().initializeLocation();
-        _goToHome();
       }
     }
   }
@@ -87,49 +90,199 @@ class _StartupCheckPageState extends State<StartupCheckPage> {
     ).pushReplacement(MaterialPageRoute(builder: (_) => const HomePage()));
   }
 
+  // dialog continue button logic
+  Future<void> _onAuthorizePressed(BuildContext dialogContext) async {
+    final locProvider = context.read<LocationProvider>();
+    Navigator.pop(dialogContext);
+    final result = await locProvider.requestPermissionAndFetch();
+    if (!mounted) return;
+    final l = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    switch (result) {
+      case LocationResult.success:
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.hideCurrentSnackBar();
+        final controller = messenger.showSnackBar(
+          SnackBar(
+            backgroundColor: colorScheme.primary,
+            duration: const Duration(seconds: 2),
+            content: Row(
+              children: [
+                Icon(Icons.check_circle_outline, color: colorScheme.onPrimary),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l.snackbar_location_permission_yes,
+                    style: TextStyle(color: colorScheme.onPrimary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+
+        await controller.closed;
+        if (!mounted) return;
+        _goToHome();
+        break;
+
+      case LocationResult.permanentlyDenied:
+        _showOpenSettingsDialog();
+        break;
+
+      case LocationResult
+          .denied: // user clicks on "Continue" and then says "Don't allow" => fuck it
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: colorScheme.error,
+            duration: const Duration(seconds: 10),
+            content: Row(
+              children: [
+                Icon(Icons.error_outline, color: colorScheme.onError),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l.error_snackbar_location_permission_no,
+                    style: TextStyle(color: colorScheme.onError),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+        _showLocationDisclosureDialog(context);
+        break;
+
+      case LocationResult.serviceDisabled:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: colorScheme.error,
+            duration: const Duration(seconds: 10),
+            content: Row(
+              children: [
+                Icon(Icons.error_outline, color: colorScheme.onError),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l.error_snackbar_gps_turned_off,
+                    style: TextStyle(color: colorScheme.onError),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+        _showLocationDisclosureDialog(context);
+        break;
+
+      case LocationResult.error:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: colorScheme.error,
+            duration: const Duration(seconds: 10),
+            content: Row(
+              children: [
+                Icon(Icons.error_outline, color: colorScheme.onError),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l.error_description_unknown,
+                    style: TextStyle(color: colorScheme.onError),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+        _showLocationDisclosureDialog(context);
+        break;
+    }
+  }
+
+  void _showOpenSettingsDialog() {
+    if (!mounted) return;
+    final l = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          // re-open previous dialog
+          if (didPop) return;
+          Navigator.of(ctx).pop();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            _showLocationDisclosureDialog(context);
+          });
+        },
+        child: AlertDialog(
+          title: Text(l.error_dialog_title_location_permission_required),
+          content: Text(
+            l.error_dialog_description_location_permission_required,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _showLocationDisclosureDialog(context);
+              },
+              child: Text(l.button_back),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _returningFromSettings = true;
+                Geolocator.openAppSettings();
+              },
+              child: Text(l.button_opensettings),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _showLocationDisclosureDialog(BuildContext context) async {
     final l = AppLocalizations.of(context)!;
 
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        icon: Icon(
-          Icons.location_on_outlined,
-          size: 48,
-          color: Theme.of(context).primaryColor,
-        ),
-        title: Text(l.dialog_location_permission_title),
-        content: Text(
-          l.dialog_location_permission_description,
-          textAlign: TextAlign.justify,
-        ),
-        actions: [
-          TextButton(
-            // add manually location
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.read<LocationProvider>().startSearchSession();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      const SearchPlacePage(mode: SearchMode.manualLocation),
-                ),
-              );
-            },
-            child: Text(l.button_add_manually),
+      builder: (ctx) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          icon: Icon(
+            Icons.location_on_outlined,
+            size: 48,
+            color: Theme.of(context).colorScheme.primary,
           ),
-          FilledButton(
-            // authorize app to use location
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await context.read<LocationProvider>().initializeLocation();
-              if (mounted) _goToHome();
-            },
-            child: Text(l.button_continue),
-          ),
-        ],
+          title: Text(l.dialog_location_permission_title),
+          content: Text(l.dialog_location_permission_description),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                // manual mode
+                context.read<LocationProvider>().startSearchSession();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const SearchPlacePage(mode: SearchMode.manualLocation),
+                  ),
+                );
+              },
+              child: Text(l.button_add_manually),
+            ),
+            FilledButton(
+              onPressed: () => _onAuthorizePressed(ctx),
+              child: Text(l.button_continue),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -137,51 +290,59 @@ class _StartupCheckPageState extends State<StartupCheckPage> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+    final locProvider = context.watch<LocationProvider>();
 
-    // checking connection or location
-    if (_hasConnection == null || _isCheckingLocation) {
+    if (_hasConnection == null || locProvider.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // we are connected to the internet
-    if (_hasConnection == true) {
-      return const HomePage();
-    }
-
-    // we are not connected to the internet
-    return RefreshIndicator(
-      onRefresh: () => _startChecks(),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: SizedBox(
-              height: constraints.maxHeight,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 96,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        l.error_title_no_connection,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
+    if (_hasConnection == false) {
+      return Scaffold(
+        body: RefreshIndicator(
+          onRefresh: () => _startChecks(),
+          child: ListView(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height - 100,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.wifi_off_rounded,
+                          size: 96,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l.error_title_no_connection,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l.error_description_no_connection,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        FilledButton.icon(
+                          onPressed: _startChecks,
+                          icon: const Icon(Icons.refresh),
+                          label: Text(l.button_retry),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
-      ),
-    );
+            ],
+          ),
+        ),
+      );
+    }
+
+    return const Scaffold();
   }
 }

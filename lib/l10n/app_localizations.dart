@@ -189,7 +189,7 @@ abstract class AppLocalizations {
   /// Confirmation button label.
   ///
   /// In en, this message translates to:
-  /// **'button_ok'**
+  /// **'Ok'**
   String get button_ok;
 
   /// Continue button label.
@@ -203,6 +203,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get button_cancel;
+
+  /// Back button label.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get button_back;
+
+  /// Open settings button label.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get button_opensettings;
 
   /// Filter button to allows the user to choose the station with the cheapest price.
   ///
@@ -693,14 +705,74 @@ abstract class AppLocalizations {
   /// This text is from the dialog that appears while asking for user's location permission. It explains easily why it is needed.
   ///
   /// In en, this message translates to:
-  /// **'CarburApp collects data about your location to show you the nearest fuel stations and calculate distances, even when the app is in use.\n\nYour location is not shared for advertising purposes.'**
+  /// **'CarburApp uses your location to show nearby fuel stations and calculate distances.\n\nIt will not be shared with third parties.\n\nIf you prefer, you can enter an address manually.'**
   String get dialog_location_permission_description;
 
   /// Button label for when user does not want to provide access to their location.
   ///
   /// In en, this message translates to:
-  /// **'Add manually'**
+  /// **'Enter location'**
   String get button_add_manually;
+
+  /// Header of list of saved places of user.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved places'**
+  String get saved_places;
+
+  /// This text appears as a placeholder in the screen that appears if users does not grant location permission and instead inserts a location manually.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter address'**
+  String get enter_address_placeholder;
+
+  /// This text appears in a snackbar when the user first presses 'continue' on the location permission dialog and then presses on don't allow later.
+  ///
+  /// In en, this message translates to:
+  /// **'Oops, you probably tapped \"no\" by mistake. Try again. If you changed your mind, you can still enter the location manually.'**
+  String get error_snackbar_location_permission_no;
+
+  /// This text appears in a snackbar when the user does not have location enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS is disabled. Enable it and continue.'**
+  String get error_snackbar_gps_turned_off;
+
+  /// Title of dialog that appears if user said to use location but has permanently disabled to location permission.
+  ///
+  /// In en, this message translates to:
+  /// **'Your intervention is required'**
+  String get error_dialog_title_location_permission_required;
+
+  /// Description of dialog that appears if user said to use location but has permanently disabled to location permission.
+  ///
+  /// In en, this message translates to:
+  /// **'You denied access to location.\n\nTo use it, you must manually enable the permission in Settings.'**
+  String get error_dialog_description_location_permission_required;
+
+  /// This tooltip refers to the bin button near a saved places list entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete saved place'**
+  String get button_tooltip_remove_places_from_saved;
+
+  /// This text appears in a snackbar when the user enables location usage.
+  ///
+  /// In en, this message translates to:
+  /// **'Great choice!'**
+  String get snackbar_location_permission_yes;
+
+  /// General settings category title.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get settings_category_general;
+
+  /// Legal settings category title.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal'**
+  String get settings_category_legal;
 }
 
 class _AppLocalizationsDelegate

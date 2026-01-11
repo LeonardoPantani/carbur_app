@@ -50,13 +50,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get button_close => 'Schließen';
 
   @override
-  String get button_ok => 'button_ok';
+  String get button_ok => 'Ok';
 
   @override
-  String get button_continue => 'Continue';
+  String get button_continue => 'Weiter';
 
   @override
-  String get button_cancel => 'Cancel';
+  String get button_cancel => 'Abbrechen';
+
+  @override
+  String get button_back => 'Zurück';
+
+  @override
+  String get button_opensettings => 'Einstellungen öffnen';
 
   @override
   String get sort_cheaper => 'Günstigste';
@@ -333,12 +339,47 @@ class AppLocalizationsDe extends AppLocalizations {
   String get favorites_added => 'Tankstelle zu den Favoriten hinzugefügt.';
 
   @override
-  String get dialog_location_permission_title => 'Location usage';
+  String get dialog_location_permission_title => 'Standortverwendung';
 
   @override
   String get dialog_location_permission_description =>
-      'CarburApp collects data about your location to show you the nearest fuel stations and calculate distances, even when the app is in use.\n\nYour location is not shared for advertising purposes.';
+      'CarburApp verwendet deinen Standort, um nahegelegene Tankstellen anzuzeigen und Entfernungen zu berechnen.\n\nEr wird nicht an Dritte weitergegeben.\n\nWenn du möchtest, kannst du eine Adresse manuell eingeben.';
 
   @override
-  String get button_add_manually => 'Add manually';
+  String get button_add_manually => 'Standort eingeben';
+
+  @override
+  String get saved_places => 'Gespeicherte Orte';
+
+  @override
+  String get enter_address_placeholder => 'Adresse eingeben';
+
+  @override
+  String get error_snackbar_location_permission_no =>
+      'Ups, du hast wahrscheinlich versehentlich \"Nein\" gewählt. Versuche es erneut. Wenn du deine Meinung geändert hast, kannst du den Standort auch manuell eingeben.';
+
+  @override
+  String get error_snackbar_gps_turned_off =>
+      'GPS ist deaktiviert. Aktiviere es und fahre fort.';
+
+  @override
+  String get error_dialog_title_location_permission_required =>
+      'Dein Eingreifen ist erforderlich';
+
+  @override
+  String get error_dialog_description_location_permission_required =>
+      'Du hast den Zugriff auf den Standort verweigert.\n\nUm ihn zu verwenden, musst du die Berechtigung manuell in den Einstellungen aktivieren.';
+
+  @override
+  String get button_tooltip_remove_places_from_saved =>
+      'Gespeicherten Ort löschen';
+
+  @override
+  String get snackbar_location_permission_yes => 'Gute Entscheidung!';
+
+  @override
+  String get settings_category_general => 'Allgemein';
+
+  @override
+  String get settings_category_legal => 'Rechtliches';
 }

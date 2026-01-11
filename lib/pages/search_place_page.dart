@@ -5,7 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../providers/location_provider.dart';
 import '../providers/plan_route_provider.dart';
 import '../services/google_places_service.dart';
-import 'home_page.dart'; // Importa il nuovo servizio
+import 'home_page.dart';
 
 enum SearchMode { start, destination, manualLocation }
 
@@ -16,7 +16,6 @@ class SearchPlacePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // A seconda della modalità, scegliamo il provider e i controller giusti
     final routeProvider = context.watch<PlanRouteProvider>();
     final locProvider = context.watch<LocationProvider>();
     final l = AppLocalizations.of(context)!;
@@ -29,7 +28,6 @@ class SearchPlacePage extends StatelessWidget {
     VoidCallback onClear;
     String hintText;
 
-    // Configurazione dinamica in base alla modalità
     switch (mode) {
       case SearchMode.start:
         controller = routeProvider.startController;
@@ -68,29 +66,22 @@ class SearchPlacePage extends StatelessWidget {
         controller = locProvider.searchController;
         suggestions = locProvider.searchSuggestions;
         onChanged = (val) => locProvider.onSearchTextChanged(val, languageCode);
-
-        // --- MODIFICA QUI ---
         onSelect = (s) async {
-          // 1. Aspettiamo che il provider ottenga le coordinate (IMPORTANTE!)
           await locProvider.selectPlace(s);
 
           if (context.mounted) {
-            // 2. Invece di pop(), navighiamo esplicitamente verso la Home
-            // pushAndRemoveUntil rimuove tutte le schermate precedenti (splash, login, etc)
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const HomePage()),
               (route) => false,
             );
           }
         };
-        // --------------------
 
         onClear = () => locProvider.onSearchTextChanged('', languageCode);
-        hintText = "Inserisci città o indirizzo";
+        hintText = l.enter_address_placeholder;
         break;
     }
 
-    // Usiamo i luoghi salvati dal LocationProvider (condivisi per semplicità)
     final savedPlaces = locProvider.savedPlaces;
     final showSavedPlaces = controller.text.isEmpty;
 
@@ -152,7 +143,7 @@ class SearchPlacePage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           child: Text(
-            "Luoghi Salvati", // Aggiungi a localizations
+            AppLocalizations.of(context)!.saved_places,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold,
@@ -168,7 +159,8 @@ class SearchPlacePage extends StatelessWidget {
                 leading: const Icon(Icons.bookmark, color: Colors.orange),
                 title: Text(s.description),
                 trailing: IconButton(
-                  icon: const Icon(Icons.delete_outline),
+                  icon: const Icon(Icons.delete_outline,),
+                  tooltip: AppLocalizations.of(context)!.button_tooltip_remove_places_from_saved,
                   onPressed: () => locProvider.toggleSavedPlace(s),
                 ),
                 onTap: () => onSelect(s),
@@ -224,8 +216,7 @@ class SearchPlacePage extends StatelessWidget {
       ),
     );
   }
-
-  // ... (Tieni il metodo placeTypeToIcon esistente) ...
+  
   IconData placeTypeToIcon(List<String> types) {
     for (final type in types) {
       switch (type) {

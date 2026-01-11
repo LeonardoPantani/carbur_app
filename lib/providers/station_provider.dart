@@ -93,7 +93,7 @@ class StationProvider extends ChangeNotifier {
 
     try {
       logger.i("Inizio download dati dal Repository...");
-      _allStations = await _repository.fetchStationsWithDrivingDistances(
+      _allStations = await _repository.obtainStations(
         lat: _lastFetchLat!,
         lng: _lastFetchLng!,
         radiusKm: _lastFetchRadius!,

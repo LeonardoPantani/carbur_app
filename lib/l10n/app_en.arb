@@ -59,7 +59,7 @@
     "@button_close": {
         "description": "Button label to close a dialog."
     },
-    "button_ok": "button_ok",
+    "button_ok": "Ok",
     "@button_ok": {
         "description": "Confirmation button label."
     },
@@ -70,6 +70,14 @@
     "button_cancel": "Cancel",
     "@button_cancel": {
         "description": "Button label to cancel an operation."
+    },
+    "button_back": "Back",
+    "@button_back": {
+        "description": "Back button label."
+    },
+    "button_opensettings": "Open Settings",
+    "@button_opensettings": {
+        "description": "Open settings button label."
     },
     "sort_cheaper": "Cheapest",
     "@sort_cheaper": {
@@ -418,12 +426,52 @@
     "@dialog_location_permission_title": {
         "description": "This title is from the dialog that appears while asking for user's location permission."
     },
-    "dialog_location_permission_description": "CarburApp collects data about your location to show you the nearest fuel stations and calculate distances, even when the app is in use.\n\nYour location is not shared for advertising purposes.",
+    "dialog_location_permission_description": "CarburApp uses your location to show nearby fuel stations and calculate distances.\n\nIt will not be shared with third parties.\n\nIf you prefer, you can enter an address manually.",
     "@dialog_location_permission_description": {
         "description": "This text is from the dialog that appears while asking for user's location permission. It explains easily why it is needed."
     },
-    "button_add_manually": "Add manually",
+    "button_add_manually": "Enter location",
     "@button_add_manually": {
         "description": "Button label for when user does not want to provide access to their location."
+    },
+    "saved_places": "Saved places",
+    "@saved_places": {
+        "description": "Header of list of saved places of user."
+    },
+    "enter_address_placeholder": "Enter address",
+    "@enter_address_placeholder": {
+        "description": "This text appears as a placeholder in the screen that appears if users does not grant location permission and instead inserts a location manually."
+    },
+    "error_snackbar_location_permission_no": "Oops, you probably tapped \"no\" by mistake. Try again. If you changed your mind, you can still enter the location manually.",
+    "@error_snackbar_location_permission_no": {
+        "description": "This text appears in a snackbar when the user first presses 'continue' on the location permission dialog and then presses on don't allow later."
+    },
+    "error_snackbar_gps_turned_off": "GPS is disabled. Enable it and continue.",
+    "@error_snackbar_gps_turned_off": {
+        "description": "This text appears in a snackbar when the user does not have location enabled."
+    },
+    "error_dialog_title_location_permission_required": "Your intervention is required",
+    "@error_dialog_title_location_permission_required": {
+        "description": "Title of dialog that appears if user said to use location but has permanently disabled to location permission."
+    },
+    "error_dialog_description_location_permission_required": "You denied access to location.\n\nTo use it, you must manually enable the permission in Settings.",
+    "@error_dialog_description_location_permission_required": {
+        "description": "Description of dialog that appears if user said to use location but has permanently disabled to location permission."
+    },
+    "button_tooltip_remove_places_from_saved": "Delete saved place",
+    "@button_tooltip_remove_places_from_saved": {
+        "description": "This tooltip refers to the bin button near a saved places list entry."
+    },
+    "snackbar_location_permission_yes": "Great choice!",
+    "@snackbar_location_permission_yes": {
+        "description": "This text appears in a snackbar when the user enables location usage."
+    },
+    "settings_category_general": "General",
+    "@settings_category_general": {
+        "description": "General settings category title."
+    },
+    "settings_category_legal": "Legal",
+    "@settings_category_legal": {
+        "description": "Legal settings category title."
     }
 }
