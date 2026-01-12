@@ -189,7 +189,7 @@ class _HomePageState extends State<HomePage> {
               : l.favorites_showonlyfavorites,
           onPressed: () => favoritesProvider.toggleFilter(),
         ),
-        const StationsSortWidget(),
+        StationsSortWidget(showNearestOption: !isFilterActive,),
       ],
       IconButton(icon: const Icon(Icons.settings), onPressed: _openSettings),
     ];

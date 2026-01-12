@@ -27,7 +27,7 @@ class PlaceSuggestion {
 }
 
 class GooglePlacesService {
-  final String _apiKey = ApiKeyGetter.autoCompleteMaps;
+  final String _apiKey = ApiKeyGetter.places;
 
   Future<List<PlaceSuggestion>> fetchAutocomplete(
     String input,

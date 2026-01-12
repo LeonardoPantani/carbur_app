@@ -7,7 +7,9 @@ import '../../providers/settings_provider.dart';
 import '../../providers/station_provider.dart';
 
 class StationsSortWidget extends StatelessWidget {
-  const StationsSortWidget({super.key});
+  final bool showNearestOption;
+
+  const StationsSortWidget({super.key, this.showNearestOption = true});
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +36,15 @@ class StationsSortWidget extends StatelessWidget {
           Icons.euro,
           AppLocalizations.of(context)!.sort_cheaper,
         ),
-        _item(
-          context,
-          StationSort.distance,
-          currentSort,
-          Icons.place,
-          AppLocalizations.of(context)!.sort_nearest,
-        ),
+        if (showNearestOption) ...[
+          _item(
+            context,
+            StationSort.distance,
+            currentSort,
+            Icons.place,
+            AppLocalizations.of(context)!.sort_nearest,
+          ),
+        ],
         _item(
           context,
           StationSort.updatedAt,

@@ -477,5 +477,21 @@
     "settings_category_legal": "Legal",
     "@settings_category_legal": {
         "description": "Legal settings category title."
+    },
+    "startup_check_internet": "Comprobando conexión a Internet...",
+    "@startup_check_internet": {
+        "description": "Brief message that appears before loading the entire app while checking if Internet works."
+    },
+    "startup_check_config": "Comprobando configuración...",
+    "@startup_check_config": {
+        "description": "Brief message that appears before loading the entire app while obtaining API keys from Firebase (technical stuff)."
+    },
+    "startup_check_location": "Comprobando ubicación...",
+    "@startup_check_location": {
+        "description": "Brief message that appears before loading the entire app while checking if location can be used."
+    },
+    "startup_check_ready": "¡Todo listo!",
+    "@startup_check_ready": {
+        "description": "Brief message that appears before loading the entire app after all previous steps have been completed."
     }
 }

@@ -386,4 +386,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_category_legal => 'Legal';
+
+  @override
+  String get startup_check_internet => 'Verificando conexão...';
+
+  @override
+  String get startup_check_config => 'Verificando configuração...';
+
+  @override
+  String get startup_check_location => 'Verificando localização...';
+
+  @override
+  String get startup_check_ready => 'Tudo pronto!';
 }

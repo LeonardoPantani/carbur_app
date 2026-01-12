@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:carbur_app/pages/home_page.dart';
 import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
 import '../providers/location_provider.dart';
+import '../services/remote_config_service.dart';
 import 'search_place_page.dart';
 
 class StartupCheckPage extends StatefulWidget {
@@ -21,12 +23,15 @@ class _StartupCheckPageState extends State<StartupCheckPage>
   // null = loading, true = connected, false = not connected
   bool? _hasConnection;
   bool _returningFromSettings = false;
+  String _loadingMessage = "";
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _startChecks();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _startChecks();
+    });
   }
 
   @override
@@ -47,10 +52,53 @@ class _StartupCheckPageState extends State<StartupCheckPage>
   }
 
   Future<void> _startChecks() async {
-    await _checkConnection();
+    final l = AppLocalizations.of(context)!;
 
-    if (_hasConnection == true && mounted) {
-      await _handleLocationPermissionFlow();
+    try {
+      // checking internet connection
+      if (mounted) {
+        setState(() {
+          _loadingMessage = l.startup_check_internet;
+        });
+      }
+      await _checkConnection();
+
+      // obtaining API keys
+      if (mounted) {
+        setState(() {
+          _loadingMessage = l.startup_check_config;
+        });
+      }
+      await RemoteConfigService.instance.initialize();
+
+      if (_hasConnection == true && mounted) {
+        final locProvider = context.read<LocationProvider>();
+
+        // trying to obtain location
+        if (mounted) {
+          setState(() {
+            _loadingMessage = l.startup_check_location;
+          });
+        }
+        bool success = await locProvider.tryInitializeLocation();
+
+        if (success && mounted) {
+          setState(() {
+            _loadingMessage = l.startup_check_ready;
+          });
+          _goToHome();
+        } else {
+          if (mounted) {
+            await _showLocationDisclosureDialog(context);
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loadingMessage = "Error: $e";
+        });
+      }
     }
   }
 
@@ -66,20 +114,6 @@ class _StartupCheckPageState extends State<StartupCheckPage>
     } on SocketException catch (_) {
       if (mounted) {
         setState(() => _hasConnection = false);
-      }
-    }
-  }
-
-  Future<void> _handleLocationPermissionFlow() async {
-    final locProvider = context.read<LocationProvider>();
-
-    bool success = await locProvider.tryInitializeLocation();
-
-    if (success && mounted) {
-      _goToHome();
-    } else {
-      if (mounted) {
-        await _showLocationDisclosureDialog(context);
       }
     }
   }
@@ -289,11 +323,30 @@ class _StartupCheckPageState extends State<StartupCheckPage>
 
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context)!;
     final locProvider = context.watch<LocationProvider>();
 
+    final l = AppLocalizations.of(context)!;
+    final textToShow = _loadingMessage.isEmpty
+        ? AppLocalizations.of(context)!.startup_check_internet
+        : _loadingMessage;
+
     if (_hasConnection == null || locProvider.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 24),
+              Text(
+                textToShow,
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     if (_hasConnection == false) {
@@ -343,6 +396,7 @@ class _StartupCheckPageState extends State<StartupCheckPage>
       );
     }
 
+    // should never arrive here
     return const Scaffold();
   }
 }

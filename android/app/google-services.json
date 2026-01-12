@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "215946227842",
+    "project_id": "carburapp-191d3",
+    "storage_bucket": "carburapp-191d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:215946227842:android:b08549d1e5e73ef200849b",
+        "android_client_info": {
+          "package_name": "it.pantani.carbur_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_55HSRqw8S2vvg7VeYgn_ys9FN-tg1b4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

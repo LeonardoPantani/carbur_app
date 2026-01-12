@@ -1,22 +1,11 @@
-import 'dart:io' show Platform;
-import 'env.dart';
+import '../services/remote_config_service.dart';
 
 class ApiKeyGetter {
-  static String get maps {
-    if (Platform.isAndroid) {
-      return Env.googleMapsSdkAndroidApiKey;
-    }
-    if (Platform.isIOS) {
-      return Env.googleMapsSdkIosApiKey;
-    }
-    throw UnsupportedError('Unsupported platform');
-  }
-
-  static String get autoCompleteMaps {
-    return Env.googlePlacesApiKey;
+  static String get places {
+    return RemoteConfigService.instance.placesApiKey;
   }
 
   static String get routes {
-    return Env.googleRoutesApiKey;
+    return RemoteConfigService.instance.routesApiKey;
   }
 }

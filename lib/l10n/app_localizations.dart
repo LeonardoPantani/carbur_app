@@ -773,6 +773,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Legal'**
   String get settings_category_legal;
+
+  /// Brief message that appears before loading the entire app while checking if Internet works.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking Internet connection...'**
+  String get startup_check_internet;
+
+  /// Brief message that appears before loading the entire app while obtaining API keys from Firebase (technical stuff).
+  ///
+  /// In en, this message translates to:
+  /// **'Checking configuration...'**
+  String get startup_check_config;
+
+  /// Brief message that appears before loading the entire app while checking if location can be used.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking location...'**
+  String get startup_check_location;
+
+  /// Brief message that appears before loading the entire app after all previous steps have been completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything ready!'**
+  String get startup_check_ready;
 }
 
 class _AppLocalizationsDelegate

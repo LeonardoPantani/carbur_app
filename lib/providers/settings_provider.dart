@@ -7,7 +7,7 @@ import '../models/station.dart';
 class SettingsProvider extends ChangeNotifier {
   final List<FuelType> availableFuels = FuelType.values;
   List<FuelType> selectedFuels = [FuelType.petrol];
-  int radiusKm = 3;
+  int radiusKm = 5;
   FuelType preferredMarkerFuel = FuelType.petrol;
   StationSort sort = StationSort.best;
 

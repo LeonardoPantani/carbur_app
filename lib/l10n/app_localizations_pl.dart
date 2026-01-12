@@ -384,4 +384,16 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get settings_category_legal => 'Informacje prawne';
+
+  @override
+  String get startup_check_internet => 'Sprawdzanie połączenia...';
+
+  @override
+  String get startup_check_config => 'Sprawdzanie konfiguracji...';
+
+  @override
+  String get startup_check_location => 'Sprawdzanie lokalizacji...';
+
+  @override
+  String get startup_check_ready => 'Wszystko gotowe!';
 }

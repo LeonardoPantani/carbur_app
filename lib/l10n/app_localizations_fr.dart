@@ -386,4 +386,17 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_category_legal => 'Mentions légales';
+
+  @override
+  String get startup_check_internet =>
+      'Vérification de la connexion Internet...';
+
+  @override
+  String get startup_check_config => 'Vérification de la configuration...';
+
+  @override
+  String get startup_check_location => 'Vérification de la localisation...';
+
+  @override
+  String get startup_check_ready => 'Tout est prêt !';
 }

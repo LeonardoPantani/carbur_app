@@ -382,4 +382,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_category_legal => 'Rechtliches';
+
+  @override
+  String get startup_check_internet => 'Prüfe Internetverbindung...';
+
+  @override
+  String get startup_check_config => 'Prüfe Konfiguration...';
+
+  @override
+  String get startup_check_location => 'Prüfe Standort...';
+
+  @override
+  String get startup_check_ready => 'Alles bereit!';
 }
