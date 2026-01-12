@@ -10,7 +10,7 @@ class PlaceSuggestion {
 
   PlaceSuggestion(this.description, this.placeId, this.types);
 
-  // for storing favorites 
+  // for storing favorites
   Map<String, dynamic> toJson() => {
     'description': description,
     'placeId': placeId,
@@ -27,8 +27,6 @@ class PlaceSuggestion {
 }
 
 class GooglePlacesService {
-  final String _apiKey = ApiKeyGetter.places;
-
   Future<List<PlaceSuggestion>> fetchAutocomplete(
     String input,
     String languageCode,
@@ -36,9 +34,11 @@ class GooglePlacesService {
     double? lat,
     double? lng,
   }) async {
+    final apiKey = ApiKeyGetter.places;
+
     final Map<String, String> parameters = {
       'input': input,
-      'key': _apiKey,
+      'key': apiKey,
       'language': languageCode,
       'sessiontoken': sessionToken,
     };
@@ -59,11 +59,13 @@ class GooglePlacesService {
 
       if (data['status'] == 'OK') {
         return (data['predictions'] as List)
-            .map((p) => PlaceSuggestion(
-                  p['description'],
-                  p['place_id'],
-                  List<String>.from(p['types'] ?? const []),
-                ))
+            .map(
+              (p) => PlaceSuggestion(
+                p['description'],
+                p['place_id'],
+                List<String>.from(p['types'] ?? const []),
+              ),
+            )
             .toList();
       }
       return [];
@@ -74,10 +76,12 @@ class GooglePlacesService {
   }
 
   Future<({double lat, double lng})?> fetchPlaceDetails(String placeId) async {
+    final apiKey = ApiKeyGetter.places;
+
     final uri = Uri.https(
       'maps.googleapis.com',
       '/maps/api/place/details/json',
-      {'place_id': placeId, 'fields': 'geometry', 'key': _apiKey},
+      {'place_id': placeId, 'fields': 'geometry', 'key': apiKey},
     );
 
     try {
@@ -88,7 +92,7 @@ class GooglePlacesService {
         final location = data['result']['geometry']['location'];
         return (
           lat: (location['lat'] as num).toDouble(),
-          lng: (location['lng'] as num).toDouble()
+          lng: (location['lng'] as num).toDouble(),
         );
       }
     } catch (e) {

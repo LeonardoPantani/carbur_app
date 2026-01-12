@@ -250,7 +250,7 @@ class _StartupCheckPageState extends State<StartupCheckPage>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: colorScheme.error,
-            duration: const Duration(seconds: 10),
+            duration: const Duration(seconds: 8),
             content: Row(
               children: [
                 Icon(Icons.error_outline, color: colorScheme.onError),
