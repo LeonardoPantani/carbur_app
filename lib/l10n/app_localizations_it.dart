@@ -384,13 +384,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_category_legal => 'Legale';
 
   @override
-  String get startup_check_internet => 'Verifica connessione Internet...';
+  String get startup_check_internet => 'Verifico la connessione Internet...';
 
   @override
-  String get startup_check_config => 'Verifica configurazione...';
+  String get startup_check_config => 'Verifico la configurazione...';
 
   @override
-  String get startup_check_location => 'Verifica posizione...';
+  String get startup_check_location => 'Ottengo la posizione...';
 
   @override
   String get startup_check_ready => 'Tutto pronto!';

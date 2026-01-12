@@ -132,46 +132,43 @@ class _StartupCheckPageState extends State<StartupCheckPage>
 
   Future<void> _showTutorialDialog(BuildContext context) async {
     final settingsProvider = context.read<SettingsProvider>();
-    List<FuelType> tempSelectedFuels = List.from(settingsProvider.selectedFuels);
+    final l = AppLocalizations.of(context)!;
+    List<FuelType> tempSelectedFuels = List.from(
+      settingsProvider.selectedFuels,
+    );
 
     await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) {
-        final l = AppLocalizations.of(ctx)!;
-        
         return PopScope(
           canPop: false,
           child: StatefulBuilder(
             builder: (context, setStateDialog) {
               return AlertDialog(
                 title: Text("${l.welcome_title} 👋"),
-                content: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                content: SizedBox(
+                  width: double.maxFinite,
+                  height: 300,
+                  child: ListView(
+                    shrinkWrap: true,
                     children: [
                       Text(
                         l.welcome_description,
-                        style: TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 16),
                       ),
-                      const SizedBox(height: 20),
-                      ...FuelType.values.map((fuel) {
+                      const SizedBox(height: 10),
+                      ...settingsProvider.availableFuels.map((fuel) {
                         final isSelected = tempSelectedFuels.contains(fuel);
                         return CheckboxListTile(
-                          title: Text(
-                            fuel.label(context),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                          title: Text(fuel.label(context)),
                           value: isSelected,
                           onChanged: (val) {
                             setStateDialog(() {
                               if (val == true) {
                                 tempSelectedFuels.add(fuel);
                               } else {
-                                if (tempSelectedFuels.length > 1) {
-                                  tempSelectedFuels.remove(fuel);
-                                }
+                                tempSelectedFuels.remove(fuel);
                               }
                             });
                           },
@@ -182,10 +179,14 @@ class _StartupCheckPageState extends State<StartupCheckPage>
                 ),
                 actions: [
                   FilledButton(
-                    onPressed: () {
-                      settingsProvider.setSelectedFuels(tempSelectedFuels);
-                      Navigator.pop(ctx);
-                    },
+                    onPressed: tempSelectedFuels.isEmpty
+                        ? null
+                        : () {
+                            settingsProvider.setSelectedFuels(
+                              tempSelectedFuels,
+                            );
+                            Navigator.pop(ctx);
+                          },
                     child: Text(l.button_continue),
                   ),
                 ],
