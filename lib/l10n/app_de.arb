@@ -493,5 +493,13 @@
     "startup_check_ready": "Alles bereit!",
     "@startup_check_ready": {
         "description": "Brief message that appears before loading the entire app after all previous steps have been completed."
+    },
+    "welcome_title": "Willkommen!",
+    "@welcome_title": {
+        "description": "Title of dialog that appears when user opens the app for the first time."
+    },
+    "welcome_description": "Wählen Sie zu Beginn die Kraftstoffarten aus, an denen Sie interessiert sind.",
+    "@welcome_description": {
+        "description": "Description of dialog that appears when user opens the app for the first time."
     }
 }

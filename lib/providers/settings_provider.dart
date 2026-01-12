@@ -11,8 +11,18 @@ class SettingsProvider extends ChangeNotifier {
   FuelType preferredMarkerFuel = FuelType.petrol;
   StationSort sort = StationSort.best;
 
+  bool _isFirstRun = true;
+  bool get isFirstRun => _isFirstRun;
+
   SettingsProvider() {
     _loadSettings();
+  }
+
+  Future<void> completeTutorial() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_first_run', false);
+    _isFirstRun = false;
+    notifyListeners();
   }
 
   void _ensureValidPreferredFuel() {
@@ -24,6 +34,8 @@ class SettingsProvider extends ChangeNotifier {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
+
+    _isFirstRun = prefs.getBool('is_first_run') ?? true;
 
     // loading [selected fuel] preference
     final stored = prefs.getStringList('selectedFuels');
@@ -43,7 +55,9 @@ class SettingsProvider extends ChangeNotifier {
     final preferredCode = prefs.getInt('preferredMarkerFuel');
     if (preferredCode != null) {
       try {
-        preferredMarkerFuel = FuelType.values.firstWhere((f) => f.ministerCode == preferredCode);
+        preferredMarkerFuel = FuelType.values.firstWhere(
+          (f) => f.ministerCode == preferredCode,
+        );
       } catch (_) {
         preferredMarkerFuel = FuelType.petrol;
       }
@@ -82,10 +96,7 @@ class SettingsProvider extends ChangeNotifier {
 
   Future<void> _savePreferredMarkerFuel() async {
     final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(
-        'preferredMarkerFuel',
-        preferredMarkerFuel.ministerCode,
-      );
+    await prefs.setInt('preferredMarkerFuel', preferredMarkerFuel.ministerCode);
   }
 
   // ---- public methods
@@ -97,7 +108,7 @@ class SettingsProvider extends ChangeNotifier {
     } else {
       selectedFuels.add(fuel);
     }
-    
+
     _saveSelectedFuels();
     _ensureValidPreferredFuel();
     notifyListeners();

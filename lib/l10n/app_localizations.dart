@@ -797,6 +797,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Everything ready!'**
   String get startup_check_ready;
+
+  /// Title of dialog that appears when user opens the app for the first time.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello!'**
+  String get welcome_title;
+
+  /// Description of dialog that appears when user opens the app for the first time.
+  ///
+  /// In en, this message translates to:
+  /// **'To begin, select the types of fuel you are interested in.'**
+  String get welcome_description;
 }
 
 class _AppLocalizationsDelegate

@@ -398,4 +398,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get startup_check_ready => '¡Todo listo!';
+
+  @override
+  String get welcome_title => '¡Bienvenido!';
+
+  @override
+  String get welcome_description =>
+      'Para comenzar, selecciona los tipos de combustible que te interesan.';
 }

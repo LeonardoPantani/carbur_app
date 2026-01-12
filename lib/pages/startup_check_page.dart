@@ -5,9 +5,12 @@ import 'package:flutter/scheduler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:carbur_app/pages/home_page.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/app_localizations.dart';
+import '../models/fuel_type.dart';
 import '../providers/location_provider.dart';
+import '../providers/settings_provider.dart';
 import '../services/remote_config_service.dart';
 import 'search_place_page.dart';
 
@@ -63,6 +66,15 @@ class _StartupCheckPageState extends State<StartupCheckPage>
       }
       await _checkConnection();
 
+      // executing tutorial to obtain fuel type
+      final prefs = await SharedPreferences.getInstance();
+      bool isFirstRun = prefs.getBool('is_first_run') ?? true;
+      if (isFirstRun && mounted) {
+        await _showTutorialDialog(context);
+        if (!mounted) return;
+        await context.read<SettingsProvider>().completeTutorial();
+      }
+
       // obtaining API keys
       if (mounted) {
         setState(() {
@@ -116,6 +128,73 @@ class _StartupCheckPageState extends State<StartupCheckPage>
         setState(() => _hasConnection = false);
       }
     }
+  }
+
+  Future<void> _showTutorialDialog(BuildContext context) async {
+    final settingsProvider = context.read<SettingsProvider>();
+    List<FuelType> tempSelectedFuels = List.from(settingsProvider.selectedFuels);
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        final l = AppLocalizations.of(ctx)!;
+        
+        return PopScope(
+          canPop: false,
+          child: StatefulBuilder(
+            builder: (context, setStateDialog) {
+              return AlertDialog(
+                title: Text("${l.welcome_title} 👋"),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.welcome_description,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 20),
+                      ...FuelType.values.map((fuel) {
+                        final isSelected = tempSelectedFuels.contains(fuel);
+                        return CheckboxListTile(
+                          title: Text(
+                            fuel.label(context),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          value: isSelected,
+                          onChanged: (val) {
+                            setStateDialog(() {
+                              if (val == true) {
+                                tempSelectedFuels.add(fuel);
+                              } else {
+                                if (tempSelectedFuels.length > 1) {
+                                  tempSelectedFuels.remove(fuel);
+                                }
+                              }
+                            });
+                          },
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+                actions: [
+                  FilledButton(
+                    onPressed: () {
+                      settingsProvider.setSelectedFuels(tempSelectedFuels);
+                      Navigator.pop(ctx);
+                    },
+                    child: Text(l.button_continue),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   void _goToHome() {

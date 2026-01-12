@@ -493,5 +493,13 @@
     "startup_check_ready": "Tudo pronto!",
     "@startup_check_ready": {
         "description": "Brief message that appears before loading the entire app after all previous steps have been completed."
+    },
+    "welcome_title": "Bem-vindo!",
+    "@welcome_title": {
+        "description": "Title of dialog that appears when user opens the app for the first time."
+    },
+    "welcome_description": "Para começar, selecione os tipos de combustível de seu interesse.",
+    "@welcome_description": {
+        "description": "Description of dialog that appears when user opens the app for the first time."
     }
 }

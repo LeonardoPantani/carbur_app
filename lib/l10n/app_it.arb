@@ -478,20 +478,28 @@
     "@settings_category_legal": {
         "description": "Legal settings category title."
     },
-    "startup_check_internet": "Verifica connessione Internet...",
+    "startup_check_internet": "Verifico la connessione Internet...",
     "@startup_check_internet": {
         "description": "Brief message that appears before loading the entire app while checking if Internet works."
     },
-    "startup_check_config": "Verifica configurazione...",
+    "startup_check_config": "Verifico la configurazione...",
     "@startup_check_config": {
         "description": "Brief message that appears before loading the entire app while obtaining API keys from Firebase (technical stuff)."
     },
-    "startup_check_location": "Verifica posizione...",
+    "startup_check_location": "Ottengo la posizione...",
     "@startup_check_location": {
         "description": "Brief message that appears before loading the entire app while checking if location can be used."
     },
     "startup_check_ready": "Tutto pronto!",
     "@startup_check_ready": {
         "description": "Brief message that appears before loading the entire app after all previous steps have been completed."
+    },
+    "welcome_title": "Ciao!",
+    "@welcome_title": {
+        "description": "Title of dialog that appears when user opens the app for the first time."
+    },
+    "welcome_description": "Per iniziare, seleziona i tipi di carburante che ti interessano.",
+    "@welcome_description": {
+        "description": "Description of dialog that appears when user opens the app for the first time."
     }
 }
