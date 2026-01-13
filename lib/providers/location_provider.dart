@@ -40,9 +40,7 @@ class LocationProvider extends ChangeNotifier {
     _loadSavedPlaces();
   }
 
-  // ---------------------------------------------------------------------------
-  // LOCATION LOGIC 
-  // ---------------------------------------------------------------------------
+  // --- LOCATION LOGIC ---
   Future<bool> tryInitializeLocation() async {
     isLoading = false;
     notifyListeners();
@@ -133,9 +131,7 @@ class LocationProvider extends ChangeNotifier {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // MANUAL SEARCH & FAVORITES
-  // ---------------------------------------------------------------------------
+  // --- MANUAL SEARCH & FAVORITES ---
   void startSearchSession() {
     searchController.clear();
     searchSuggestions.clear();

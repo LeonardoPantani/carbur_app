@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../extensions/brand_estensions.dart';
 import '../models/station.dart';
 import '../pages/widgets/marker_generator.dart';
 import 'settings_provider.dart';
@@ -103,7 +102,7 @@ class MapProvider extends ChangeNotifier {
 
         final priceVal = fuelPrice.pricePerLiter;
         final priceStr = "${priceVal.toStringAsFixed(3)} €";
-        final assetPath = s.brand.asset;
+        final brandName = s.brand;
         final color = MarkerGenerator.getColorForPrice(
           priceVal,
           lowThreshold,
@@ -111,13 +110,13 @@ class MapProvider extends ChangeNotifier {
         );
 
         // cache key calculated from: price + brand + color
-        final cacheKey = '$priceStr-$assetPath-${color.toARGB32()}';
+        final cacheKey = '$priceStr-$brandName-${color.toARGB32()}';
 
         if (!_markerCache.containsKey(cacheKey)) {
           tasks.add(
             MarkerGenerator.createPriceMarker(
               price: priceStr,
-              assetPath: assetPath,
+              brandName: brandName,
               backgroundColor: color,
             ).then((bit) => _markerCache[cacheKey] = bit),
           );
@@ -166,7 +165,7 @@ class MapProvider extends ChangeNotifier {
               lowThreshold,
               highThreshold,
             );
-            final cacheKey = '$priceStr-${s.brand.asset}-${color.toARGB32()}';
+            final cacheKey = '$priceStr-${s.brand}-${color.toARGB32()}';
 
             // calculating zIndex in case of clipping of the bubble caused by near fuel stations
             int zIndexInt = 0;

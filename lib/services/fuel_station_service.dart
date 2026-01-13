@@ -199,7 +199,7 @@ class FuelStationService {
     return Station(
       id: json["id"],
       name: json["name"],
-      brandString: json["brand"] ?? "",
+      brand: json["brand"],
       lastUpdate: DateTime.parse(json["insertDate"]),
       latitude: json["location"]["lat"],
       longitude: json["location"]["lng"],
@@ -253,7 +253,7 @@ class FuelStationService {
     return Station(
       id: json["id"],
       name: json["name"] ?? json["nomeImpianto"] ?? "Stazione",
-      brandString: json["brand"] ?? "Sconosciuto",
+      brand: json["brand"] ?? "Sconosciuto",
       lastUpdate: lastUpdate ?? DateTime.now(),
       latitude: 0.0,
       longitude: 0.0,

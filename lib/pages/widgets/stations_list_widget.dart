@@ -95,34 +95,37 @@ class StationsList extends StatelessWidget {
     if (stationsToShow.isEmpty) {
       return RefreshIndicator(
         onRefresh: () => _onRefresh(context),
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.7,
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      favoritesProvider.showFavoritesOnly
-                          ? Icons.star_border
-                          : Icons.local_gas_station_outlined,
-                      size: 64,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      favoritesProvider.showFavoritesOnly
-                          ? l.favorites_empty
-                          : l.no_stations_found,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        favoritesProvider.showFavoritesOnly
+                            ? Icons.star_border
+                            : Icons.local_gas_station_outlined,
+                        size: 64,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        favoritesProvider.showFavoritesOnly
+                            ? l.favorites_empty
+                            : l.no_stations_found,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }

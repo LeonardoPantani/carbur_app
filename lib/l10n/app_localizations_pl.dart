@@ -392,6 +392,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get startup_check_config => 'Sprawdzanie konfiguracji...';
 
   @override
+  String get startup_check_resources => 'Pobieranie zasobów...';
+
+  @override
   String get startup_check_location => 'Sprawdzanie lokalizacji...';
 
   @override

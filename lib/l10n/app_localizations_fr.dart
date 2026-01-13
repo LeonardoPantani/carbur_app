@@ -395,6 +395,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get startup_check_config => 'Vérification de la configuration...';
 
   @override
+  String get startup_check_resources => 'Récupération des ressources...';
+
+  @override
   String get startup_check_location => 'Vérification de la localisation...';
 
   @override

@@ -387,6 +387,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startup_check_config => 'Checking configuration...';
 
   @override
+  String get startup_check_resources => 'Obtaining resources...';
+
+  @override
   String get startup_check_location => 'Checking location...';
 
   @override

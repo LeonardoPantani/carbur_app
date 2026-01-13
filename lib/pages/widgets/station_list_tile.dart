@@ -1,10 +1,10 @@
+import 'package:carbur_app/pages/widgets/brand_logo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../models/fuel_type.dart';
 import '../../models/station.dart';
 import '../../providers/settings_provider.dart';
-import '../../extensions/brand_estensions.dart';
 import '../../extensions/prices_estensions.dart';
 import '../../extensions/number_extensions.dart';
 import '../../extensions/navigation_extensions.dart';
@@ -32,7 +32,7 @@ class StationTile extends StatelessWidget {
         width: 75,
         child: AspectRatio(
           aspectRatio: 1,
-          child: Image.asset(station.brand.asset, fit: BoxFit.contain),
+          child: BrandLogoWidget(brandName: station.brand, size: 75,),
         ),
       ),
       title: Text(

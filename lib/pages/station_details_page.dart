@@ -4,7 +4,6 @@ import 'package:carbur_app/models/fuel_type.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../extensions/brand_estensions.dart';
 import '../extensions/station_facilities_extension.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/settings_provider.dart';
@@ -12,6 +11,7 @@ import '../providers/station_details_provider.dart';
 import '../providers/station_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../utils/hyperlink_utils.dart';
+import 'widgets/brand_logo_widget.dart';
 
 class StationDetailsPage extends StatelessWidget {
   const StationDetailsPage({super.key});
@@ -134,13 +134,7 @@ class StationDetailsPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // logo
-                Image.asset(
-                  station.brand.asset,
-                  width: 75,
-                  height: 75,
-                  fit: BoxFit.contain,
-                ),
+                BrandLogoWidget(brandName: station.brand, size: 75),
               ],
             ),
 
@@ -195,13 +189,16 @@ class StationDetailsPage extends StatelessWidget {
                 ),
               )
             else
-              // showing disclaimer and table with opening hours
+            // showing disclaimer and table with opening hours
+            ...[
               Text(
                 l.opening_hours_note,
                 style: Theme.of(
                   context,
                 ).textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
               ),
+              const SizedBox(height: 8),
+            ],
             if (details.openingHours.isNotEmpty)
               Table(
                 columnWidths: const {
@@ -297,12 +294,16 @@ class StationDetailsPage extends StatelessWidget {
               Row(
                 children: [
                   Text('${l.phone}: '),
-                  InkWell(
-                    onTap: () => openPhone(details.phone!),
-                    child: Text(
-                      details.phone!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => openPhone(details.phone!),
+                      child: Text(
+                        details.phone!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                   ),
@@ -313,12 +314,16 @@ class StationDetailsPage extends StatelessWidget {
               Row(
                 children: [
                   Text('${l.email}: '),
-                  InkWell(
-                    onTap: () => openEmail(details.email!),
-                    child: Text(
-                      details.email!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => openEmail(details.email!),
+                      child: Text(
+                        details.email!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                   ),
@@ -329,12 +334,16 @@ class StationDetailsPage extends StatelessWidget {
               Row(
                 children: [
                   Text('${l.website}: '),
-                  InkWell(
-                    onTap: () => openWebsite(details.website!),
-                    child: Text(
-                      details.website!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => openWebsite(details.website!),
+                      child: Text(
+                        details.website!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                   ),

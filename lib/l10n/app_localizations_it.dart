@@ -390,6 +390,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get startup_check_config => 'Verifico la configurazione...';
 
   @override
+  String get startup_check_resources => 'Ottengo le risorse...';
+
+  @override
   String get startup_check_location => 'Ottengo la posizione...';
 
   @override

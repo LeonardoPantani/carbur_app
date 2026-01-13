@@ -786,6 +786,12 @@ abstract class AppLocalizations {
   /// **'Checking configuration...'**
   String get startup_check_config;
 
+  /// Brief message that appears before loading the entire app while obtaining station brand logos (technical stuff).
+  ///
+  /// In en, this message translates to:
+  /// **'Obtaining resources...'**
+  String get startup_check_resources;
+
   /// Brief message that appears before loading the entire app while checking if location can be used.
   ///
   /// In en, this message translates to:

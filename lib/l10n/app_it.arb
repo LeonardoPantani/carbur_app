@@ -486,6 +486,10 @@
     "@startup_check_config": {
         "description": "Brief message that appears before loading the entire app while obtaining API keys from Firebase (technical stuff)."
     },
+    "startup_check_resources": "Ottengo le risorse...",
+    "@startup_check_resources": {
+        "description": "Brief message that appears before loading the entire app while obtaining station brand logos (technical stuff)."
+    },
     "startup_check_location": "Ottengo la posizione...",
     "@startup_check_location": {
         "description": "Brief message that appears before loading the entire app while checking if location can be used."

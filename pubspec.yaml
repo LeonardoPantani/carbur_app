@@ -9,19 +9,21 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   google_maps_flutter:
   provider:
   shared_preferences:
   geolocator:
   http:
   url_launcher:
-  flutter_localizations:
-    sdk: flutter
   intl:
   shimmer:
   logger:
   firebase_core:
   firebase_remote_config:
+  path_provider:
+  firebase_analytics:
 
 dev_dependencies:
   flutter_test:
@@ -34,7 +36,7 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
-    - assets/brands/
+    - assets/unknown.png
 
 flutter_launcher_icons:
   android: true

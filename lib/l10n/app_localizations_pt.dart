@@ -394,6 +394,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get startup_check_config => 'Verificando configuração...';
 
   @override
+  String get startup_check_resources => 'Obtendo recursos...';
+
+  @override
   String get startup_check_location => 'Verificando localização...';
 
   @override

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import '../l10n/app_localizations.dart';
 import '../models/fuel_type.dart';
 import '../providers/location_provider.dart';
 import '../providers/settings_provider.dart';
+import '../services/brand_service.dart';
 import '../services/remote_config_service.dart';
 import 'search_place_page.dart';
 
@@ -23,17 +25,102 @@ class StartupCheckPage extends StatefulWidget {
 
 class _StartupCheckPageState extends State<StartupCheckPage>
     with WidgetsBindingObserver {
-  // null = loading, true = connected, false = not connected
-  bool? _hasConnection;
-  bool _returningFromSettings = false;
+  // State variables
+  bool _isInitializing = true;
+  bool _backgroundTasksSuccess = false;
   String _loadingMessage = "";
+  bool _returningFromSettings = false;
+
+  late Future<bool> _backgroundTasksFuture;
+
+  @override
+  Widget build(BuildContext context) {
+    final locProvider = context.watch<LocationProvider>();
+    final l = AppLocalizations.of(context)!;
+
+    final textToShow =
+        _loadingMessage.isEmpty ? l.startup_check_internet : _loadingMessage;
+
+    // 1 loading state
+    if (_isInitializing || locProvider.isLoading) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 24),
+              Text(
+                textToShow,
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // 2 error state
+    if (!_backgroundTasksSuccess) {
+      return Scaffold(
+        body: RefreshIndicator(
+          onRefresh: () => _restart(),
+          child: ListView(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height - 100,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.wifi_off_rounded,
+                          size: 96,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l.error_title_no_connection,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l.error_description_no_connection,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        FilledButton.icon(
+                          onPressed: _restart,
+                          icon: const Icon(Icons.refresh),
+                          label: Text(l.button_retry),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // 3 fallback
+    return const Scaffold();
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      _startChecks();
+      _backgroundTasksFuture = _runBackgroundTasks();
+      _runUserInteractionFlow();
     });
   }
 
@@ -47,89 +134,103 @@ class _StartupCheckPageState extends State<StartupCheckPage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && _returningFromSettings) {
       _returningFromSettings = false;
-      if (mounted) {
-        setState(() => _hasConnection = null);
-      }
-      _startChecks();
+      _restart();
     }
   }
 
-  Future<void> _startChecks() async {
+  Future<void> _restart() async {
+    setState(() {
+      _isInitializing = true;
+      _backgroundTasksSuccess = false;
+      _loadingMessage = "";
+    });
+    _backgroundTasksFuture = _runBackgroundTasks();
+    _runUserInteractionFlow();
+  }
+
+  // --- THREAD 1: Background Tasks (Internet, Config, Assets) ---
+  Future<bool> _runBackgroundTasks() async {
     final l = AppLocalizations.of(context)!;
-
     try {
-      // checking internet connection
-      if (mounted) {
-        setState(() {
-          _loadingMessage = l.startup_check_internet;
-        });
-      }
-      await _checkConnection();
+      // 1. checking connection
+      if (mounted) setState(() => _loadingMessage = l.startup_check_internet);
+      final hasConnection = await _checkConnection();
+      if (!hasConnection) return false;
 
-      // executing tutorial to obtain fuel type
-      final prefs = await SharedPreferences.getInstance();
-      bool isFirstRun = prefs.getBool('is_first_run') ?? true;
-      if (isFirstRun && mounted) {
-        await _showTutorialDialog(context);
-        if (!mounted) return;
-        await context.read<SettingsProvider>().completeTutorial();
-      }
-
-      // obtaining API keys
-      if (mounted) {
-        setState(() {
-          _loadingMessage = l.startup_check_config;
-        });
-      }
+      // 2. configuration (API keys)
+      if (mounted) setState(() => _loadingMessage = l.startup_check_config);
       await RemoteConfigService.instance.initialize();
 
-      if (_hasConnection == true && mounted) {
-        final locProvider = context.read<LocationProvider>();
+      // 3. downloading logos
+      if (mounted) setState(() => _loadingMessage = l.startup_check_resources);
+      await BrandService.instance.initialize();
 
-        // trying to obtain location
-        if (mounted) {
-          setState(() {
-            _loadingMessage = l.startup_check_location;
-          });
-        }
-        bool success = await locProvider.tryInitializeLocation();
-
-        if (success && mounted) {
-          setState(() {
-            _loadingMessage = l.startup_check_ready;
-          });
-          _goToHome();
-        } else {
-          if (mounted) {
-            await _showLocationDisclosureDialog(context);
-          }
-        }
-      }
+      return true;
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _loadingMessage = "Error: $e";
-        });
-      }
+      if (mounted) setState(() => _loadingMessage = "Error: $e");
+      return false;
     }
   }
 
-  Future<void> _checkConnection() async {
-    if (!mounted) return;
+  Future<bool> _checkConnection() async {
     try {
       final result = await InternetAddress.lookup('carburanti.mise.gov.it');
-      if (mounted) {
-        setState(() {
-          _hasConnection = result.isNotEmpty && result[0].rawAddress.isNotEmpty;
-        });
-      }
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
     } on SocketException catch (_) {
-      if (mounted) {
-        setState(() => _hasConnection = false);
+      return false;
+    }
+  }
+
+  // --- THREAD 2: User Interaction (Tutorial, Location) ---
+  Future<void> _runUserInteractionFlow() async {
+    // 1. tutorial
+    final prefs = await SharedPreferences.getInstance();
+    bool isFirstRun = prefs.getBool('is_first_run') ?? true;
+    if (isFirstRun && mounted) {
+      await _showTutorialDialog(context);
+      if (!mounted) return;
+      await context.read<SettingsProvider>().completeTutorial();
+    }
+
+    // 2. location
+    if (mounted) {
+      final locProvider = context.read<LocationProvider>();     
+      bool success = await locProvider.tryInitializeLocation();
+
+      if (success && mounted) {
+        _finalizeStartup();
+      } else {
+        if (mounted) await _showLocationDisclosureDialog(context);
       }
     }
   }
 
+  // --- SYNC POINT ---
+  Future<void> _finalizeStartup() async {
+    final l = AppLocalizations.of(context)!;
+    
+    // waiting for background tasks to complete
+    if (mounted) setState(() => _loadingMessage = l.startup_check_ready);
+    
+    final bgSuccess = await _backgroundTasksFuture;
+
+    if (!mounted) return;
+
+    if (bgSuccess) {
+      // all good
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
+    } else {
+      // background fail
+      setState(() {
+        _isInitializing = false;
+        _backgroundTasksSuccess = false;
+      });
+    }
+  }
+
+  // --- Dialogs & Handlers ---
   Future<void> _showTutorialDialog(BuildContext context) async {
     final settingsProvider = context.read<SettingsProvider>();
     final l = AppLocalizations.of(context)!;
@@ -198,17 +299,13 @@ class _StartupCheckPageState extends State<StartupCheckPage>
     );
   }
 
-  void _goToHome() {
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => const HomePage()));
-  }
-
   // dialog continue button logic
   Future<void> _onAuthorizePressed(BuildContext dialogContext) async {
     final locProvider = context.read<LocationProvider>();
     Navigator.pop(dialogContext);
+    
     final result = await locProvider.requestPermissionAndFetch();
+    
     if (!mounted) return;
     final l = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
@@ -238,15 +335,14 @@ class _StartupCheckPageState extends State<StartupCheckPage>
 
         await controller.closed;
         if (!mounted) return;
-        _goToHome();
+        _finalizeStartup(); // proceed to sync point instead of direct navigation
         break;
 
       case LocationResult.permanentlyDenied:
         _showOpenSettingsDialog();
         break;
 
-      case LocationResult
-          .denied: // user clicks on "Continue" and then says "Don't allow" => fuck it
+      case LocationResult.denied:
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: colorScheme.error,
@@ -324,7 +420,6 @@ class _StartupCheckPageState extends State<StartupCheckPage>
       builder: (ctx) => PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) {
-          // re-open previous dialog
           if (didPop) return;
           Navigator.of(ctx).pop();
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -399,84 +494,5 @@ class _StartupCheckPageState extends State<StartupCheckPage>
         ),
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final locProvider = context.watch<LocationProvider>();
-
-    final l = AppLocalizations.of(context)!;
-    final textToShow = _loadingMessage.isEmpty
-        ? AppLocalizations.of(context)!.startup_check_internet
-        : _loadingMessage;
-
-    if (_hasConnection == null || locProvider.isLoading) {
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 24),
-              Text(
-                textToShow,
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (_hasConnection == false) {
-      return Scaffold(
-        body: RefreshIndicator(
-          onRefresh: () => _startChecks(),
-          child: ListView(
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height - 100,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.wifi_off_rounded,
-                          size: 96,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          l.error_title_no_connection,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          l.error_description_no_connection,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 24),
-                        FilledButton.icon(
-                          onPressed: _startChecks,
-                          icon: const Icon(Icons.refresh),
-                          label: Text(l.button_retry),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    // should never arrive here
-    return const Scaffold();
   }
 }

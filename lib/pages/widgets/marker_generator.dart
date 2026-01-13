@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../../services/brand_service.dart';
 
 class MarkerGenerator {
   static final Map<String, ui.Image> _brandImageCache = {};
@@ -55,22 +58,41 @@ class MarkerGenerator {
 
   static Future<BitmapDescriptor> createPriceMarker({
     required String price,
-    required String assetPath,
+    required String brandName,
     required Color backgroundColor,
   }) async {
-    ui.Image? logoImage = _brandImageCache[assetPath];
+    ui.Image? logoImage = _brandImageCache[brandName];
     if (logoImage == null) {
       try {
-        final ByteData data = await rootBundle.load(assetPath);
+        final String? localPath = BrandService.instance.getLogoPathForBrand(brandName);
+        Uint8List? bytes;
+
+        // 1 trying to load from file system
+        if (localPath != null) {
+          final file = File(localPath);
+          if (await file.exists()) {
+            bytes = await file.readAsBytes();
+          }
+        }
+
+        // 2 fallback on unknown.png asset if file does not exists of brand is not found
+        if (bytes == null) {
+           final ByteData data = await rootBundle.load('assets/unknown.png');
+           bytes = data.buffer.asUint8List();
+        }
+
+        // 3 decoding image
         final ui.Codec codec = await ui.instantiateImageCodec(
-          data.buffer.asUint8List(),
+          bytes,
           targetWidth: _iconSize.toInt(),
         );
         final ui.FrameInfo fi = await codec.getNextFrame();
         logoImage = fi.image;
-        _brandImageCache[assetPath] = logoImage;
+        
+        // saving in cache
+        _brandImageCache[brandName] = logoImage;
       } catch (e) {
-        debugPrint("Errore logo $assetPath: $e");
+        debugPrint("Errore caricamento logo per $brandName: $e");
       }
     }
 
