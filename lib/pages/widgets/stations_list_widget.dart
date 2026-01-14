@@ -8,6 +8,8 @@ import '../../providers/location_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/station_provider.dart';
 import '../../providers/favorites_provider.dart';
+import '../../services/remote_config_service.dart';
+import 'ad_banner_widget.dart';
 import 'station_list_tile.dart';
 
 class StationsList extends StatelessWidget {
@@ -26,7 +28,8 @@ class StationsList extends StatelessWidget {
       );
     }
 
-    bool isFavLoading = favoritesProvider.showFavoritesOnly && favoritesProvider.isLoading;
+    bool isFavLoading =
+        favoritesProvider.showFavoritesOnly && favoritesProvider.isLoading;
     if (stationsProvider.isLoading || isFavLoading) {
       return RefreshIndicator(
         onRefresh: () async {},
@@ -87,7 +90,9 @@ class StationsList extends StatelessWidget {
     List<Station> stationsToShow;
 
     if (favoritesProvider.showFavoritesOnly) {
-      stationsToShow = stationsProvider.sortStations(favoritesProvider.favoriteStations);
+      stationsToShow = stationsProvider.sortStations(
+        favoritesProvider.favoriteStations,
+      );
     } else {
       stationsToShow = stationsProvider.listStations;
     }
@@ -130,6 +135,9 @@ class StationsList extends StatelessWidget {
       );
     }
 
+    final showAds = RemoteConfigService.instance.showListAd;
+    const adFrequency = 5;
+
     return RefreshIndicator(
       onRefresh: () => _onRefresh(context),
       child: Column(
@@ -152,9 +160,24 @@ class StationsList extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               key: ValueKey(Theme.of(context).brightness),
-              itemCount: stationsToShow.length,
+              itemCount: showAds
+                  ? stationsToShow.length +
+                        (stationsToShow.length ~/ adFrequency)
+                  : stationsToShow.length,
               itemBuilder: (context, index) {
-                final station = stationsToShow[index];
+                if (showAds) {
+                  if ((index + 1) % (adFrequency + 1) == 0) {
+                    return Center(child: AdBannerWidget());
+                  }
+                }
+                final stationIndex = showAds
+                    ? index - (index ~/ (adFrequency + 1))
+                    : index;
+                if (stationIndex >= stationsToShow.length) {
+                  return const SizedBox();
+                }
+                final station = stationsToShow[stationIndex];
+
                 return StationTile(
                   station: station,
                   showDistance: !favoritesProvider.showFavoritesOnly,
@@ -172,17 +195,17 @@ class StationsList extends StatelessWidget {
     final settings = context.read<SettingsProvider>();
     final stations = context.read<StationProvider>();
     final favorites = context.read<FavoritesProvider>();
-    
+
     await pos.tryInitializeLocation();
 
     if (pos.latitude != null) {
-       await stations.loadStations(
-          lat: pos.latitude!,
-          lng: pos.longitude!,
-          radiusKm: settings.radiusKm,
-          fuels: settings.selectedFuels,
-          sort: settings.sort,
-       );
+      await stations.loadStations(
+        lat: pos.latitude!,
+        lng: pos.longitude!,
+        radiusKm: settings.radiusKm,
+        fuels: settings.selectedFuels,
+        sort: settings.sort,
+      );
     }
 
     if (favorites.showFavoritesOnly) {

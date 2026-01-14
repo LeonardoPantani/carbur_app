@@ -1,7 +1,10 @@
 import 'package:carbur_app/extensions/number_extensions.dart';
 import 'package:carbur_app/extensions/prices_estensions.dart';
 import 'package:carbur_app/models/fuel_type.dart';
+import 'package:carbur_app/pages/widgets/interstitial_ad_wrapper.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 import '../extensions/station_facilities_extension.dart';
@@ -13,8 +16,21 @@ import '../providers/favorites_provider.dart';
 import '../utils/hyperlink_utils.dart';
 import 'widgets/brand_logo_widget.dart';
 
-class StationDetailsPage extends StatelessWidget {
+class StationDetailsPage extends StatefulWidget {
   const StationDetailsPage({super.key});
+
+  @override
+  State<StationDetailsPage> createState() => _StationDetailsPageState();
+}
+
+class _StationDetailsPageState extends State<StationDetailsPage> {
+  InterstitialAd? _interstitialAd;
+
+  @override
+  void dispose() {
+    _interstitialAd?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -354,82 +370,92 @@ class StationDetailsPage extends StatelessWidget {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(
-              isFavorite ? Icons.star : Icons.star_border,
-              color: isFavorite ? Colors.amber : null,
-            ),
-            tooltip: isFavorite
-                ? l.favorites_remove_from_favorites
-                : l.favorites_add_to_favorites,
-            onPressed: () {
-              favoritesProvider.toggleFavorite(station);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: colorScheme.secondary,
-                  content: Row(
+    return InterstitialAdWrapper(
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            actions: [
+              IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.star : Icons.star_border,
+                  color: isFavorite ? Colors.amber : null,
+                ),
+                tooltip: isFavorite
+                    ? l.favorites_remove_from_favorites
+                    : l.favorites_add_to_favorites,
+                onPressed: () {
+                  favoritesProvider.toggleFavorite(station);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: colorScheme.secondary,
+                      content: Row(
+                        children: [
+                          Icon(
+                            isFavorite ? Icons.remove : Icons.add,
+                            color: colorScheme.onSecondary,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              isFavorite
+                                  ? l.favorites_removed
+                                  : l.favorites_added,
+                              style: TextStyle(color: colorScheme.onSecondary),
+                            ),
+                          ),
+                        ],
+                      ),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
+              ),
+            ],
+            title: Text(l.station_details_title),
+          ),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Expanded(child: content),
+                  // showing at the bottom the back and navigate buttons
+                  const SizedBox(height: 12),
+                  Row(
                     children: [
-                      Icon(
-                        isFavorite ? Icons.remove : Icons.add,
-                        color: colorScheme.onSecondary,
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.arrow_back),
+                          label: Text(l.back),
+                          onPressed: () => Navigator.pop(context),
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text(
-                          isFavorite ? l.favorites_removed : l.favorites_added,
-                          style: TextStyle(color: colorScheme.onSecondary),
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.map),
+                          label: Text(l.start_navigation),
+                          onPressed:
+                              (station.latitude == 0 && station.longitude == 0)
+                              ? null
+                              : () {
+                                  // analytics
+                                  FirebaseAnalytics.instance.logEvent(
+                                    name: 'navigation_started',
+                                  );
+
+                                  openNavigation(
+                                    station.latitude,
+                                    station.longitude,
+                                  );
+                                },
                         ),
                       ),
                     ],
                   ),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-            },
-          ),
-        ],
-        title: Text(l.station_details_title),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Expanded(child: content),
-
-              // showing at the bottom the back and navigate buttons
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.arrow_back),
-                      label: Text(l.back),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.map),
-                      label: Text(l.start_navigation),
-                      onPressed:
-                          (station.latitude == 0 && station.longitude == 0)
-                          ? null
-                          : () {
-                              openNavigation(
-                                station.latitude,
-                                station.longitude,
-                              );
-                            },
-                    ),
-                  ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),

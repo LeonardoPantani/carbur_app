@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:geolocator/geolocator.dart';
@@ -30,6 +31,7 @@ class _StartupCheckPageState extends State<StartupCheckPage>
   bool _backgroundTasksSuccess = false;
   String _loadingMessage = "";
   bool _returningFromSettings = false;
+  final Stopwatch _stopwatch = Stopwatch();
 
   late Future<bool> _backgroundTasksFuture;
 
@@ -116,8 +118,8 @@ class _StartupCheckPageState extends State<StartupCheckPage>
   @override
   void initState() {
     super.initState();
+    _stopwatch.start();
     WidgetsBinding.instance.addObserver(this);
-    
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _backgroundTasksFuture = _runBackgroundTasks();
       _runUserInteractionFlow();
@@ -218,6 +220,14 @@ class _StartupCheckPageState extends State<StartupCheckPage>
 
     if (bgSuccess) {
       // all good
+      _stopwatch.stop();
+      FirebaseAnalytics.instance.logEvent(
+        name: 'app_startup_complete',
+        parameters: {
+          'duration_ms': _stopwatch.elapsedMilliseconds,
+        },
+      );
+      if(!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomePage()),
       );

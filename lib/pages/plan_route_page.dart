@@ -1,4 +1,5 @@
 import 'package:carbur_app/extensions/navigation_extensions.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -57,7 +58,9 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
     final l = AppLocalizations.of(context)!;
     String message;
 
-    if (error is ApiException || error is ApiTimeoutException || error is NoRouteException) {
+    if (error is ApiException ||
+        error is ApiTimeoutException ||
+        error is NoRouteException) {
       message = l.error_description_api_routes_notworking;
     } else if (error is NetworkException) {
       message = l.error_description_no_connection;
@@ -427,6 +430,12 @@ class _PlanRoutePageState extends State<PlanRoutePage> {
       ),
       onPressed: routeProvider.canSearch
           ? () async {
+              // tracking
+              FirebaseAnalytics.instance.logEvent(
+                name: 'route_search',
+                parameters: {'travel_mode': 'driving'},
+              );
+
               setState(() {
                 _isMenuExpanded = false;
                 _routeFitted = false;

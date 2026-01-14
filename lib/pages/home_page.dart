@@ -1,4 +1,5 @@
 import 'package:carbur_app/pages/plan_route_page.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +10,8 @@ import '../providers/location_provider.dart';
 import '../providers/map_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/station_provider.dart';
+import '../services/remote_config_service.dart';
+import 'widgets/ad_banner_widget.dart';
 import 'widgets/stations_list_widget.dart';
 import 'widgets/stations_map_widget.dart';
 import 'widgets/stations_sort_widget.dart';
@@ -25,8 +28,35 @@ class _HomePageState extends State<HomePage> {
 
   bool get _showSortMenu => _currentIndex == 1;
 
+  bool get _shouldShowBanner {
+   if (!RemoteConfigService.instance.showBottomAd) return false;
+
+   final allowedString = RemoteConfigService.instance.bottomBannerAdTabs; // "1,2"
+   return allowedString.contains(_currentIndex.toString());
+}
+
   void _onNavSelected(int index) {
     setState(() => _currentIndex = index);
+
+    // tracking page usage
+    String pageName;
+    switch (index) {
+      case 0:
+        pageName = "Mappa";
+        break;
+      case 1:
+        pageName = "Lista";
+        break;
+      case 2:
+        pageName = "Viaggia";
+        break;
+      default:
+        pageName = "Sconosciuto";
+    }
+    FirebaseAnalytics.instance.logScreenView(
+      screenName: pageName,
+      screenClass: 'HomePageTab',
+    );
   }
 
   @override
@@ -43,7 +73,7 @@ class _HomePageState extends State<HomePage> {
     final stations = context.read<StationProvider>();
 
     if (loc.latitude == null || loc.longitude == null) {
-       await loc.tryInitializeLocation(); 
+      await loc.tryInitializeLocation();
     }
 
     if (loc.latitude != null && loc.longitude != null && mounted) {
@@ -55,9 +85,35 @@ class _HomePageState extends State<HomePage> {
         sort: settings.sort,
       );
     }
+
+    // tracking settings
+    final analytics = FirebaseAnalytics.instance;
+
+    // 1 radius
+    await analytics.setUserProperty(
+      name: 'user_radius_km',
+      value: settings.radiusKm.toString(),
+    );
+
+    // 2 favorite fuels
+    await analytics.setUserProperty(
+      name: 'user_fuel_types',
+      value: settings.selectedFuels.map((f) => f.name).join(","),
+    );
+
+    // 3 preferred order
+    await analytics.setUserProperty(
+      name: 'user_sort_preference',
+      value: settings.sort.toString(),
+    );
   }
 
   void _openSettings() async {
+    FirebaseAnalytics.instance.logScreenView(
+      screenName: 'Impostazioni',
+      screenClass: 'SettingsPage',
+    );
+
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const SettingsPage()),
@@ -89,16 +145,24 @@ class _HomePageState extends State<HomePage> {
         left: !isLandscape,
         bottom: true,
         top: true,
-
-        child: IndexedStack(
-          index: _currentIndex,
+        child: Column(
           children: [
-            StationsMap(),
-            StationsList(),
-            ChangeNotifierProvider(
-              create: (_) => MapProvider(),
-              child: const PlanRoutePage(),
+            Expanded(
+              child: IndexedStack(
+                index: _currentIndex,
+                children: [
+                  StationsMap(),
+                  StationsList(),
+                  ChangeNotifierProvider(
+                    create: (_) => MapProvider(),
+                    child: const PlanRoutePage(),
+                  ),
+                ],
+              ),
             ),
+
+            if (_shouldShowBanner) 
+              const Center(child: AdBannerWidget()),
           ],
         ),
       ),
@@ -189,7 +253,7 @@ class _HomePageState extends State<HomePage> {
               : l.favorites_showonlyfavorites,
           onPressed: () => favoritesProvider.toggleFilter(),
         ),
-        StationsSortWidget(showNearestOption: !isFilterActive,),
+        StationsSortWidget(showNearestOption: !isFilterActive),
       ],
       IconButton(icon: const Icon(Icons.settings), onPressed: _openSettings),
     ];

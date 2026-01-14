@@ -24,6 +24,7 @@ dependencies:
   firebase_remote_config:
   path_provider:
   firebase_analytics:
+  google_mobile_ads:
 
 dev_dependencies:
   flutter_test:
