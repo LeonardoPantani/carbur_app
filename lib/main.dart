@@ -21,6 +21,13 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await MobileAds.instance.updateRequestConfiguration(
+    RequestConfiguration(
+      testDeviceIds: [
+        "50221F18632DC2281DF1971473E89DC5",
+      ], 
+    ),
+  );
   MobileAds.instance.initialize();
   runApp(
     MultiProvider(
