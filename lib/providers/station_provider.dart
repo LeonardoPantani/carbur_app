@@ -18,6 +18,7 @@ class StationProvider extends ChangeNotifier {
 
   int _filterRadiusKm = 10;
   List<FuelType> _filterFuels = [];
+  List<String> _filterBrands = [];
   StationSort _currentSort = StationSort.best;
   List<Station> _allStations = [];
 
@@ -32,6 +33,7 @@ class StationProvider extends ChangeNotifier {
     required double lng,
     required int radiusKm,
     required List<FuelType> fuels,
+    required List<String> brands,
     required StationSort sort,
   }) async {
     // checking if we need to reload
@@ -45,6 +47,7 @@ class StationProvider extends ChangeNotifier {
 
     _filterRadiusKm = radiusKm;
     _filterFuels = List.from(fuels);
+    _filterBrands = List.from(brands);
     _currentSort = sort;
 
     if (needsNetworkFetch) {
@@ -60,16 +63,13 @@ class StationProvider extends ChangeNotifier {
   }
 
   List<Station> get listStations {
-    return _filterByFuel(
-      stations,
-    ).where((s) => s.distanceKm <= _filterRadiusKm).toList();
+    return stations.where((s) => s.distanceKm <= _filterRadiusKm).toList();
   }
 
   List<Station> get mapStations {
     const mapRadiusKm = 10.0;
-    return _filterByFuel(
-      _allStations,
-    ).where((s) => s.distanceKm <= mapRadiusKm).toList();
+    final filtered = _applyCoreFilters(_allStations);
+    return filtered.where((s) => s.distanceKm <= mapRadiusKm).toList();
   }
 
   void setSorting(StationSort sort) {
@@ -92,7 +92,7 @@ class StationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      logger.i("Inizio download dati dal Repository...");
+      logger.i("Inizio download dati dal repository...");
       _allStations = await _repository.obtainStations(
         lat: _lastFetchLat!,
         lng: _lastFetchLng!,
@@ -113,14 +113,10 @@ class StationProvider extends ChangeNotifier {
   }
 
   void _applyLocalFilters() {
-    if (_filterFuels.isEmpty) {
-      stations = List.from(_allStations);
-    } else {
-      stations = _allStations.where((s) {
-        return s.prices.keys.any((k) => _filterFuels.contains(k));
-      }).toList();
-    }
+    // 1. Apply Core Filters (Brand + Fuel)
+    stations = _applyCoreFilters(_allStations);
 
+    // 2. Apply Sorting
     _performSort(stations, _filterFuels, _currentSort);
 
     notifyListeners();
@@ -155,12 +151,29 @@ class StationProvider extends ChangeNotifier {
     });
   }
 
-  List<Station> _filterByFuel(List<Station> input) {
-    if (_filterFuels.isEmpty) return List.from(input);
+  List<Station> _applyCoreFilters(List<Station> input) {
+    var tempStations = List<Station>.from(input);
 
-    return input.where((s) {
-      return s.prices.keys.any((k) => _filterFuels.contains(k));
-    }).toList();
+    // 1. Filter by Fuel
+    if (_filterFuels.isNotEmpty) {
+      tempStations = tempStations.where((s) {
+        return s.prices.keys.any((k) => _filterFuels.contains(k));
+      }).toList();
+    }
+
+    // 2. Filter by Brand
+    if (_filterBrands.isNotEmpty) {
+      final allowed = _filterBrands
+          .map((e) => e.toLowerCase().replaceAll(' ', ''))
+          .toSet();
+      
+      tempStations = tempStations.where((s) {
+        final sBrand = s.brand.toLowerCase().replaceAll(' ', '');
+        return allowed.contains(sBrand);
+      }).toList();
+    }
+
+    return tempStations;
   }
 
   void _applyBestSorting(List<Station> targetList, List<FuelType> fuels) {

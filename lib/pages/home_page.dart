@@ -83,6 +83,7 @@ class _HomePageState extends State<HomePage> {
         lng: loc.longitude!,
         radiusKm: settings.radiusKm,
         fuels: settings.selectedFuels,
+        brands: settings.selectedBrands,
         sort: settings.sort,
       );
     }

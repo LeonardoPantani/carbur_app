@@ -13,29 +13,32 @@ class BrandService {
       'https://carburanti.mise.gov.it/ospzApi/registry/alllogos';
   static const String _prefsKeyBrandsMap = 'brand_logo_map_v1';
   static const String _prefsKeyLastUpdate = 'brand_logo_last_update';
+  static const String _prefsKeyAvailableBrands = 'available_brands_list';
 
   Map<String, String> _brandLogoMap = {};
+  List<String> _availableBrands = [];
+
+  List<String> get availableBrands => _availableBrands;
 
   Future<bool> initialize() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // loading existing map
     final savedMapString = prefs.getString(_prefsKeyBrandsMap);
     if (savedMapString != null) {
       try {
         _brandLogoMap = Map<String, String>.from(jsonDecode(savedMapString));
       } catch (e) {
-        logger.e('Errore decodifica mappa brand: $e');
+        logger.e(e);
       }
     }
 
-    // checking if we need to update map (14 days cache)
+    _availableBrands = prefs.getStringList(_prefsKeyAvailableBrands) ?? [];
+
     final lastUpdateMillis = prefs.getInt(_prefsKeyLastUpdate) ?? 0;
     final lastUpdate = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
     final daysDiff = DateTime.now().difference(lastUpdate).inDays;
 
-    if (daysDiff >= 14 || _brandLogoMap.isEmpty) {
-      logger.i('Aggiornamento loghi necessario.');
+    if (daysDiff >= 14 || _brandLogoMap.isEmpty || _availableBrands.isEmpty) {
       return await _fetchAndSaveLogos(prefs);
     }
     return true;
@@ -51,7 +54,6 @@ class BrandService {
         final data = jsonDecode(response.body);
         final List<dynamic> loghi = data['loghi'];
 
-        // SupportDirectory is not visible for the user but is persistent
         final appDir = await getApplicationSupportDirectory();
         final brandsDir = Directory('${appDir.path}/brands_cache');
         if (!await brandsDir.exists()) {
@@ -59,12 +61,16 @@ class BrandService {
         }
 
         final Map<String, String> newMap = {};
+        final Set<String> brandNames = {};
 
         for (var item in loghi) {
-          final String brandName = item['bandiera'];
-          final List<dynamic> markers = item['logoMarkerList'] ?? [];
+          final String rawName = item['bandiera'];
 
-          // looking for 'logo'
+          // apply normalization here
+          final String brandName = _normalizeBrandName(rawName);
+          brandNames.add(brandName);
+
+          final List<dynamic> markers = item['logoMarkerList'] ?? [];
           var logoObj = markers.firstWhere(
             (m) => m['tipoFile'] == 'logo',
             orElse: () => null,
@@ -73,8 +79,6 @@ class BrandService {
           if (logoObj != null && logoObj['content'] != null) {
             final String base64Image = logoObj['content'];
             final String extension = logoObj['estensione'] ?? 'png';
-
-            // cleaning file name
             final safeFileName = brandName.replaceAll(
               RegExp(r'[^a-zA-Z0-9]'),
               '_',
@@ -89,23 +93,63 @@ class BrandService {
 
         if (newMap.isNotEmpty) {
           _brandLogoMap = newMap;
+          // sort alphabetically
+          _availableBrands = brandNames.toList()..sort();
+
           await prefs.setString(_prefsKeyBrandsMap, jsonEncode(_brandLogoMap));
+          await prefs.setStringList(_prefsKeyAvailableBrands, _availableBrands);
           await prefs.setInt(
             _prefsKeyLastUpdate,
             DateTime.now().millisecondsSinceEpoch,
           );
-          logger.i('Loghi salvati: ${newMap.length} brand mappati.');
         }
         return true;
       }
       return false;
     } catch (e) {
-      logger.e('Errore fetch loghi: $e');
+      logger.e(e);
       return false;
     }
   }
 
+  String _normalizeBrandName(String rawValue) {
+    // 1. override mapping
+    // on the left: json key "bandiera" that comes from the logos API
+    // on the right: json key "brand" that arrives from the stations API
+    const Map<String, String> manualOverrides = {
+      // 'Agip Eni': 'Eni',
+    };
+
+    if (manualOverrides.containsKey(rawValue)) {
+      return manualOverrides[rawValue]!;
+    }
+
+    // 2. standard formatting
+    if (rawValue.trim().isEmpty) return rawValue;
+    return rawValue
+        .trim()
+        .split(' ')
+        .map((word) {
+          if (word.isEmpty) return '';
+          if (word.length == 1) return word.toUpperCase();
+          return word[0].toUpperCase() + word.substring(1).toLowerCase();
+        })
+        .join(' ');
+  }
+
   String? getLogoPathForBrand(String brandName) {
-    return _brandLogoMap[brandName];
+    if (_brandLogoMap.containsKey(brandName)) {
+      return _brandLogoMap[brandName];
+    }
+
+    final searchKey = brandName.toLowerCase().replaceAll(' ', '');
+
+    for (final key in _brandLogoMap.keys) {
+      if (key.toLowerCase().replaceAll(' ', '') == searchKey) {
+        return _brandLogoMap[key];
+      }
+    }
+
+    return null;
   }
 }

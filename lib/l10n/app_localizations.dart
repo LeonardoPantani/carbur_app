@@ -827,6 +827,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Every feedback is appreciated.'**
   String get settings_contact_us_subtitle;
+
+  /// Setting name that allows the user to filter the brands.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourite Brands'**
+  String get settings_filter_brands;
+
+  /// Setting value shown under setting name based on how many brands have been selected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 brand selected} other{{count} brands selected}}'**
+  String settings_brands_selected(int count);
+
+  /// If no brand is selected, than there is no filter.
+  ///
+  /// In en, this message translates to:
+  /// **'All brands'**
+  String get settings_brands_all_selected;
+
+  /// Dialog title for when choosing brands.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Brands'**
+  String get settings_select_brands_dialog_title;
+
+  /// Placeholder text for a dialog search bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Search brand...'**
+  String get search_brands_placeholder;
+
+  /// Description for a setting that is not available.
+  ///
+  /// In en, this message translates to:
+  /// **'Option currently unavailable'**
+  String get settings_setting_unavailable;
 }
 
 class _AppLocalizationsDelegate

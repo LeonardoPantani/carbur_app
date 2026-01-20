@@ -16,9 +16,6 @@ class _AdCappingManager {
 
     if ((DateTime.now().difference(_lastAdShownTime!)).inMinutes <
         RemoteConfigService.instance.interstitialMinInterval) {
-      logger.i(
-        'Ad interstitial non mostrato perché non è passato abbastanza tempo.',
-      );
       return false;
     }
 

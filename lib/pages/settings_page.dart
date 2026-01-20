@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/fuel_type.dart';
 import '../providers/settings_provider.dart';
 import '../l10n/app_localizations.dart';
+import '../services/brand_service.dart';
 import '../utils/hyperlink_utils.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -42,6 +43,23 @@ class SettingsPage extends StatelessWidget {
                     leading: const Icon(Icons.local_gas_station),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => _openFuelSelectionDialog(context, settings),
+                  ),
+
+                  ListTile(
+                    title: Text(l.settings_filter_brands),
+                    subtitle: Text(
+                      BrandService.instance.availableBrands.isEmpty
+                          ? l.settings_setting_unavailable
+                          : settings.selectedBrands.isEmpty
+                          ? l.settings_brands_all_selected
+                          : l.settings_brands_selected(
+                              settings.selectedBrands.length,
+                            ),
+                    ),
+                    enabled: BrandService.instance.availableBrands.isNotEmpty,
+                    leading: const Icon(Icons.store),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: BrandService.instance.availableBrands.isNotEmpty ? () => _openBrandSelectionDialog(context, settings) : null,
                   ),
 
                   ListTile(
@@ -172,6 +190,121 @@ class SettingsPage extends StatelessWidget {
                           Navigator.pop(context);
                         },
                   child: Text(l.button_ok),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _openBrandSelectionDialog(
+    BuildContext context,
+    SettingsProvider settings,
+  ) {
+    final l = AppLocalizations.of(context)!;
+    final allBrands = BrandService.instance.availableBrands;
+    final initialSelectedSet = settings.selectedBrands.toSet();
+
+    // sorted list
+    final sortedAllBrands = List<String>.from(allBrands)
+      ..sort((a, b) {
+        final aSelected = initialSelectedSet.contains(a);
+        final bSelected = initialSelectedSet.contains(b);
+
+        // prioritize the selected element
+        if (aSelected && !bSelected) return -1;
+        if (!aSelected && bSelected) return 1;
+
+        // otherwise sort alphabetically
+        return a.toLowerCase().compareTo(b.toLowerCase());
+      });
+
+    List<String> tempSelected = List.from(settings.selectedBrands);
+    List<String> filteredBrands = List.from(sortedAllBrands);
+    final searchController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            void onSearchChanged(String query) {
+              setStateDialog(() {
+                if (query.isEmpty) {
+                  filteredBrands = List.from(allBrands);
+                } else {
+                  filteredBrands = allBrands
+                      .where(
+                        (b) => b.toLowerCase().contains(query.toLowerCase()),
+                      )
+                      .toList();
+                }
+              });
+            }
+
+            return AlertDialog(
+              title: Text(l.settings_select_brands_dialog_title),
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 400,
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        hintText: l.search_brands_placeholder,
+                        prefixIcon: const Icon(Icons.search),
+                        border: const OutlineInputBorder(),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                        ),
+                      ),
+                      onChanged: onSearchChanged,
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: filteredBrands.length,
+                        itemBuilder: (context, index) {
+                          final brand = filteredBrands[index];
+                          final isSelected = tempSelected.contains(brand);
+
+                          return CheckboxListTile(
+                            title: Text(
+                              brand,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            value: isSelected,
+                            onChanged: (bool? checked) {
+                              setStateDialog(() {
+                                if (checked == true) {
+                                  tempSelected.add(brand);
+                                } else {
+                                  tempSelected.remove(brand);
+                                }
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: Text(l.button_cancel),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                TextButton(
+                  child: Text(l.button_ok),
+                  onPressed: () {
+                    settings.setSelectedBrands(tempSelected);
+                    Navigator.pop(context);
+                  },
                 ),
               ],
             );

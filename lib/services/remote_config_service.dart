@@ -55,7 +55,7 @@ class RemoteConfigService {
         _kIosInterstitialId: 'ca-app-pub-3940256099942544/4411468910',
       });
       await _remoteConfig.fetchAndActivate();
-      logger.i('Remote Config fetched successfully');
+      logger.i('Remote Config recuperato.');
     } catch (e) {
       logger.i('Errore nel fetch di Remote Config: $e');
     }

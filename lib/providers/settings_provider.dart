@@ -3,10 +3,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/fuel_type.dart';
 import '../models/station.dart';
+import '../services/brand_service.dart';
 
 class SettingsProvider extends ChangeNotifier {
   final List<FuelType> availableFuels = FuelType.values;
   List<FuelType> selectedFuels = [FuelType.petrol];
+  List<String> selectedBrands = [];
   int radiusKm = 3;
   FuelType preferredMarkerFuel = FuelType.petrol;
   StationSort sort = StationSort.best;
@@ -51,6 +53,13 @@ class SettingsProvider extends ChangeNotifier {
       selectedFuels = [FuelType.petrol];
     }
 
+    // loading [selected brands] preference
+    selectedBrands = prefs.getStringList('selectedBrands') ?? [];
+    final allBrands = BrandService.instance.availableBrands;
+    if (allBrands.isNotEmpty) {
+      selectedBrands.removeWhere((b) => !allBrands.contains(b));
+    }
+
     // loading [preferred marker fuel] preference
     final preferredCode = prefs.getInt('preferredMarkerFuel');
     if (preferredCode != null) {
@@ -82,6 +91,11 @@ class SettingsProvider extends ChangeNotifier {
       'selectedFuels',
       codes.map((e) => e.toString()).toList(),
     );
+  }
+
+  Future<void> _saveSelectedBrands() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('selectedBrands', selectedBrands);
   }
 
   Future<void> _saveRadius() async {
@@ -125,6 +139,12 @@ class SettingsProvider extends ChangeNotifier {
     selectedFuels = List.from(newFuels);
     _saveSelectedFuels();
     _ensureValidPreferredFuel();
+    notifyListeners();
+  }
+
+  void setSelectedBrands(List<String> newBrands) {
+    selectedBrands = List.from(newBrands);
+    _saveSelectedBrands();
     notifyListeners();
   }
 

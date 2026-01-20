@@ -513,5 +513,34 @@
     "settings_contact_us_subtitle": "Chaque retour est apprécié.",
     "@settings_contact_us_subtitle": {
         "description": "Subtitle for the contact us button in settings"
+    },
+    "settings_filter_brands": "Marques favorites",
+    "@settings_filter_brands": {
+        "description": "Setting name that allows the user to filter the brands."
+    },
+    "settings_brands_selected": "{count, plural, one{1 marque sélectionnée} other{{count} marques sélectionnées}}",
+    "@settings_brands_selected": {
+        "description": "Setting value shown under setting name based on how many brands have been selected.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "settings_brands_all_selected": "Toutes les marques",
+    "@settings_brands_all_selected": {
+        "description": "If no brand is selected, than there is no filter."
+    },
+    "settings_select_brands_dialog_title": "Sélectionner des marques",
+    "@settings_select_brands_dialog_title": {
+        "description": "Dialog title for when choosing brands."
+    },
+    "search_brands_placeholder": "Rechercher une marque...",
+    "@search_brands_placeholder": {
+        "description": "Placeholder text for a dialog search bar."
+    },
+    "settings_setting_unavailable": "Option indisponible",
+    "@settings_setting_unavailable": {
+        "description": "Description for a setting that is not available."
     }
 }

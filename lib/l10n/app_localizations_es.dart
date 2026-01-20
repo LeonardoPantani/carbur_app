@@ -414,4 +414,30 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_contact_us_subtitle => 'Se agradece cada comentario.';
+
+  @override
+  String get settings_filter_brands => 'Marcas favoritas';
+
+  @override
+  String settings_brands_selected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count marcas seleccionadas',
+      one: '1 marca seleccionada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_brands_all_selected => 'Todas las marcas';
+
+  @override
+  String get settings_select_brands_dialog_title => 'Seleccionar marcas';
+
+  @override
+  String get search_brands_placeholder => 'Buscar marca...';
+
+  @override
+  String get settings_setting_unavailable => 'Opción no disponible';
 }

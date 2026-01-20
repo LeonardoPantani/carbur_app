@@ -60,6 +60,7 @@ class _StationsMapState extends State<StationsMap> {
                 lng: pos.longitude!,
                 radiusKm: settings.radiusKm,
                 fuels: settings.selectedFuels,
+                brands: settings.selectedBrands,
                 sort: settings.sort,
             );
           }
