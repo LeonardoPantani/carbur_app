@@ -401,4 +401,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get welcome_description =>
       'To begin, select the types of fuel you are interested in.';
+
+  @override
+  String get settings_contact_us => 'Contact us';
+
+  @override
+  String get settings_contact_us_subtitle => 'Every feedback is appreciated.';
 }

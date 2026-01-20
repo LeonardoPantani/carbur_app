@@ -29,11 +29,12 @@ class _HomePageState extends State<HomePage> {
   bool get _showSortMenu => _currentIndex == 1;
 
   bool get _shouldShowBanner {
-   if (!RemoteConfigService.instance.showBottomAd) return false;
+    if (!RemoteConfigService.instance.showBottomAd) return false;
 
-   final allowedString = RemoteConfigService.instance.bottomBannerAdTabs; // "1,2"
-   return allowedString.contains(_currentIndex.toString());
-}
+    final allowedString =
+        RemoteConfigService.instance.bottomBannerAdTabs; // "1,2"
+    return allowedString.contains(_currentIndex.toString());
+  }
 
   void _onNavSelected(int index) {
     setState(() => _currentIndex = index);
@@ -161,8 +162,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            if (_shouldShowBanner) 
-              const Center(child: AdBannerWidget()),
+            if (_shouldShowBanner) const Center(child: AdBannerWidget()),
           ],
         ),
       ),

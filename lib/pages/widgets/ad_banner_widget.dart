@@ -1,6 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import '../../services/remote_config_service.dart';
+import '../../utils/logger.dart';
 
 class AdBannerWidget extends StatefulWidget {
   const AdBannerWidget({super.key});
@@ -13,9 +15,7 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
   BannerAd? _bannerAd;
   bool _isLoaded = false;
 
-  final String _adUnitId = Platform.isAndroid
-      ? 'ca-app-pub-3602256028153056/7083786581'
-      : 'ca-app-pub-3602256028153056/8409326606';
+  final String _adUnitId = RemoteConfigService.instance.bannerAdUnitId;
 
   @override
   void initState() {
@@ -32,7 +32,8 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
         onAdLoaded: (ad) {
           setState(() => _isLoaded = true);
         },
-        onAdFailedToLoad: (ad, err) {
+        onAdFailedToLoad: (Ad ad, LoadAdError err) {
+          logger.i('Banner failed to load: ${err.message} (error code ${err.code})');
           ad.dispose();
         },
       ),

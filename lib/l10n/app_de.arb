@@ -505,5 +505,13 @@
     "welcome_description": "Wählen Sie zu Beginn die Kraftstoffarten aus, an denen Sie interessiert sind.",
     "@welcome_description": {
         "description": "Description of dialog that appears when user opens the app for the first time."
+    },
+    "settings_contact_us": "Kontaktieren Sie uns",
+    "@settings_contact_us": {
+        "description": "Label for the contact us button in settings"
+    },
+    "settings_contact_us_subtitle": "Jedes Feedback wird geschätzt.",
+    "@settings_contact_us_subtitle": {
+        "description": "Subtitle for the contact us button in settings"
     }
 }

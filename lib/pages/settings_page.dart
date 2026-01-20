@@ -83,6 +83,19 @@ class SettingsPage extends StatelessWidget {
                       );
                     },
                   ),
+
+                  ListTile(
+                    title: Text(l.settings_contact_us),
+                    subtitle: Text(l.settings_contact_us_subtitle),
+                    leading: const Icon(Icons.mail_outline),
+                    trailing: const Icon(Icons.open_in_new),
+                    onTap: () {
+                      openEmail(
+                        'leopantaa+feedbacks@protonmail.com',
+                        subject: 'USER FEEDBACK',
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

@@ -815,6 +815,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To begin, select the types of fuel you are interested in.'**
   String get welcome_description;
+
+  /// Label for the contact us button in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Contact us'**
+  String get settings_contact_us;
+
+  /// Subtitle for the contact us button in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Every feedback is appreciated.'**
+  String get settings_contact_us_subtitle;
 }
 
 class _AppLocalizationsDelegate

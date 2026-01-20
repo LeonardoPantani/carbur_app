@@ -404,4 +404,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get welcome_description =>
       'Wählen Sie zu Beginn die Kraftstoffarten aus, an denen Sie interessiert sind.';
+
+  @override
+  String get settings_contact_us => 'Kontaktieren Sie uns';
+
+  @override
+  String get settings_contact_us_subtitle => 'Jedes Feedback wird geschätzt.';
 }

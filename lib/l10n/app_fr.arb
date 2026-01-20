@@ -505,5 +505,13 @@
     "welcome_description": "Pour commencer, sélectionnez les types de carburant qui vous intéressent.",
     "@welcome_description": {
         "description": "Description of dialog that appears when user opens the app for the first time."
+    },
+    "settings_contact_us": "Contactez-nous",
+    "@settings_contact_us": {
+        "description": "Label for the contact us button in settings"
+    },
+    "settings_contact_us_subtitle": "Chaque retour est apprécié.",
+    "@settings_contact_us_subtitle": {
+        "description": "Subtitle for the contact us button in settings"
     }
 }

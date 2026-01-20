@@ -7,10 +7,15 @@ Future<void> openPhone(String phone) async {
   }
 }
 
-Future<void> openEmail(String email) async {
-  final uri = Uri.parse('mailto:$email');
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+Future<void> openEmail(String email, {String? subject}) async {
+  final Uri emailLaunchUri = Uri(
+    scheme: 'mailto',
+    path: email,
+    query: subject != null ? 'subject=${Uri.encodeComponent(subject)}' : null,
+  );
+
+  if (await canLaunchUrl(emailLaunchUri)) {
+    await launchUrl(emailLaunchUri);
   }
 }
 

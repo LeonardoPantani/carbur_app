@@ -406,4 +406,10 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get welcome_description =>
       'Aby rozpocząć, wybierz rodzaje paliw, które Cię interesują.';
+
+  @override
+  String get settings_contact_us => 'Skontaktuj się z nami';
+
+  @override
+  String get settings_contact_us_subtitle => 'Każda opinia jest mile widziana.';
 }

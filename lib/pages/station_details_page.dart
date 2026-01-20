@@ -1,10 +1,9 @@
 import 'package:carbur_app/extensions/number_extensions.dart';
 import 'package:carbur_app/extensions/prices_estensions.dart';
 import 'package:carbur_app/models/fuel_type.dart';
-import 'package:carbur_app/pages/widgets/interstitial_ad_wrapper.dart';
+import 'package:carbur_app/pages/widgets/ad_interstitial_wrapper.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 import '../extensions/station_facilities_extension.dart';
@@ -24,14 +23,6 @@ class StationDetailsPage extends StatefulWidget {
 }
 
 class _StationDetailsPageState extends State<StationDetailsPage> {
-  InterstitialAd? _interstitialAd;
-
-  @override
-  void dispose() {
-    _interstitialAd?.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final stationsProvider = context.watch<StationDetailsProvider>();
@@ -423,14 +414,6 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          icon: const Icon(Icons.arrow_back),
-                          label: Text(l.back),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.map),

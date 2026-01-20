@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../services/brand_service.dart';
+import '../../utils/logger.dart';
 
 class MarkerGenerator {
   static final Map<String, ui.Image> _brandImageCache = {};
@@ -92,7 +93,7 @@ class MarkerGenerator {
         // saving in cache
         _brandImageCache[brandName] = logoImage;
       } catch (e) {
-        debugPrint("Errore caricamento logo per $brandName: $e");
+        logger.i("Errore caricamento logo per $brandName: $e");
       }
     }
 
