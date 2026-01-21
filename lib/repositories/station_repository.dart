@@ -21,12 +21,16 @@ class StationRepository {
     required double lng,
     required int radiusKm,
   }) async {
-    final stations = await _fuelService.fetchStations(
+    List<Station> stations = await _fuelService.fetchStations(
       lat: lat,
       lng: lng,
       radiusKm: radiusKm,
     );
 
+    // removing stations where lastUpdate is more than 1 month old
+    stations = stations.where((s) => s.lastUpdate.isAfter(DateTime.now().subtract(const Duration(days: 30)))).toList();
+
+    // immediately return [] if empty
     if (stations.isEmpty) return [];
 
     // calculating accurate distances

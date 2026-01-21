@@ -255,8 +255,8 @@ abstract class AppLocalizations {
   /// Last update date and time for a fuel station.
   ///
   /// In en, this message translates to:
-  /// **'Updated on {date} at {time}'**
-  String last_update(Object date, Object time);
+  /// **'Prices updated on {date}'**
+  String last_update(Object date);
 
   /// String visible in the bottom bar selection menu.
   ///

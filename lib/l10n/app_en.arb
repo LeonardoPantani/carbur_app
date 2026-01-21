@@ -113,15 +113,12 @@
             }
         }
     },
-    "last_update": "Updated on {date} at {time}",
+    "last_update": "Prices updated on {date}",
     "@last_update": {
         "description": "Last update date and time for a fuel station.",
         "placeholders": {
             "date": {
                 "description": "Formatted date, e.g. August 14"
-            },
-            "time": {
-                "description": "Formatted time, e.g. 14:30"
             }
         }
     },

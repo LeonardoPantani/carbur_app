@@ -55,10 +55,7 @@ class StationTile extends StatelessWidget {
             l.last_update(
               DateFormat.MMMMd(
                 Localizations.localeOf(context).toString(),
-              ).format(station.lastUpdate),
-              DateFormat.Hm(
-                Localizations.localeOf(context).toString(),
-              ).format(station.lastUpdate),
+              ).format(station.lastUpdate)
             ),
             style: Theme.of(context).textTheme.bodySmall,
           ),

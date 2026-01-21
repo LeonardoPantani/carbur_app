@@ -99,8 +99,8 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String last_update(Object date, Object time) {
-    return 'Mis à jour le $date à $time';
+  String last_update(Object date) {
+    return 'Prix mis à jour le $date';
   }
 
   @override
