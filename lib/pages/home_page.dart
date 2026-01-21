@@ -25,6 +25,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 1;
+  bool _hasLoadedInitialData = false;
 
   bool get _showSortMenu => _currentIndex == 1;
 
@@ -69,6 +70,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _initData() async {
+    context.read<LocationProvider>();
+    final settings = context.read<SettingsProvider>();
+    context.read<StationProvider>();
+
+    if (!settings.isInitialized) {
+      settings.addListener(() {
+        if (settings.isInitialized && !_hasLoadedInitialData) {
+          _loadStationsData();
+        }
+      });
+
+      return;
+    }
+
+    await _loadStationsData();
+  }
+
+  Future<void> _loadStationsData() async {
+    if (_hasLoadedInitialData) return;
+    _hasLoadedInitialData = true;
+
     final loc = context.read<LocationProvider>();
     final settings = context.read<SettingsProvider>();
     final stations = context.read<StationProvider>();
@@ -78,7 +100,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (loc.latitude != null && loc.longitude != null && mounted) {
-      stations.loadStations(
+      await stations.loadStations(
         lat: loc.latitude!,
         lng: loc.longitude!,
         radiusKm: settings.radiusKm,
@@ -120,14 +142,22 @@ class _HomePageState extends State<HomePage> {
       context,
       MaterialPageRoute(builder: (_) => const SettingsPage()),
     );
+
     if (mounted) {
+      // Reset flag per permettere il reload se necessario
+      _hasLoadedInitialData = false;
       _initData();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // check orientation
+    final settings = context.watch<SettingsProvider>();
+
+    if (!settings.isInitialized) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 

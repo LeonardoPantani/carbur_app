@@ -16,8 +16,17 @@ class SettingsProvider extends ChangeNotifier {
   bool _isFirstRun = true;
   bool get isFirstRun => _isFirstRun;
 
+  bool _isInitialized = false;
+  bool get isInitialized => _isInitialized;
+
   SettingsProvider() {
-    _loadSettings();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _loadSettings();
+    _isInitialized = true;
+    notifyListeners();
   }
 
   Future<void> completeTutorial() async {
@@ -39,7 +48,7 @@ class SettingsProvider extends ChangeNotifier {
 
     _isFirstRun = prefs.getBool('is_first_run') ?? true;
 
-    // loading [selected fuel] preference
+    // loading fuel types
     final stored = prefs.getStringList('selectedFuels');
     if (stored != null) {
       selectedFuels = stored.map((value) {
@@ -53,14 +62,19 @@ class SettingsProvider extends ChangeNotifier {
       selectedFuels = [FuelType.petrol];
     }
 
-    // loading [selected brands] preference
-    selectedBrands = prefs.getStringList('selectedBrands') ?? [];
+    // loading brands
+    final storedBrands = prefs.getStringList('selectedBrands') ?? [];
     final allBrands = BrandService.instance.availableBrands;
+    
     if (allBrands.isNotEmpty) {
-      selectedBrands.removeWhere((b) => !allBrands.contains(b));
+      selectedBrands = storedBrands
+          .where((b) => allBrands.contains(b))
+          .toList();
+    } else {
+      selectedBrands = [];
     }
 
-    // loading [preferred marker fuel] preference
+    // loading preferred fuel
     final preferredCode = prefs.getInt('preferredMarkerFuel');
     if (preferredCode != null) {
       try {
@@ -73,15 +87,14 @@ class SettingsProvider extends ChangeNotifier {
     }
     _ensureValidPreferredFuel();
 
-    // loading [radius] preference
+    // loading radius
     radiusKm = prefs.getInt('radiusKm') ?? radiusKm;
 
-    // loading [sorting] preference (editable in the fuel stations page only)
+    // loading sorting
     final sortIndex = prefs.getInt('stationSort');
-    if (sortIndex != null) {
+    if (sortIndex != null && sortIndex < StationSort.values.length) {
       sort = StationSort.values[sortIndex];
     }
-    notifyListeners();
   }
 
   Future<void> _saveSelectedFuels() async {
@@ -113,7 +126,7 @@ class SettingsProvider extends ChangeNotifier {
     await prefs.setInt('preferredMarkerFuel', preferredMarkerFuel.ministerCode);
   }
 
-  // ---- public methods
+  // public methods
   void toggleFuel(FuelType fuel) {
     final isSelected = selectedFuels.contains(fuel);
 
@@ -143,6 +156,13 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   void setSelectedBrands(List<String> newBrands) {
+    final oldSet = selectedBrands.toSet();
+    final newSet = newBrands.toSet();
+
+    if (oldSet.length == newSet.length && oldSet.containsAll(newSet)) {
+      return;
+    }
+
     selectedBrands = List.from(newBrands);
     _saveSelectedBrands();
     notifyListeners();
