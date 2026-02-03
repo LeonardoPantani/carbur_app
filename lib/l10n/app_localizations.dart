@@ -863,6 +863,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Option currently unavailable'**
   String get settings_setting_unavailable;
+
+  /// Title for setting fuel consumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Average car consumption'**
+  String get settings_fuel_consumption_title;
+
+  /// Description for setting fuel consumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your vehicle\'s fuel consumption'**
+  String get settings_fuel_consumption_subtitle;
+
+  /// Description for unit km/L regarding car efficiency.
+  ///
+  /// In en, this message translates to:
+  /// **'km/L'**
+  String get unit_km_per_liter;
+
+  /// Description for unit L/100km regarding car efficiency.
+  ///
+  /// In en, this message translates to:
+  /// **'L/100km'**
+  String get unit_liters_per_100km;
 }
 
 class _AppLocalizationsDelegate

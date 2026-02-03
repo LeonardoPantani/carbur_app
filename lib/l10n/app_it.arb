@@ -539,5 +539,21 @@
     "settings_setting_unavailable": "Impostazione non disponibile",
     "@settings_setting_unavailable": {
         "description": "Description for a setting that is not available."
+    },
+    "settings_fuel_consumption_title": "Consumo medio veicolo",
+    "@settings_fuel_consumption_title": {
+        "description": "Title for setting fuel consumption."
+    },
+    "settings_fuel_consumption_subtitle": "Inserisci consumo del tuo veicolo",
+    "@settings_fuel_consumption_subtitle": {
+        "description": "Description for setting fuel consumption."
+    },
+    "unit_km_per_liter": "km/L",
+    "@unit_km_per_liter": {
+        "description": "Description for unit km/L regarding car efficiency."
+    },
+    "unit_liters_per_100km": "L/100km",
+    "@unit_liters_per_100km": {
+        "description": "Description for unit L/100km regarding car efficiency."
     }
 }

@@ -438,4 +438,17 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get settings_setting_unavailable => 'Opcja niedostępna';
+
+  @override
+  String get settings_fuel_consumption_title => 'Średnie spalanie';
+
+  @override
+  String get settings_fuel_consumption_subtitle =>
+      'Wprowadź zużycie paliwa swojego pojazdu';
+
+  @override
+  String get unit_km_per_liter => 'km/L';
+
+  @override
+  String get unit_liters_per_100km => 'L/100km';
 }

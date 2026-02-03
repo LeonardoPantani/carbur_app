@@ -13,6 +13,18 @@ class SettingsProvider extends ChangeNotifier {
   FuelType preferredMarkerFuel = FuelType.petrol;
   StationSort sort = StationSort.best;
 
+  double _fuelConsumptionL100Km = 7.0; 
+  bool _isKmPerLiter = false;
+  double get fuelConsumptionL100km => _fuelConsumptionL100Km;
+  bool get isKmPerLiter => _isKmPerLiter;
+  double get displayConsumption {
+    if (_isKmPerLiter) {
+      if (_fuelConsumptionL100Km == 0) return 0;
+      return 100 / _fuelConsumptionL100Km;
+    }
+    return _fuelConsumptionL100Km;
+  }
+
   bool _isFirstRun = true;
   bool get isFirstRun => _isFirstRun;
 
@@ -95,6 +107,10 @@ class SettingsProvider extends ChangeNotifier {
     if (sortIndex != null && sortIndex < StationSort.values.length) {
       sort = StationSort.values[sortIndex];
     }
+
+    // loading fuel consumption
+    _fuelConsumptionL100Km = prefs.getDouble('fuel_consumption') ?? 7.0;
+    _isKmPerLiter = prefs.getBool('is_km_per_liter') ?? false;
   }
 
   Future<void> _saveSelectedFuels() async {
@@ -124,6 +140,26 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> _savePreferredMarkerFuel() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('preferredMarkerFuel', preferredMarkerFuel.ministerCode);
+  }
+
+  Future<void> saveConsumption(double value) async {
+    if (value <= 0) return;
+    final prefs = await SharedPreferences.getInstance();
+    
+    if (_isKmPerLiter) {
+      _fuelConsumptionL100Km = 100 / value;
+    } else {
+      _fuelConsumptionL100Km = value;
+    }
+    await prefs.setDouble('fuel_consumption', _fuelConsumptionL100Km);
+    notifyListeners();
+  }
+
+  Future<void> toggleUnit(bool isKmPerL) async {
+    _isKmPerLiter = isKmPerL;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_km_per_liter', _isKmPerLiter);
+    notifyListeners();
   }
 
   // public methods

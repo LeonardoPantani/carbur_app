@@ -59,7 +59,9 @@ class SettingsPage extends StatelessWidget {
                     enabled: BrandService.instance.availableBrands.isNotEmpty,
                     leading: const Icon(Icons.store),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: BrandService.instance.availableBrands.isNotEmpty ? () => _openBrandSelectionDialog(context, settings) : null,
+                    onTap: BrandService.instance.availableBrands.isNotEmpty
+                        ? () => _openBrandSelectionDialog(context, settings)
+                        : null,
                   ),
 
                   ListTile(
@@ -68,6 +70,18 @@ class SettingsPage extends StatelessWidget {
                     leading: const Icon(Icons.my_location),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => _openRadiusDialog(context, settings),
+                  ),
+
+                  ListTile(
+                    title: Text(l.settings_fuel_consumption_title),
+                    subtitle: Text(
+                      '${settings.displayConsumption.toStringAsFixed(1)} ${settings.isKmPerLiter ? l.unit_km_per_liter : l.unit_liters_per_100km}',
+                    ),
+                    leading: const Icon(Icons.directions_car),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      _showConsumptionDialog(context);
+                    },
                   ),
 
                   ListTile(
@@ -396,6 +410,97 @@ class SettingsPage extends StatelessWidget {
               child: Text(l.button_ok),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showConsumptionDialog(BuildContext context) async {
+    final settings = context.read<SettingsProvider>();
+    final l10n = AppLocalizations.of(context)!;
+
+    final TextEditingController controller = TextEditingController(
+      text: settings.displayConsumption.toStringAsFixed(1),
+    );
+    bool tempIsKmPerLiter = settings.isKmPerLiter;
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(l10n.settings_fuel_consumption_title),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(l10n.settings_fuel_consumption_subtitle),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      suffixText: tempIsKmPerLiter
+                          ? l10n.unit_km_per_liter
+                          : l10n.unit_liters_per_100km,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Selettore unità
+                  ToggleButtons(
+                    borderRadius: BorderRadius.circular(8),
+                    isSelected: [!tempIsKmPerLiter, tempIsKmPerLiter],
+                    onPressed: (index) {
+                      setDialogState(() {
+                        final double? currentVal = double.tryParse(
+                          controller.text.replaceAll(',', '.'),
+                        );
+                        if (currentVal != null && currentVal > 0) {
+                          final converted = 100 / currentVal;
+                          controller.text = converted.toStringAsFixed(1);
+                        }
+
+                        tempIsKmPerLiter = index == 1;
+                      });
+                    },
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(l10n.unit_liters_per_100km),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(l10n.unit_km_per_liter),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.button_cancel),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final double? val = double.tryParse(
+                      controller.text.replaceAll(',', '.'),
+                    );
+                    if (val != null) {
+                      settings.toggleUnit(tempIsKmPerLiter);
+                      settings.saveConsumption(val);
+                    }
+                    Navigator.pop(context);
+                  },
+                  child: Text(l10n.button_ok),
+                ),
+              ],
+            );
+          },
         );
       },
     );
